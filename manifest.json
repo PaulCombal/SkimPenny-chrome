@@ -18,7 +18,7 @@
 
    "description": "Shows you the price evolution of items",
 
-   "permissions": [ "storage", "*://ldlc.com/*", "*://scroogealpha.esy.es/*" ],
+   "permissions": [ "storage", "activeTab","*://ldlc.com/*", "*://scroogealpha.esy.es/*" ],
 
    "version": "0.0.1",
 

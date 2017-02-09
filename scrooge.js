@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	//First thing to do: detect whe website we're browsing
 
-	if(document.domain.includes("ldlc.com")){
+	if(document.domain.includes("ldlc.com/fiche/")){
 		processLDLC();
 	}
 }); //End of document.ready callback
