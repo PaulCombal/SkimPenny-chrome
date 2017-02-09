@@ -1,0 +1,29 @@
+{
+   "content_scripts": [ 
+      {
+        "js": [ "jquery.min.js", "scrooge.js" ],
+        "matches": [ "*://www.ldlc.com/fiche/*", "*://ldlc.com/fiche/*" ]
+      }],
+   
+   "icons": {
+      "128": "scrooge128.png",
+      "16": "scrooge16.png",
+      "48": "scrooge48.png"
+   },
+   "manifest_version": 2,
+   "name": "Scrooge Tracker",
+   "short_name": "Scrooge",
+   "description": "Shows you the price evolution of items",
+   "permissions": [ "storage", "*://ldlc.com/*" ],
+   "version": "0.0.1",
+   "web_accessible_resources": [ 
+    ],
+   "background":{
+    "scripts" : ["eventPage.js"],
+    "persistent": false
+   },
+    "options_ui": {
+      "page": "settings.html",
+      "chrome_style": true
+   }
+}
