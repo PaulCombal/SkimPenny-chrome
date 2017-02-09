@@ -1,6 +1,6 @@
 {
-   "content_scripts": [ 
-      {
+  "content_scripts": [ 
+    {
         "js": [ "jquery.min.js", "scrooge.js" ],
         "matches": [ "*://www.ldlc.com/fiche/*", "*://ldlc.com/fiche/*" ]
       }],
@@ -11,11 +11,22 @@
       "48": "scrooge48.png"
    },
    "manifest_version": 2,
+
    "name": "Scrooge Tracker",
+
    "short_name": "Scrooge",
+
    "description": "Shows you the price evolution of items",
-   "permissions": [ "storage", "*://ldlc.com/*" ],
+
+   "permissions": [ "storage", "*://ldlc.com/*", "*://scroogealpha.esy.es/*" ],
+
    "version": "0.0.1",
+
+   "browser_action": {
+          "default_title": "Worth buying?",      // optional; shown in tooltip
+          "default_popup": "popup.html"        // optional
+    },
+
    "web_accessible_resources": [ 
     ],
    "background":{
