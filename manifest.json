@@ -18,11 +18,11 @@
 
    "description": "Shows you the price evolution of items",
 
-   "permissions": [ "storage", "activeTab","*://ldlc.com/*", "*://scroogealpha.esy.es/*" ],
+   "permissions": [ "storage", "tabs","*://ldlc.com/*", "*://scroogealpha.esy.es/*" ],
 
    "version": "0.0.1",
 
-   "browser_action": {
+   "page_action": {
           "default_title": "Worth buying?",      // optional; shown in tooltip
           "default_popup": "popup.html"        // optional
     },

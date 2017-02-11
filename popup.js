@@ -10,25 +10,47 @@ $(document).ready(function() {
 }); //End of document.ready callback
 
 function getPriceCurve(storeName, productPage){
-	console.log(storeName);
-	console.log(productPage);
-
 	$.post("http://scroogealpha.esy.es/get.php", 
 		{
 			store : storeName,
 			product : productPage,
 		},
 		showResults,
-		'html')
+		'text')
 	.fail(function(){
 		console.log("Error sending request :(");
 	});
-
 }
 
-function showResults(html){
-	$("#maindiv").replaceWith(html);
-	console.log(html);
+function showResults(text){
+	$("#maindiv").replaceWith(text);
+
+	var pricearray = $('.priceentry .price').map(function(){
+			return $.trim($(this).text());
+			}).get();
+
+	var datearray = $('.priceentry .date').map(function(){
+			return $.trim($(this).text());
+			}).get();
+
+	// Create a simple line chart
+	var data = {
+	  // A labels array that can contain any sort of values
+	  labels: datearray,
+	  // Our series array that contains series objects or in this case series data arrays
+	  series: [
+	    pricearray
+	  ]
+	};
+
+	// As options we currently only set a static size of 300x200 px
+	var options = {
+	  width: '700px',
+	  height: '500px'
+	};
+
+	// In the global name space Chartist we call the Line function to initialize a line chart. As a first parameter we pass in a selector where we would like to get our chart created. Second parameter is the actual data object and as a third parameter we pass in our options
+	new Chartist.Line('#chart', data, options);
 }
 
 function processLDLC(fullurl){
