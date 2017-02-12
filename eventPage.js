@@ -1,4 +1,4 @@
-let matches = ["://www.ldlc.com/fiche/", "://ldlc.com/fiche/" ]
+let matches = ["://www.ldlc.com/fiche/", "://ldlc.com/fiche/", "://shop.hardware.fr/fiche/"]
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     for (let i in matches) {
@@ -7,4 +7,27 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
             break;
         }
     }
-})
+});
+
+chrome.runtime.onMessage.addListener(function(request, sender, callback) {
+    if (request.action == "xhttp") {
+		$.post("http://scroogealpha.esy.es/add.php", 
+			{
+				store : request.storeName,
+				product : request.productPage,
+				price : request.price
+			},
+			logAddRecordResponse,
+			'text')
+		.fail(function(){
+			console.log("Error sending request :(");
+		});
+
+        return true; // prevents the callback from being called too early on return
+    }
+});
+
+function logAddRecordResponse(response){
+	console.log("Scrooge answered:");
+	console.log(response);
+}

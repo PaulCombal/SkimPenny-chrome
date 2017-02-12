@@ -2,7 +2,7 @@
   "content_scripts": [ 
     {
         "js": [ "jquery.min.js", "scrooge.js" ],
-        "matches": [ "*://www.ldlc.com/fiche/*", "*://ldlc.com/fiche/*" ]
+        "matches": [ "*://www.ldlc.com/fiche/*", "*://ldlc.com/fiche/*", "*://shop.hardware.fr/fiche/*" ]
       }],
    
    "icons": {
@@ -30,7 +30,7 @@
    "web_accessible_resources": [ 
     ],
    "background":{
-    "scripts" : ["eventPage.js"],
+    "scripts" : ["jquery.min.js", "eventPage.js"],
     "persistent": false
    },
     "options_ui": {

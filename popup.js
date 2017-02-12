@@ -1,6 +1,7 @@
 $(document).ready(function() {
 	//First thing to do: detect whe website we're browsing
-	//also check the url from the tab, not extension
+	//also check the url from the tab, we can't use window, 
+	//as it will rturn the popup's location
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		if(tabs[0].url.includes("ldlc.com/fiche/")){
 			processLDLC(tabs[0].url);
