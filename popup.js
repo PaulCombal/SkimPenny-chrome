@@ -6,6 +6,9 @@ $(document).ready(function() {
 		if(tabs[0].url.includes("ldlc.com/fiche/")){
 			processLDLC(tabs[0].url);
 		}
+		else if(tabs[0].url.includes("shop.hardware.fr/fiche/")){
+			processHardwarefr(tabs[0].url);
+		}
 	});
 
 }); //End of document.ready callback
@@ -59,7 +62,12 @@ function showResults(text){
 	});
 }
 
+
 function processLDLC(fullurl){
 	//Next line is very ugly
 	getPriceCurve("LDLC", fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length)); 
+}
+
+function processHardwarefr(fullurl){
+	getPriceCurve("hardwarefr", fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length)); 	
 }
