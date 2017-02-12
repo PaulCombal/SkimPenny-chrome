@@ -34,23 +34,28 @@ function showResults(text){
 			}).get();
 
 	// Create a simple line chart
-	var data = {
-	  // A labels array that can contain any sort of values
-	  labels: datearray,
-	  // Our series array that contains series objects or in this case series data arrays
-	  series: [
-	    pricearray
-	  ]
-	};
 
-	// As options we currently only set a static size of 300x200 px
-	var options = {
-	  width: '700px',
-	  height: '500px'
-	};
-
-	// In the global name space Chartist we call the Line function to initialize a line chart. As a first parameter we pass in a selector where we would like to get our chart created. Second parameter is the actual data object and as a third parameter we pass in our options
-	new Chartist.Line('#chart', data, options);
+	var chart = c3.generate({
+	    data: {
+	        x: 'x',
+	        columns: [
+	            $.merge(['x'], datearray),
+	            $.merge(['Price evolution'], pricearray)
+	        ]
+	    },
+	    size: {
+	    	height: 500,
+	    	width: 700
+	    },
+	    axis: {
+	        x: {
+	            type: 'timeseries',
+	            tick: {
+	                format: '%Y-%m-%d'
+	            }
+	        }
+	    }
+	});
 }
 
 function processLDLC(fullurl){
