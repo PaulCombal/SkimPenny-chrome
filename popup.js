@@ -9,13 +9,24 @@ $(document).ready(function() {
 		else if(tabs[0].url.includes("shop.hardware.fr/fiche/")){
 			processHardwarefr(tabs[0].url);
 		}
+		else{
+			console.log("Warning: Unknown store for page " + tabs[0].url);
+		}
+
+
+		//Now let's take care of the page elements
+		$("#sett_button").click(showOptionsDropMenu);
+		$("#fav_button").click(function(){favoritesClicked(tabs[0].url);});
+		$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
+		//TODO check if not in favorites already
+
 	});
 
-	//Now let's take care of the page elements
-	$("#sett_button").click(showOptionsDropMenu);
-	$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
-
 }); //End of document.ready callback
+
+/////////////////////////////////////////////////
+//Below are funcs to get data from the database//
+/////////////////////////////////////////////////
 
 function getPriceCurve(storeName, productPage){
 
@@ -23,8 +34,14 @@ function getPriceCurve(storeName, productPage){
 	//This message MUST be read in the script injected in the store page
 	chrome.tabs.getSelected(null, function(tab) {
 		chrome.tabs.sendMessage(tab.id, {action: "getItemName", store: storeName}, function(response) {
-			console.log("The item in this page is " + response.itemName);
-			$("header span").text(response.itemName);
+			if (response === undefined) {
+				$("header span").text("Error loading item name");
+				//We don't want undefined favorites
+				$("#fav_button").off("click");
+			}
+			else{
+				$("header span").text(response.itemName);
+			}
 		});
 	});
 
@@ -93,7 +110,9 @@ function processHardwarefr(fullurl){
 	getPriceCurve("hardwarefr", fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length)); 	
 }
 
-/* All the following is only for presentation concerns */
+/* ****************************************************** */
+/* All the following is only for presenting the HTML page */
+/* ****************************************************** */
 
 function showOptionsDropMenu(){
 	$("#sett_button img")
@@ -119,4 +138,34 @@ function hideOptionsDropMenu(){
 	$("#sett_button")
 	.off("click")
 	.click(showOptionsDropMenu);
+}
+
+//TODO Fix this asynchronous call doing nothing
+function searchInFavorites(fullurl){
+
+	chrome.storage.sync.get(null, (data) => {
+		var allKeys = Object.keys(data);
+		//returns -1 if not found
+		result = $.inArray(fullurl, allKeys);
+		console.log(result > 0);
+	});
+
+}
+
+function isInFavorites(data){
+
+}
+
+function favoritesClicked(fullurl){
+
+	searchInFavorites(fullurl);
+
+	var date = new Date();
+	date = date.toLocaleDateString();
+	var favorite = {};
+	favorite[fullurl] = [$("header span").text(), date];
+	//Like this we have a unique ID for the favorite as well as many properties
+
+	chrome.storage.sync.set(favorite); 
+	//chrome.storage.sync.get(fullurl, (data) => {console.log(data);});
 }
