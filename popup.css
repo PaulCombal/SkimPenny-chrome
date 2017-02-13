@@ -3,6 +3,7 @@ html, body{
 	height: 584px;
 	color: #5f5f5f;
 	overflow: hidden;
+	margin: 0;
 }
 
 .priceentry{
@@ -31,4 +32,43 @@ html, body{
 	100% {
 		padding-top: 10px;
 	}
+}
+
+/* HEADER */
+
+a#fav_button {
+    float: left;
+    width: 50px;
+    height: 50px;
+}
+
+a#sett_button {
+    float: right;
+    height: 50px;
+    width: 50px;
+}
+
+a#sett_button img, a#fav_button img{
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+span#itemname {
+    text-align: center;
+    margin: auto;
+    display: inline-block;
+    font-weight: bold;
+    font-size: large;
+    width: 684px;
+}
+
+header {
+    background: #191919;
+    margin: 0;
+    padding: 0;
+    height: 50px;
+    line-height: 50px;
+    box-shadow: 0 0 4px 0px #3c3c3c;
+    color: #e6e6e6;
+    margin-bottom: 15px;
 }

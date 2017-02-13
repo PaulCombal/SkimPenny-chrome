@@ -9,6 +9,21 @@ $(document).ready(function() {
 	}
 });
 
+//If the popup is opened, it will ask for the item name
+//Here we answer what th item name is
+chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+	if (request.action == "getItemName"){
+	 	if(request.store == "LDLC"){
+			sendResponse({itemName: $("span.fn.designation_courte").first().text().trim()});
+		}
+		else{
+			console.log("Store unrecognized in request");
+		}
+	}
+ else
+	sendResponse({error: "Unexpected message on scrooje.js"});
+});
+
 
 //SendToDB just tells chrome to send a post request
 function sendToDB(storeName, productPage, price){

@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	//First thing to do: detect whe website we're browsing
 	//also check the url from the tab, we can't use window, 
-	//as it will rturn the popup's location
+	//as it will return the popup's location
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		if(tabs[0].url.includes("ldlc.com/fiche/")){
 			processLDLC(tabs[0].url);
@@ -14,6 +14,17 @@ $(document).ready(function() {
 }); //End of document.ready callback
 
 function getPriceCurve(storeName, productPage){
+
+	//This chrome message gets the item name from the loaded page
+	//This message MUST be read in the script injected in the store page
+	chrome.tabs.getSelected(null, function(tab) {
+		chrome.tabs.sendMessage(tab.id, {action: "getItemName", store: storeName}, function(response) {
+			console.log("The item in this page is " + response.itemName);
+			$("header span").text(response.itemName);
+		});
+	});
+
+	//This post request gets us the prices and dates for the item
 	$.post("http://scroogealpha.esy.es/get.php", 
 		{
 			store : storeName,

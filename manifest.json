@@ -6,9 +6,9 @@
       }],
    
    "icons": {
-      "128": "scrooge128.png",
-      "16": "scrooge16.png",
-      "48": "scrooge48.png"
+      "128": "img/scrooge128.png",
+      "16": "img/scrooge16.png",
+      "48": "img/scrooge48.png"
    },
    "manifest_version": 2,
 
@@ -20,7 +20,7 @@
 
    "permissions": [ "storage", "tabs","*://ldlc.com/*", "*://scroogealpha.esy.es/*" ],
 
-   "version": "0.0.1",
+   "version": "0.1.0",
 
    "page_action": {
           "default_title": "Worth buying?",      // optional; shown in tooltip
