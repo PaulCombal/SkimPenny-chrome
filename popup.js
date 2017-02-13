@@ -11,6 +11,9 @@ $(document).ready(function() {
 		}
 	});
 
+	//Now let's take care of the page elements
+	$("#sett_button").first().click(function(){chrome.runtime.openOptionsPage();});
+
 }); //End of document.ready callback
 
 function getPriceCurve(storeName, productPage){

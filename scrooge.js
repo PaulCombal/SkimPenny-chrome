@@ -16,8 +16,11 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	 	if(request.store == "LDLC"){
 			sendResponse({itemName: $("span.fn.designation_courte").first().text().trim()});
 		}
+		else if(request.store == "hardwarefr"){
+			sendResponse({itemName: $("#description h1").first().text().trim()});
+		}
 		else{
-			console.log("Store unrecognized in request");
+			sendResponse({itemName: "Unknown store"});
 		}
 	}
  else
@@ -27,19 +30,19 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
 //SendToDB just tells chrome to send a post request
 function sendToDB(storeName, productPage, price){
-	console.log(storeName);
-	console.log(productPage);
-	console.log(price);
+	//console.log(storeName);
+	//console.log(productPage);
+	//console.log(price);
 
 	//Because of security reasons, we better not send the request from the loaded page
 	//We're gonna tell chrome to send the request from the background script
 
 	chrome.runtime.sendMessage({
-    method: 'POST',
-    action: 'xhttp',
-    storeName: storeName,
-    productPage: productPage,
-    price: price
+	    method: 'POST',
+	    action: 'xhttp',
+	    storeName: storeName,
+	    productPage: productPage,
+	    price: price
 	});
 }
 

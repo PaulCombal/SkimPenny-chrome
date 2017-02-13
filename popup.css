@@ -4,6 +4,7 @@ html, body{
 	color: #5f5f5f;
 	overflow: hidden;
 	margin: 0;
+	background: whitesmoke;
 }
 
 .priceentry{
@@ -51,6 +52,7 @@ a#sett_button {
 a#sett_button img, a#fav_button img{
     vertical-align: middle;
     margin-left: 10px;
+    cursor: pointer;
 }
 
 span#itemname {
