@@ -12,7 +12,8 @@ $(document).ready(function() {
 	});
 
 	//Now let's take care of the page elements
-	$("#sett_button").first().click(function(){chrome.runtime.openOptionsPage();});
+	$("#sett_button").click(showOptionsDropMenu);
+	$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
 
 }); //End of document.ready callback
 
@@ -36,7 +37,9 @@ function getPriceCurve(storeName, productPage){
 		showResults,
 		'text')
 	.fail(function(){
-		console.log("Error sending request :(");
+		$("#maindiv").html("Hacking didn't go so well..<br><span style=\"font-size: smaller\">Are you connected to the internet?</span>")
+		.css("animation", "none")
+		.css("line-height", "100px");
 	});
 }
 
@@ -63,7 +66,11 @@ function showResults(text){
 	    },
 	    size: {
 	    	height: 500,
-	    	width: 700
+	    	width: 750
+	    },
+	    padding: {
+	    	//We add this padding to prevent labels from getting cropped
+	    	right: 30
 	    },
 	    axis: {
 	        x: {
@@ -84,4 +91,32 @@ function processLDLC(fullurl){
 
 function processHardwarefr(fullurl){
 	getPriceCurve("hardwarefr", fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length)); 	
+}
+
+/* All the following is only for presentation concerns */
+
+function showOptionsDropMenu(){
+	$("#sett_button img")
+	.css("animation", "rotate60 0.2s normal forwards")
+	.css("animation-play-state", "running");
+
+	$("#settDropdown")
+	.css("display", "inline-block")
+	.css("animation", "fadein 0.2s normal forwards")
+	.css("animation-play-state", "running");
+
+	$("#sett_button")
+	.off("click")
+	.click(hideOptionsDropMenu);
+}
+
+function hideOptionsDropMenu(){
+	$("#sett_button img")
+	.css("animation", "none");
+
+	$("#settDropdown")
+	.css("display", "none");
+	$("#sett_button")
+	.off("click")
+	.click(showOptionsDropMenu);
 }
