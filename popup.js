@@ -18,7 +18,15 @@ $(document).ready(function() {
 		$("#sett_button").click(showOptionsDropMenu);
 		$("#fav_button").click(function(){favoritesClicked(tabs[0].url);});
 		$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
-		//TODO check if not in favorites already
+		
+		//Making sure the favorite star has correct icon
+		chrome.storage.sync.get(null, (data) => {
+			var allKeys = Object.keys(data);
+			//returns -1 if not found
+			//By default, the star-outline is used
+			if($.inArray(tabs[0].url, allKeys) > -1)
+				$("#fav_button img").attr("src", "img/star.png");
+		});
 
 	});
 
@@ -37,7 +45,10 @@ function getPriceCurve(storeName, productPage){
 			if (response === undefined) {
 				$("header span").text("Error loading item name");
 				//We don't want undefined favorites
-				$("#fav_button").off("click");
+				$("#fav_button")
+				.off("click")
+				.css("opacity", "0")
+				.css("cursor", "auto");
 			}
 			else{
 				$("header span").text(response.itemName);
@@ -140,32 +151,32 @@ function hideOptionsDropMenu(){
 	.click(showOptionsDropMenu);
 }
 
-//TODO Fix this asynchronous call doing nothing
-function searchInFavorites(fullurl){
+function favoritesClicked(fullurl){
 
+	//First of all, we have to figure if the page has been loaded
+	//This check is done in getPriceCurve if the title can't be found,
+	//The onclick event is turned off
+
+	//First we figure if it is not already in favorites
 	chrome.storage.sync.get(null, (data) => {
 		var allKeys = Object.keys(data);
 		//returns -1 if not found
-		result = $.inArray(fullurl, allKeys);
-		console.log(result > 0);
+		if($.inArray(fullurl, allKeys) > -1){
+			//This page is already in favorites
+			//We have to delete the page from the favorites
+			chrome.storage.sync.remove(fullurl);
+			$("#fav_button img").attr("src", "img/star-outline.png");
+		}
+		else{
+			//We have to add the current page to favorites
+			var date = new Date();
+			date = date.toLocaleDateString();
+			var favorite = {};
+			favorite[fullurl] = [$("header span").text(), date];
+			//Like this we have a unique ID for the favorite as well as many properties
+
+			chrome.storage.sync.set(favorite);
+			$("#fav_button img").attr("src", "img/star.png");
+		}
 	});
-
-}
-
-function isInFavorites(data){
-
-}
-
-function favoritesClicked(fullurl){
-
-	searchInFavorites(fullurl);
-
-	var date = new Date();
-	date = date.toLocaleDateString();
-	var favorite = {};
-	favorite[fullurl] = [$("header span").text(), date];
-	//Like this we have a unique ID for the favorite as well as many properties
-
-	chrome.storage.sync.set(favorite); 
-	//chrome.storage.sync.get(fullurl, (data) => {console.log(data);});
 }
