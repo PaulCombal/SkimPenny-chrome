@@ -53,6 +53,7 @@ a#sett_button img, a#fav_button img{
     vertical-align: middle;
     margin-left: 10px;
     cursor: pointer;
+    user-select: none;
 }
 
 span#itemname {

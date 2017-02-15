@@ -18,6 +18,7 @@ $(document).ready(function() {
 		$("#sett_button").click(showOptionsDropMenu);
 		$("#fav_button").click(function(){favoritesClicked(tabs[0].url);});
 		$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
+		$("#seeMyFavorites").click(showFavorites);
 		
 		//Making sure the favorite star has correct icon
 		chrome.storage.sync.get(null, (data) => {
@@ -48,6 +49,8 @@ function getPriceCurve(storeName, productPage){
 				$("#fav_button")
 				.off("click")
 				.css("opacity", "0")
+				.css("cursor", "auto")
+				.find("img")
 				.css("cursor", "auto");
 			}
 			else{
@@ -155,7 +158,7 @@ function favoritesClicked(fullurl){
 
 	//First of all, we have to figure if the page has been loaded
 	//This check is done in getPriceCurve if the title can't be found,
-	//The onclick event is turned off
+	//The onclick event is then turned off
 
 	//First we figure if it is not already in favorites
 	chrome.storage.sync.get(null, (data) => {
@@ -179,4 +182,27 @@ function favoritesClicked(fullurl){
 			$("#fav_button img").attr("src", "img/star.png");
 		}
 	});
+}
+
+function showFavorites(){
+
+	hideOptionsDropMenu();
+
+	$("#sett_button")
+	.off("click")
+	.click(exitFavoriteMode);
+
+	$("#sett_button img").attr("src", "img/close.png");
+	
+	$("header").css("background", "#ffb100");
+}
+
+function exitFavoriteMode(){
+	$("#sett_button")
+	.off("click")
+	.click(showOptionsDropMenu);
+
+	$("#sett_button img").attr("src", "img/settings.png");
+
+	$("header").css("background", "#191919");
 }
