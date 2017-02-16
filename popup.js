@@ -3,10 +3,10 @@ $(document).ready(function() {
 	//also check the url from the tab, we can't use window, 
 	//as it will return the popup's location
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-		if(tabs[0].url.includes("ldlc.com/fiche/")){
+		if(getStoreFromURL(tabs[0].url) === "LDLC"){
 			processLDLC(tabs[0].url);
 		}
-		else if(tabs[0].url.includes("shop.hardware.fr/fiche/")){
+		else if(getStoreFromURL(tabs[0].url) === "hardwarefr"){
 			processHardwarefr(tabs[0].url);
 		}
 		else{
@@ -19,19 +19,44 @@ $(document).ready(function() {
 		$("#fav_button").click(function(){favoritesClicked(tabs[0].url);});
 		$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
 		$("#seeMyFavorites").click(showFavorites);
+		//BUG: clicking show favorites when the page is still loading does nothing
 		
 		//Making sure the favorite star has correct icon
 		chrome.storage.sync.get(null, (data) => {
-			var allKeys = Object.keys(data);
-			//returns -1 if not found
 			//By default, the star-outline is used
-			if($.inArray(tabs[0].url, allKeys) > -1)
+			if (isInFavorites(data.favlist, tabs[0].url))
 				$("#fav_button img").attr("src", "img/star.png");
 		});
 
 	});
 
 }); //End of document.ready callback
+
+function isInFavorites(favArray, fullurl) {
+
+	if (favArray !== undefined) {
+		var result = false;
+		$.each(favArray, (index, favorite) =>{
+			if (favorite["fullurl"] == fullurl) {
+				return result = true;
+			}
+		 });
+		return result;
+	}
+	return false;
+}
+
+function getStoreFromURL(fullurl){
+	if (fullurl.includes("ldlc.com/fiche/")) {
+		return "LDLC";
+	}
+	else if (fullurl.includes("shop.hardware.fr/fiche/")) {
+		return "hardwarefr";
+	}
+	else{
+		return "Unknown store";
+	}
+}
 
 /////////////////////////////////////////////////
 //Below are funcs to get data from the database//
@@ -76,7 +101,10 @@ function getPriceCurve(storeName, productPage){
 
 function showResults(text){
 	$("#maindiv").replaceWith(text);
+	buildGraph();
+}
 
+function buildGraph(){
 	var pricearray = $('.priceentry .price').map(function(){
 			return $.trim($(this).text());
 			}).get();
@@ -162,12 +190,21 @@ function favoritesClicked(fullurl){
 
 	//First we figure if it is not already in favorites
 	chrome.storage.sync.get(null, (data) => {
-		var allKeys = Object.keys(data);
 		//returns -1 if not found
-		if($.inArray(fullurl, allKeys) > -1){
+		if(isInFavorites(data.favlist, fullurl)){
 			//This page is already in favorites
 			//We have to delete the page from the favorites
-			chrome.storage.sync.remove(fullurl);
+
+			//We know that favlist isn't empty as there is at least one favorite
+			$.each(data.favlist, (index, favorite) => {
+				if (favorite["fullurl"] == fullurl) {
+					data.favlist.splice(index, 1);
+				}
+
+			});
+
+			chrome.storage.sync.set({favlist: data.favlist})
+
 			$("#fav_button img").attr("src", "img/star-outline.png");
 		}
 		else{
@@ -175,10 +212,19 @@ function favoritesClicked(fullurl){
 			var date = new Date();
 			date = date.toLocaleDateString();
 			var favorite = {};
-			favorite[fullurl] = [$("header span").text(), date];
-			//Like this we have a unique ID for the favorite as well as many properties
+			favorite["itemName"] = $("header span").text();
+			favorite["dateAdded"] = date;
+			favorite["fullurl"] = fullurl;
+			favorite["store"] = getStoreFromURL(fullurl);
 
-			chrome.storage.sync.set(favorite);
+			//First check if this is the first favorite
+			if (data.favlist === undefined) {
+				chrome.storage.sync.set({favlist: [favorite]});	
+			}
+			else{
+				chrome.storage.sync.set({favlist: $.merge(data.favlist, [favorite])});
+			}
+
 			$("#fav_button img").attr("src", "img/star.png");
 		}
 	});
@@ -188,16 +234,46 @@ function showFavorites(){
 
 	hideOptionsDropMenu();
 
-	$("#sett_button")
-	.off("click")
-	.click(exitFavoriteMode);
-
 	$("#sett_button img").attr("src", "img/close.png");
 	
 	$("header").css("background", "#ffb100");
+
+	//Doing a copy of the graph and restoring doesn't seem to work
+	//I didn't do further research, so instead we will rebuild the graph from previously 
+	//downloaded data
+	//backupPage = $("#chart").find("*");
+
+	//Show the list of favorites
+	chrome.storage.sync.get(null, (favorites) => {
+
+		$("#chart")
+		.empty();
+
+		if (favorites.favlist !== undefined) {
+			$.each(favorites.favlist, (index, favorite) => {
+				//Is there a way to improve the following?
+				$("#chart").append('<div class="favorite">' + favorite["itemName"] + " - " + favorite["fullurl"] + '</div>');
+			});
+		}
+		else{
+			$("#chart").append("You have no favorites m8");
+		}
+
+		$("#sett_button")
+		.off("click")
+		.click(function(){exitFavoriteMode()});
+	});
 }
 
 function exitFavoriteMode(){
+
+	//Clearing the favorites shown, and restoring the original graph
+	$("#chart").empty();
+
+	//Rebuilding the graph
+	buildGraph();
+
+	//Setting back the original options button instead of the cross to close
 	$("#sett_button")
 	.off("click")
 	.click(showOptionsDropMenu);
