@@ -113,3 +113,36 @@ header {
 	0% { transform: rotate(0deg); }
 	100% { transform: rotate(60deg); }
 }
+
+/* Favorites */
+
+.favorite{
+	background: #e0e0e0;
+	height: 200px;
+	margin: 10px;
+	font-size: large;
+	padding: 10px;
+	box-shadow: 0 0 3px 0px #616161;
+	border-radius: 3px;
+}
+
+div#favchart {
+    display: inline-block;
+    float: right;
+    width: 325px;
+    line-height: 196px;
+    text-align: center;
+    background: #efefef;
+    border-radius: 3px;
+}
+
+.favinfo {
+    display: inline-block;
+    height: 100%;
+    max-width: 400px;
+}
+
+a{
+    color: #006eff;
+    text-decoration: none;
+}

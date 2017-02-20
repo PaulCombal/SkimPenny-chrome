@@ -3,20 +3,25 @@ $(document).ready(function() {
 	//also check the url from the tab, we can't use window, 
 	//as it will return the popup's location
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		//shorturl aka unique ID for store
+		var shorturl;
 		if(getStoreFromURL(tabs[0].url) === "LDLC"){
-			processLDLC(tabs[0].url);
+			shorturl = processLDLC(tabs[0].url);
 		}
 		else if(getStoreFromURL(tabs[0].url) === "hardwarefr"){
-			processHardwarefr(tabs[0].url);
+			shorturl = processHardwarefr(tabs[0].url);
+		}
+		else if(getStoreFromURL(tabs[0].url) === "cdiscount"){
+			shorturl = processCdiscount(tabs[0].url);
 		}
 		else{
 			console.log("Warning: Unknown store for page " + tabs[0].url);
+			shorturl = "Error, unknown store";
 		}
-
 
 		//Now let's take care of the page elements
 		$("#sett_button").click(showOptionsDropMenu);
-		$("#fav_button").click(function(){favoritesClicked(tabs[0].url);});
+		$("#fav_button").click(function(){favoritesClicked(tabs[0].url, shorturl);});
 		$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
 		$("#seeMyFavorites").click(showFavorites);
 		//BUG: clicking show favorites when the page is still loading does nothing
@@ -52,6 +57,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("shop.hardware.fr/fiche/")) {
 		return "hardwarefr";
+	}
+	else if (fullurl.includes("cdiscount.com/")) {
+		return "cdiscount";
 	}
 	else{
 		return "Unknown store";
@@ -144,12 +152,27 @@ function buildGraph(){
 
 
 function processLDLC(fullurl){
-	//Next line is very ugly
-	getPriceCurve("LDLC", fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length)); 
+	//shortUrl aka unique ID for the database
+	var shorturl = fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length);
+	getPriceCurve("LDLC", shorturl);
+	return shorturl;
 }
 
 function processHardwarefr(fullurl){
-	getPriceCurve("hardwarefr", fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length)); 	
+	var shorturl = fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length);
+	getPriceCurve("hardwarefr", shorturl);
+	return shorturl;
+} 
+
+function processCdiscount(fullurl){
+	var shorturl = fullurl.substr(fullurl.lastIndexOf('/') + 1);
+
+	var n = shorturl.indexOf('#');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+
+	console.log(shorturl);
+	getPriceCurve("cdiscount", shorturl);
+	return shorturl;
 }
 
 /* ****************************************************** */
@@ -182,7 +205,7 @@ function hideOptionsDropMenu(){
 	.click(showOptionsDropMenu);
 }
 
-function favoritesClicked(fullurl){
+function favoritesClicked(fullurl, shorturl){
 
 	//First of all, we have to figure if the page has been loaded
 	//This check is done in getPriceCurve if the title can't be found,
@@ -190,7 +213,6 @@ function favoritesClicked(fullurl){
 
 	//First we figure if it is not already in favorites
 	chrome.storage.sync.get(null, (data) => {
-		//returns -1 if not found
 		if(isInFavorites(data.favlist, fullurl)){
 			//This page is already in favorites
 			//We have to delete the page from the favorites
@@ -215,6 +237,7 @@ function favoritesClicked(fullurl){
 			favorite["itemName"] = $("header span").text();
 			favorite["dateAdded"] = date;
 			favorite["fullurl"] = fullurl;
+			favorite["shorturl"] = shorturl;
 			favorite["store"] = getStoreFromURL(fullurl);
 
 			//First check if this is the first favorite
@@ -249,13 +272,27 @@ function showFavorites(){
 		$("#chart")
 		.empty();
 
-		if (favorites.favlist !== undefined) {
+		if (favorites.favlist !== undefined && favorites.favlist.length > 0) {
 			$.each(favorites.favlist, (index, favorite) => {
 				//Is there a way to improve the following?
-				$("#chart").append('<div class="favorite">' + favorite["itemName"] + " - " + favorite["fullurl"] + '</div>');
+				$("#chart").append(
+					'<div class="favorite">' +
+						'<div class="favinfo">' + 
+							'<a href="' + favorite["fullurl"] + '" target="_blank">' +
+								favorite["itemName"] +
+							'</a> <br />' + 
+							'<span class="itemDate">Item added on ' + favorite["dateAdded"] + '</span>' +
+						'</div>' + 
+						'<div data-store="' + favorite["store"] + '" data-url="' + favorite["shorturl"] + '" id="favchart">' +
+							'Click to see graph' +
+						'</div>' +
+					'</div>'
+				);
 			});
 		}
 		else{
+			console.log("favlist is ");
+			console.log(favorites.favlist);
 			$("#chart").append("You have no favorites m8");
 		}
 

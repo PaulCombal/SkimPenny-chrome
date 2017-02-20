@@ -1,8 +1,10 @@
-let matches = ["://www.ldlc.com/fiche/", "://ldlc.com/fiche/", "://shop.hardware.fr/fiche/"]
+let matches = [	/.*:\/\/.*ldlc.com\/fiche\/.*(\.html)$/g, 
+				/.*:\/\/.*shop\.hardware\.fr\/fiche\/.*(\.html)$/g, 
+				/.*:\/\/.*cdiscount\.com\/.*(\/f-[0-9]+-.*\.html(#.*)?)$/g];
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     for (let i in matches) {
-        if (tab.url.includes(matches[i])) {
+        if (tab.url.match(matches[i])) {
             chrome.pageAction.show(tabId);
             break;
         }

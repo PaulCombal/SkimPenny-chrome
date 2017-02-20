@@ -7,6 +7,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("shop.hardware.fr")) {
 		processHardwarefr();
 	}
+	else if (document.domain.endsWith("cdiscount.com")) {
+		processCdiscount();
+	}
 });
 
 //If the popup is opened, it will ask for the item name
@@ -18,6 +21,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "hardwarefr"){
 			sendResponse({itemName: $("#description h1").first().text().trim()});
+		}
+		else if(request.store == "cdiscount"){
+			sendResponse({itemName: $("h1[itemprop=name").text().trim()});
 		}
 		else{
 			sendResponse({itemName: "Unknown store"});
@@ -51,11 +57,26 @@ function sendToDB(storeName, productPage, price){
 ////////////////////////
 
 function processLDLC(){
+	//Only triggers when browsing /fiche url!!
 	var price = $("#productshipping meta[itemprop=price]").attr("content").replace(/,/g, '.');
 	sendToDB("LDLC", window.location.pathname /*+ window.location.search*/, price);
 }
 
 function processHardwarefr(){
+	//Only triggers when browsing /fiche url!!
 	var price = $("#stockPriceBlock .prix").text().replace(/€/g, '.').trim();
 	sendToDB("hardwarefr", window.location.pathname /*+ window.location.search*/, price);
+}
+
+function processCdiscount() {
+	//Only triggers when last url part starts with f-, as described in manifest
+	var lasturlpart = window.location.pathname;
+	lasturlpart = lasturlpart.substr(lasturlpart.lastIndexOf('/') + 1);
+
+	//The following line is completely unnecesary
+	if (lasturlpart.startsWith("f-")) {
+		var price = $("span.price[itemprop=price]").attr("content");
+		console.log("Prrice then ID - " + price + " - " + lasturlpart);
+		sendToDB("cdiscount", lasturlpart, price);
+	}
 }

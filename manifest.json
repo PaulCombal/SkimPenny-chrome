@@ -2,7 +2,7 @@
   "content_scripts": [ 
     {
         "js": [ "jquery.min.js", "scrooge.js" ],
-        "matches": [ "*://www.ldlc.com/fiche/*", "*://ldlc.com/fiche/*", "*://shop.hardware.fr/fiche/*" ]
+        "matches": [ "*://www.ldlc.com/fiche/*", "*://ldlc.com/fiche/*", "*://shop.hardware.fr/fiche/*", "*://www.cdiscount.com/*/*/*/f-*" ]
       }],
    
    "icons": {
