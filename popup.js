@@ -14,6 +14,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "cdiscount"){
 			shorturl = processCdiscount(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "conradfr"){
+			shorturl = processConradfr(tabs[0].url);
+		}
 		else{
 			console.log("Warning: Unknown store for page " + tabs[0].url);
 			shorturl = "Error, unknown store";
@@ -60,6 +63,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("cdiscount.com/")) {
 		return "cdiscount";
+	}
+	else if (fullurl.includes("conrad.fr/ce/fr/product/")) {
+		return "conradfr";
 	}
 	else{
 		return "Unknown store";
@@ -150,6 +156,19 @@ function buildGraph(){
 	});
 }
 
+function getLastUrlPart(fullurl) {
+	var shorturl = fullurl.substr(fullurl.lastIndexOf('/') + 1);
+
+	var n = shorturl.indexOf('#');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+
+	n = shorturl.indexOf('?');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+
+	console.log(shorturl);
+	return shorturl;
+}
+
 
 function processLDLC(fullurl){
 	//shortUrl aka unique ID for the database
@@ -164,14 +183,17 @@ function processHardwarefr(fullurl){
 	return shorturl;
 } 
 
+//This func only keeps whats behind the last slash of the url and removes anchors
+//and GET parameters
 function processCdiscount(fullurl){
-	var shorturl = fullurl.substr(fullurl.lastIndexOf('/') + 1);
-
-	var n = shorturl.indexOf('#');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-
-	console.log(shorturl);
+	var shorturl = getLastUrlPart(fullurl);
 	getPriceCurve("cdiscount", shorturl);
+	return shorturl;
+}
+
+function processConradfr(fullurl){
+	var shorturl = getLastUrlPart(fullurl);
+	getPriceCurve("conradfr", shorturl);
 	return shorturl;
 }
 

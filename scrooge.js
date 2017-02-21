@@ -10,6 +10,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("cdiscount.com")) {
 		processCdiscount();
 	}
+	else if (document.domain.endsWith("conrad.fr")) {
+		processConrad();
+	}
 });
 
 //If the popup is opened, it will ask for the item name
@@ -24,6 +27,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "cdiscount"){
 			sendResponse({itemName: $("h1[itemprop=name").text().trim()});
+		}
+		else if(request.store == "conradfr"){
+			sendResponse({itemName: $("a.fn[name=head_detail").text().trim()});
 		}
 		else{
 			sendResponse({itemName: "Unknown store"});
@@ -79,4 +85,14 @@ function processCdiscount() {
 		console.log("Prrice then ID - " + price + " - " + lasturlpart);
 		sendToDB("cdiscount", lasturlpart, price);
 	}
+}
+
+function processConrad() {
+	//Only triggers on product page, as described in manifest
+	var lasturlpart = window.location.pathname;
+	lasturlpart = lasturlpart.substr(lasturlpart.lastIndexOf('/') + 1);
+
+	var price = $("span.price").text().trim();
+	console.log("Prrice then ID - " + price + " - " + lasturlpart);
+	sendToDB("conradfr", lasturlpart, price);
 }
