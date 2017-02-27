@@ -6,7 +6,8 @@
           "*://ldlc.com/fiche/*", 
           "*://shop.hardware.fr/fiche/*", 
           "*://www.cdiscount.com/*/*/*/f-*",
-          "*://www.conrad.fr/ce/fr/product/*/*" ]
+          "*://www.conrad.fr/ce/fr/product/*/*",
+          "*://store.nike.com/*/pid-*/pgid-*" ]
       }],
    
    "icons": {
@@ -22,7 +23,7 @@
 
    "description": "Shows you the price evolution of items",
 
-   "permissions": [ "storage", "tabs","*://ldlc.com/*", "*://scroogealpha.esy.es/*" ],
+   "permissions": [ "storage", "tabs","*://ldlc.com/*", "*://scroogealpha.esy.es/*", "*://waxence.fr/*" ],
 
    "version": "0.1.0",
 

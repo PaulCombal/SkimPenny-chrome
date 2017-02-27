@@ -13,6 +13,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("conrad.fr")) {
 		processConrad();
 	}
+	else if (document.domain.endsWith("store.nike.com")) {
+		processNike();
+	}
 });
 
 //If the popup is opened, it will ask for the item name
@@ -30,6 +33,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "conradfr"){
 			sendResponse({itemName: $("a.fn[name=head_detail").text().trim()});
+		}
+		else if(request.store == "nike"){
+			sendResponse({itemName: $('h1.exp-product-title.nsg-font-family--platform').text().trim()});
 		}
 		else{
 			sendResponse({itemName: "Unknown store"});
@@ -61,6 +67,10 @@ function sendToDB(storeName, productPage, price){
 ////////////////////////
 //STORE SPECIFIC FUNCS//
 ////////////////////////
+
+function getUrlPart(url, index) {
+   return url.replace(/^https?:\/\//, '').split('/')[index];
+}
 
 function processLDLC(){
 	//Only triggers when browsing /fiche url!!
@@ -95,4 +105,13 @@ function processConrad() {
 	var price = $("span.price").text().trim();
 	console.log("Prrice then ID - " + price + " - " + lasturlpart);
 	sendToDB("conradfr", lasturlpart, price);
+}
+
+function processNike() {
+	var urlid = window.location.pathname;
+	urlid = getUrlPart(urlid, 5);
+
+	var price = $('.exp-pdp-product-price span').last().text().replace("€", " ").replace(",", ".").trim();
+	console.log("Prrice then ID - " + price + " - " + urlid);
+	sendToDB("nike", urlid, price);
 }

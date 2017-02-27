@@ -17,6 +17,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "conradfr"){
 			shorturl = processConradfr(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "nike"){
+			shorturl = processNike(tabs[0].url);
+		}
 		else{
 			console.log("Warning: Unknown store for page " + tabs[0].url);
 			shorturl = "Error, unknown store";
@@ -67,6 +70,9 @@ function getStoreFromURL(fullurl){
 	else if (fullurl.includes("conrad.fr/ce/fr/product/")) {
 		return "conradfr";
 	}
+	else if (fullurl.includes("store.nike.com/")) {
+		return "nike";
+	}
 	else{
 		return "Unknown store";
 	}
@@ -99,17 +105,21 @@ function getPriceCurve(storeName, productPage){
 	});
 
 	//This post request gets us the prices and dates for the item
-	$.post("http://scroogealpha.esy.es/get.php", 
+	$.post("http://waxence.fr/skimpenny/get.php", 
 		{
 			store : storeName,
 			product : productPage,
 		},
 		showResults,
 		'text')
-	.fail(function(){
+	.fail(function(xhr, status, error){
 		$("#maindiv").html("Hacking didn't go so well..<br><span style=\"font-size: smaller\">Are you connected to the internet?</span>")
 		.css("animation", "none")
 		.css("line-height", "100px");
+
+		console.log("Error codes:");
+		console.log(status);
+		console.log(error);
 	});
 }
 
@@ -169,6 +179,10 @@ function getLastUrlPart(fullurl) {
 	return shorturl;
 }
 
+function getUrlPart(url, index) {
+   return url.replace(/^https?:\/\//, '').split('/')[index];
+}
+
 
 function processLDLC(fullurl){
 	//shortUrl aka unique ID for the database
@@ -194,6 +208,12 @@ function processCdiscount(fullurl){
 function processConradfr(fullurl){
 	var shorturl = getLastUrlPart(fullurl);
 	getPriceCurve("conradfr", shorturl);
+	return shorturl;
+}
+
+function processNike(fullurl){
+	var shorturl = getUrlPart(fullurl, 5);
+	getPriceCurve("nike", shorturl);
 	return shorturl;
 }
 
