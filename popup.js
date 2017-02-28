@@ -82,7 +82,7 @@ function getStoreFromURL(fullurl){
 //Below are funcs to get data from the database//
 /////////////////////////////////////////////////
 
-function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = "#chart"){
+function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = "#chart", mini = false){
 
 	//This chrome message gets the item name from the loaded page
 	//This message MUST be read in the script injected in the store page
@@ -110,7 +110,7 @@ function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = 
 			store : storeName,
 			product : productPage,
 		},
-		(data) => {showResults(data, datadiv, selector);},
+		(data) => {showResults(data, datadiv, selector, mini);},
 		'text')
 	.fail(function(xhr, status, error){
 		$("#maindiv").html("Hacking didn't go so well..<br><span style=\"font-size: smaller\">Are you connected to the internet?</span>")
@@ -126,12 +126,12 @@ function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = 
 /*text: the data retrieved from the server
   datadiv: where to write the data on the page. The css will force it to not be displayed
   selector: in what block to build the graph*/
-function showResults(text, datadiv, selector){
+function showResults(text, datadiv, selector, mini = false){
 	$(datadiv).empty().append(text).css("display", "none");
-	buildSelectGraph(datadiv, selector);
+	buildSelectGraph(datadiv, selector, mini);
 }
 
-function buildSelectGraph(datadiv = "#maindiv", selector = "#chart"){
+function buildSelectGraph(datadiv = "#maindiv", selector = "#chart", mini = false){
 	var pricearray = $(datadiv + ' .priceentry .price').map(function(){
 			return $.trim($(this).text());
 			}).get();
@@ -140,10 +140,10 @@ function buildSelectGraph(datadiv = "#maindiv", selector = "#chart"){
 			return $.trim($(this).text());
 			}).get();
 
-	buildGraph(pricearray, datearray, selector);
+	buildGraph(pricearray, datearray, selector, mini);
 }
 
-function buildGraph(pricearray, datearray, selector){
+function buildGraph(pricearray, datearray, selector, mini = false){
 
 	// Create a simple line chart
 
@@ -157,8 +157,8 @@ function buildGraph(pricearray, datearray, selector){
 	        ]
 	    },
 	    size: {
-	    	height: 500,
-	    	width: 750
+	    	height: mini ? 197 : 500,
+	    	width: mini ? 310 : 750
 	    },
 	    padding: {
 	    	//We add this padding to prevent labels from getting cropped
@@ -167,10 +167,17 @@ function buildGraph(pricearray, datearray, selector){
 	    axis: {
 	        x: {
 	            type: 'timeseries',
+	            show: !mini,
 	            tick: {
 	                format: '%Y-%m-%d'
 	            }
+	        },
+	        y: {
+	        	show: !mini
 	        }
+	    },
+	    interaction: {
+	    	enabled: !mini
 	    }
 	});
 }
@@ -326,15 +333,17 @@ function showFavorites(){
 		if (favorites.favlist !== undefined && favorites.favlist.length > 0) {
 			$.each(favorites.favlist, (index, favorite) => {
 				//Is there a way to improve the following?
+				var id = favorite["shorturl"].replace(/\//g, "-").replace(/\./g, "-");
 				$("#chart").append(
 					'<div class="favorite">' +
+						'<div class="datadiv ' + id + '"></div>' +
 						'<div class="favinfo">' + 
 							'<a href="' + favorite["fullurl"] + '" target="_blank">' +
 								favorite["itemName"] +
 							'</a> <br />' + 
 							'<span class="itemDate">Item added on ' + favorite["dateAdded"] + '</span>' +
 						'</div>' + 
-						'<div data-store="' + favorite["store"] + '" data-url="' + favorite["shorturl"] + '" class="favchart">' +
+						'<div class="favchart ' + id + '">' +
 							'Click to see graph' +
 						'</div>' +
 					'</div>'
@@ -343,9 +352,8 @@ function showFavorites(){
 				$("div.favchart").last().click(()=>{
 					$("div.favchart[data-url='" + favorite["shorturl"] + "']").text("Loading");
 					//TODO
-					//Step One: Retrieve data from the server and store it somewhere
-
-					//Step Two: Build the graph
+					//function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = "#chart", mini)
+					getPriceCurve(favorite["store"], favorite["shorturl"], ".datadiv." + id, ".favchart." + id, true);
 				});
 			});
 		}
