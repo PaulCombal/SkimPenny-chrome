@@ -119,14 +119,14 @@ header {
 .favorite{
 	background: #e0e0e0;
 	height: 200px;
-	margin: 10px;
+	margin: 25px 10px;
 	font-size: large;
 	padding: 10px;
 	box-shadow: 0 0 3px 0px #616161;
 	border-radius: 3px;
 }
 
-div#favchart {
+div.favchart {
     display: inline-block;
     float: right;
     width: 325px;

@@ -82,7 +82,7 @@ function getStoreFromURL(fullurl){
 //Below are funcs to get data from the database//
 /////////////////////////////////////////////////
 
-function getPriceCurve(storeName, productPage){
+function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = "#chart"){
 
 	//This chrome message gets the item name from the loaded page
 	//This message MUST be read in the script injected in the store page
@@ -110,7 +110,7 @@ function getPriceCurve(storeName, productPage){
 			store : storeName,
 			product : productPage,
 		},
-		showResults,
+		(data) => {showResults(data, datadiv, selector);},
 		'text')
 	.fail(function(xhr, status, error){
 		$("#maindiv").html("Hacking didn't go so well..<br><span style=\"font-size: smaller\">Are you connected to the internet?</span>")
@@ -123,23 +123,32 @@ function getPriceCurve(storeName, productPage){
 	});
 }
 
-function showResults(text){
-	$("#maindiv").replaceWith(text);
-	buildGraph();
+/*text: the data retrieved from the server
+  datadiv: where to write the data on the page. The css will force it to not be displayed
+  selector: in what block to build the graph*/
+function showResults(text, datadiv, selector){
+	$(datadiv).empty().append(text).css("display", "none");
+	buildSelectGraph(datadiv, selector);
 }
 
-function buildGraph(){
-	var pricearray = $('.priceentry .price').map(function(){
+function buildSelectGraph(datadiv = "#maindiv", selector = "#chart"){
+	var pricearray = $(datadiv + ' .priceentry .price').map(function(){
 			return $.trim($(this).text());
 			}).get();
 
-	var datearray = $('.priceentry .date').map(function(){
+	var datearray = $(datadiv + ' .priceentry .date').map(function(){
 			return $.trim($(this).text());
 			}).get();
+
+	buildGraph(pricearray, datearray, selector);
+}
+
+function buildGraph(pricearray, datearray, selector){
 
 	// Create a simple line chart
 
 	var chart = c3.generate({
+		bindto: selector,
 	    data: {
 	        x: 'x',
 	        columns: [
@@ -175,7 +184,6 @@ function getLastUrlPart(fullurl) {
 	n = shorturl.indexOf('?');
 	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
 
-	console.log(shorturl);
 	return shorturl;
 }
 
@@ -312,7 +320,8 @@ function showFavorites(){
 	chrome.storage.sync.get(null, (favorites) => {
 
 		$("#chart")
-		.empty();
+		.empty()
+		.css("overflow-y", "scroll");
 
 		if (favorites.favlist !== undefined && favorites.favlist.length > 0) {
 			$.each(favorites.favlist, (index, favorite) => {
@@ -325,11 +334,19 @@ function showFavorites(){
 							'</a> <br />' + 
 							'<span class="itemDate">Item added on ' + favorite["dateAdded"] + '</span>' +
 						'</div>' + 
-						'<div data-store="' + favorite["store"] + '" data-url="' + favorite["shorturl"] + '" id="favchart">' +
+						'<div data-store="' + favorite["store"] + '" data-url="' + favorite["shorturl"] + '" class="favchart">' +
 							'Click to see graph' +
 						'</div>' +
 					'</div>'
 				);
+
+				$("div.favchart").last().click(()=>{
+					$("div.favchart[data-url='" + favorite["shorturl"] + "']").text("Loading");
+					//TODO
+					//Step One: Retrieve data from the server and store it somewhere
+
+					//Step Two: Build the graph
+				});
 			});
 		}
 		else{
@@ -347,10 +364,13 @@ function showFavorites(){
 function exitFavoriteMode(){
 
 	//Clearing the favorites shown, and restoring the original graph
-	$("#chart").empty();
+	$("#chart")
+	.empty()
+	.css("overflow-y", "hidden");
 
 	//Rebuilding the graph
-	buildGraph();
+	//No parameters -> main graph
+	buildSelectGraph();
 
 	//Setting back the original options button instead of the cross to close
 	$("#sett_button")
