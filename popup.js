@@ -328,7 +328,7 @@ function showFavorites(){
 
 		$("#chart")
 		.empty()
-		.css("overflow-y", "scroll");
+		.css("overflow-y", "auto");
 
 		if (favorites.favlist !== undefined && favorites.favlist.length > 0) {
 			$.each(favorites.favlist, (index, favorite) => {
@@ -360,7 +360,7 @@ function showFavorites(){
 		else{
 			console.log("favlist is ");
 			console.log(favorites.favlist);
-			$("#chart").append("You have no favorites m8");
+			$("#chart").append("<span id=\"nofavorites\">You don't have any favorites yet :(</span>");
 		}
 
 		$("#sett_button")

@@ -146,3 +146,10 @@ a{
     color: #006eff;
     text-decoration: none;
 }
+
+#nofavorites{
+	display: block;
+	text-align: center;
+	font-size: x-large;
+	margin-top: 40px;
+}
