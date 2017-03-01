@@ -1,7 +1,7 @@
 {
   "content_scripts": [ 
     {
-        "js": [ "jquery.min.js", "scrooge.js" ],
+        "js": [ "jquery.min.js", "skimpenny.js" ],
         "matches": [ "*://www.ldlc.com/fiche/*", 
           "*://ldlc.com/fiche/*", 
           "*://shop.hardware.fr/fiche/*", 
@@ -11,15 +11,15 @@
       }],
    
    "icons": {
-      "128": "img/scrooge128.png",
-      "16": "img/scrooge16.png",
-      "48": "img/scrooge48.png"
+      "128": "img/sp128.png",
+      "16": "img/sp16.png",
+      "48": "img/sp48.png"
    },
    "manifest_version": 2,
 
-   "name": "Scrooge Tracker",
+   "name": "SkimPenny Price Tracker",
 
-   "short_name": "Scrooge",
+   "short_name": "SkimPenny",
 
    "description": "Shows you the price evolution of items",
 
