@@ -20,6 +20,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "nike"){
 			shorturl = processNike(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "grosbill"){
+			shorturl = processGrosbill(tabs[0].url);
+		}
 		else{
 			console.log("Warning: Unknown store for page " + tabs[0].url);
 			shorturl = "Error, unknown store";
@@ -72,6 +75,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("store.nike.com/")) {
 		return "nike";
+	}
+	else if (fullurl.includes("grosbill.com/")) {
+		return "grosbill";
 	}
 	else{
 		return "Unknown store";
@@ -229,6 +235,12 @@ function processConradfr(fullurl){
 function processNike(fullurl){
 	var shorturl = getUrlPart(fullurl, 5);
 	getPriceCurve("nike", shorturl);
+	return shorturl;
+}
+
+function processGrosbill(fullurl){
+	var shorturl = getUrlPart(fullurl, 1);
+	getPriceCurve("grosbill", shorturl);
 	return shorturl;
 }
 

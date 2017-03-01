@@ -16,6 +16,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("store.nike.com")) {
 		processNike();
 	}
+	else if (document.domain.endsWith("grosbill.com")) {
+		processGrosbill();
+	}
 });
 
 //If the popup is opened, it will ask for the item name
@@ -36,6 +39,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "nike"){
 			sendResponse({itemName: $('h1.exp-product-title.nsg-font-family--platform').text().trim()});
+		}
+		else if(request.store == "grosbill"){
+			sendResponse({itemName: $('h1[itemprop=name]').text().trim()});
 		}
 		else{
 			sendResponse({itemName: "Unknown store"});
@@ -92,7 +98,7 @@ function processCdiscount() {
 	//The following line is completely unnecesary
 	if (lasturlpart.startsWith("f-")) {
 		var price = $("span.price[itemprop=price]").attr("content");
-		console.log("Prrice then ID - " + price + " - " + lasturlpart);
+		console.log("Price then ID - " + price + " - " + lasturlpart);
 		sendToDB("cdiscount", lasturlpart, price);
 	}
 }
@@ -103,7 +109,7 @@ function processConrad() {
 	lasturlpart = lasturlpart.substr(lasturlpart.lastIndexOf('/') + 1);
 
 	var price = $("span.price").text().trim();
-	console.log("Prrice then ID - " + price + " - " + lasturlpart);
+	console.log("Price then ID - " + price + " - " + lasturlpart);
 	sendToDB("conradfr", lasturlpart, price);
 }
 
@@ -112,6 +118,15 @@ function processNike() {
 	urlid = getUrlPart(urlid, 5);
 
 	var price = $('.exp-pdp-product-price span').last().text().replace("€", " ").replace(",", ".").trim();
-	console.log("Prrice then ID - " + price + " - " + urlid);
+	console.log("Price then ID - " + price + " - " + urlid);
 	sendToDB("nike", urlid, price);
+}
+
+function processGrosbill() {
+	var urlid = window.location.pathname;
+	urlid = getUrlPart(urlid, 1);
+
+	var price = $('.datasheet_price_and_strike_price_wrapper div').first().text().trim().replace("€", ".");
+	console.log("Price then ID - " + price + " - " + urlid);
+	sendToDB("grosbill", urlid, price);
 }
