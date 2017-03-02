@@ -23,6 +23,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("undiz.com")) {
 		processUndiz();
 	}
+	else if (document.domain.endsWith("romwe.com") && !document.domain.startsWith("www")) {
+		processRomwe();
+	}
 });
 
 //If the popup is opened, it will ask for the item name
@@ -49,6 +52,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "undiz"){
 			sendResponse({itemName: $('p.product-name').text().trim()});
+		}
+		else if(request.store == "romwe"){
+			sendResponse({itemName: $('h1').text().trim()});
 		}
 		else{
 			sendResponse({itemName: "Unknown store"});
@@ -83,6 +89,18 @@ function getUrlPart(url, index) {
    return url.replace(/^https?:\/\//, '').split('/')[index];
 }
 
+function getLastUrlPart(fullurl) {
+	var shorturl = fullurl.substr(fullurl.lastIndexOf('/') + 1);
+
+	var n = shorturl.indexOf('#');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+
+	n = shorturl.indexOf('?');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+
+	return shorturl;
+}
+
 function processLDLC(){
 	//Only triggers when browsing /fiche url!!
 	var price = $("#productshipping meta[itemprop=price]").attr("content").replace(/,/g, '.');
@@ -97,13 +115,16 @@ function processHardwarefr(){
 
 function processCdiscount() {
 	//Only triggers when last url part starts with f-, as described in manifest
-	var lasturlpart = window.location.pathname;
-	lasturlpart = lasturlpart.substr(lasturlpart.lastIndexOf('/') + 1);
+	var lasturlpart = getLastUrlPart(window.location.pathname);
 
 	//The following line is completely unnecesary
 	if (lasturlpart.startsWith("f-")) {
 		var price = $("span.price[itemprop=price]").attr("content");
 		sendToDB("cdiscount", lasturlpart, price);
+	}
+	else
+	{
+		console.log("random error occurred");
 	}
 }
 
@@ -135,17 +156,25 @@ function processNikeAjaxEvents() {
 }
 
 function processGrosbill() {
-	var urlid = window.location.pathname;
-	urlid = getUrlPart(urlid, 1);
+	var urlid = getLastUrlPart(window.location.pathname);
 
 	var price = $('.datasheet_price_and_strike_price_wrapper div').first().text().trim().replace("€", ".");
 	sendToDB("grosbill", urlid, price);
 }
 
 function processUndiz() {
-	var urlid = window.location.pathname;
-	urlid = getUrlPart(urlid, 3);
+	var urlid = getLastUrlPart(window.location.pathname);
 
 	var price = $('span.price-sales.wishPrice').first().text().trim().replace(/ €/g, "").replace(/,/g, ".");
 	sendToDB("undiz", urlid, price);
+}
+
+function processRomwe() {
+	var lasturlpart = getLastUrlPart(window.location.pathname);
+
+	console.log(document.domain);
+
+	var price = $("span#spanSubTotal_").last().text().trim().replace(/€/g, "");
+	//console.log("prid " + price + "  " + lasturlpart);
+	sendToDB("romwe", lasturlpart, price);
 }

@@ -9,7 +9,8 @@
           "*://www.conrad.fr/ce/fr/product/*/*",
           "*://store.nike.com/*/pid-*/pgid-*",
           "*://www.grosbill.com/4-*",
-          "*://www.undiz.com/*/*/*.html" ]
+          "*://www.undiz.com/*/*/*.html",
+          "*://*.romwe.com/*-p-*-cat-*.html*" ]
       }],
    
    "icons": {

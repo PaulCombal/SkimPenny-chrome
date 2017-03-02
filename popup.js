@@ -26,6 +26,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "undiz"){
 			shorturl = processUndiz(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "romwe"){
+			shorturl = processRomwe(tabs[0].url);
+		}
 		else{
 			console.log("Warning: Unknown store for page " + tabs[0].url);
 			shorturl = "Error, unknown store";
@@ -84,6 +87,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("www.undiz.com/")) {
 		return "undiz";
+	}
+	else if (fullurl.includes("romwe.com/")) {
+		return "romwe";
 	}
 	else{
 		return "Unknown store";
@@ -253,6 +259,12 @@ function processGrosbill(fullurl){
 function processUndiz(fullurl){
 	var shorturl = getUrlPart(fullurl, 3);
 	getPriceCurve("undiz", shorturl);
+	return shorturl;
+}
+
+function processRomwe(fullurl){
+	var shorturl = getLastUrlPart(fullurl);
+	getPriceCurve("romwe", shorturl);
 	return shorturl;
 }
 
