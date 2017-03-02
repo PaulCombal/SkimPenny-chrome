@@ -15,6 +15,7 @@ $(document).ready(function() {
 	}
 	else if (document.domain.endsWith("store.nike.com")) {
 		processNike();
+		processNikeAjaxEvents();
 	}
 	else if (document.domain.endsWith("grosbill.com")) {
 		processGrosbill();
@@ -53,10 +54,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 			sendResponse({itemName: "Unknown store"});
 		}
 	}
- else
-	sendResponse({error: "Unexpected message on scrooje.js"});
+	else
+		sendResponse({error: "Unexpected message on scrooje.js"});
 });
-
 
 //SendToDB just tells chrome to send a post request
 function sendToDB(storeName, productPage, price){
@@ -68,7 +68,6 @@ function sendToDB(storeName, productPage, price){
 	//We're gonna tell chrome to send the request from the background script
 
 	chrome.runtime.sendMessage({
-	    method: 'POST',
 	    action: 'xhttp',
 	    storeName: storeName,
 	    productPage: productPage,
@@ -104,7 +103,6 @@ function processCdiscount() {
 	//The following line is completely unnecesary
 	if (lasturlpart.startsWith("f-")) {
 		var price = $("span.price[itemprop=price]").attr("content");
-		console.log("Price then ID - " + price + " - " + lasturlpart);
 		sendToDB("cdiscount", lasturlpart, price);
 	}
 }
@@ -115,7 +113,6 @@ function processConrad() {
 	lasturlpart = lasturlpart.substr(lasturlpart.lastIndexOf('/') + 1);
 
 	var price = $("span.price").text().trim();
-	console.log("Price then ID - " + price + " - " + lasturlpart);
 	sendToDB("conradfr", lasturlpart, price);
 }
 
@@ -124,8 +121,17 @@ function processNike() {
 	urlid = getUrlPart(urlid, 5);
 
 	var price = $('.exp-pdp-product-price span').last().text().replace("€", " ").replace(",", ".").trim();
-	console.log("Price then ID - " + price + " - " + urlid);
 	sendToDB("nike", urlid, price);
+}
+
+function processNikeAjaxEvents() {
+	var DOMTimeout = null;
+	$('.exp-pdp-main-pdp-content').bind('DOMNodeInserted', function() {
+		if(DOMTimeout)
+			clearTimeout(DOMTimeout);
+
+		DOMTimeout = setTimeout(function() { processNike(); console.log('processNike called'); }, 200);
+	});
 }
 
 function processGrosbill() {
@@ -133,7 +139,6 @@ function processGrosbill() {
 	urlid = getUrlPart(urlid, 1);
 
 	var price = $('.datasheet_price_and_strike_price_wrapper div').first().text().trim().replace("€", ".");
-	console.log("Price then ID - " + price + " - " + urlid);
 	sendToDB("grosbill", urlid, price);
 }
 
@@ -142,6 +147,5 @@ function processUndiz() {
 	urlid = getUrlPart(urlid, 3);
 
 	var price = $('span.price-sales.wishPrice').first().text().trim().replace(/ €/g, "").replace(/,/g, ".");
-	console.log("Price then ID - " + price + " - " + urlid);
 	sendToDB("undiz", urlid, price);
 }
