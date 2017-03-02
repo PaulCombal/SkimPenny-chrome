@@ -19,6 +19,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("grosbill.com")) {
 		processGrosbill();
 	}
+	else if (document.domain.endsWith("undiz.com")) {
+		processUndiz();
+	}
 });
 
 //If the popup is opened, it will ask for the item name
@@ -42,6 +45,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "grosbill"){
 			sendResponse({itemName: $('h1[itemprop=name]').text().trim()});
+		}
+		else if(request.store == "undiz"){
+			sendResponse({itemName: $('p.product-name').text().trim()});
 		}
 		else{
 			sendResponse({itemName: "Unknown store"});
@@ -129,4 +135,13 @@ function processGrosbill() {
 	var price = $('.datasheet_price_and_strike_price_wrapper div').first().text().trim().replace("€", ".");
 	console.log("Price then ID - " + price + " - " + urlid);
 	sendToDB("grosbill", urlid, price);
+}
+
+function processUndiz() {
+	var urlid = window.location.pathname;
+	urlid = getUrlPart(urlid, 3);
+
+	var price = $('span.price-sales.wishPrice').first().text().trim().replace(/ €/g, "").replace(/,/g, ".");
+	console.log("Price then ID - " + price + " - " + urlid);
+	sendToDB("undiz", urlid, price);
 }

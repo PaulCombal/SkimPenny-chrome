@@ -3,7 +3,8 @@ let matches = [	/.*:\/\/.*ldlc.com\/fiche\/.*(\.html)$/g,
 				/.*:\/\/.*cdiscount\.com\/.*(\/f-[0-9]+-.*\.html((#|\?).*)?)$/g,
 				/.*:\/\/.*conrad\.fr\/ce\/fr\/product\/[0-9]+\/.+/g,
 				/.*\/\/store\.nike\.com\/.*\/pgid-[0-9]{8}/g,
-				/.*\/\/www\.grosbill\.com\/4-.*/g];
+				/.*\/\/www\.grosbill\.com\/4-.*/g,
+				/.*\/\/www\.undiz\.com\/.*\/.*\/.*([0-9]\.html)$/g];
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 	for (let i in matches) {

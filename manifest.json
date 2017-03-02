@@ -8,7 +8,8 @@
           "*://www.cdiscount.com/*/*/*/f-*",
           "*://www.conrad.fr/ce/fr/product/*/*",
           "*://store.nike.com/*/pid-*/pgid-*",
-          "*://www.grosbill.com/4-*" ]
+          "*://www.grosbill.com/4-*",
+          "*://www.undiz.com/*/*/*.html" ]
       }],
    
    "icons": {
@@ -29,12 +30,12 @@
    "version": "0.5.0",
 
    "page_action": {
-          "default_title": "Worth buying?",      // optional; shown in tooltip
-          "default_popup": "popup.html"        // optional
+      "default_title": "Worth buying?",
+      "default_popup": "popup.html"
     },
 
-   "web_accessible_resources": [ 
-    ],
+   "web_accessible_resources": [ ],
+   
    "background":{
     "scripts" : ["jquery.min.js", "eventPage.js"],
     "persistent": false
