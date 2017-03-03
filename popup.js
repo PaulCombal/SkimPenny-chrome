@@ -8,6 +8,9 @@ $(document).ready(function() {
 		if(getStoreFromURL(tabs[0].url) === "LDLC"){
 			shorturl = processLDLC(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "amazonfr"){
+			shorturl = processAmazonfr(tabs[0].url);
+		}
 		else if(getStoreFromURL(tabs[0].url) === "hardwarefr"){
 			shorturl = processHardwarefr(tabs[0].url);
 		}
@@ -90,6 +93,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("romwe.com/")) {
 		return "romwe";
+	}
+	else if (fullurl.includes("://www.amazon.fr/")) {
+		return "amazonfr";
 	}
 	else{
 		return "Unknown store";
@@ -200,6 +206,8 @@ function buildGraph(pricearray, datearray, selector, mini = false){
 	});
 }
 
+//This func only keeps whats behind the last slash of the url and removes anchors
+//and GET parameters
 function getLastUrlPart(fullurl) {
 	var shorturl = fullurl.substr(fullurl.lastIndexOf('/') + 1);
 
@@ -230,8 +238,6 @@ function processHardwarefr(fullurl){
 	return shorturl;
 } 
 
-//This func only keeps whats behind the last slash of the url and removes anchors
-//and GET parameters
 function processCdiscount(fullurl){
 	var shorturl = getLastUrlPart(fullurl);
 	getPriceCurve("cdiscount", shorturl);
@@ -265,6 +271,21 @@ function processUndiz(fullurl){
 function processRomwe(fullurl){
 	var shorturl = getLastUrlPart(fullurl);
 	getPriceCurve("romwe", shorturl);
+	return shorturl;
+}
+
+function processAmazonfr(fullurl){
+	var shorturl = getUrlPart(fullurl, 3);
+	//This may be correct, but in some cases this is also the last part 
+	//So we have to remove additional anchors/GET parameters
+
+	var n = shorturl.indexOf('#');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+
+	n = shorturl.indexOf('?');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+
+	getPriceCurve("amazonfr", shorturl);
 	return shorturl;
 }
 

@@ -13,7 +13,7 @@ html, body{
 
 #maindiv{
 	margin: auto;
-	font-family: Cantarell;
+	font-family: 'Segoe UI', Cantarell;
 	vertical-align: middle;
 	height: 584px;
 	overflow: hidden;
@@ -74,6 +74,7 @@ header {
     box-shadow: 0 0 4px 0px #3c3c3c;
     color: #e6e6e6;
     margin-bottom: 15px;
+    overflow: hidden;
 }
 
 /* Dropdown menu */
@@ -134,6 +135,7 @@ div.favchart {
     text-align: center;
     background: #efefef;
     border-radius: 3px;
+    cursor: pointer;
 }
 
 .favinfo {

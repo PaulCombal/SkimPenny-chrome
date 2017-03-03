@@ -15,6 +15,7 @@ For now, supported sites are:
 * grosbill.com
 * undiz.com
 * romwe.com (non-english only)
+* amazon.fr (partial support)
 
 I am very open to any kind of feedback, and if you want to ask for a new store support, just go to the issues tab, and make your request!
 

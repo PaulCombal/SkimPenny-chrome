@@ -7,6 +7,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("shop.hardware.fr")) {
 		processHardwarefr();
 	}
+	else if (document.domain.endsWith("amazon.fr")) {
+		processAmazonfr();
+	}
 	else if (document.domain.endsWith("cdiscount.com")) {
 		processCdiscount();
 	}
@@ -23,7 +26,7 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("undiz.com")) {
 		processUndiz();
 	}
-	else if (document.domain.endsWith("romwe.com") && !document.domain.startsWith("www")) {
+	else if (document.domain.endsWith("romwe.com") && !document.domain.startsWith("www")) { // www. -> english site
 		processRomwe();
 	}
 });
@@ -37,6 +40,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "hardwarefr"){
 			sendResponse({itemName: $("#description h1").first().text().trim()});
+		}
+		else if(request.store == "amazonfr"){
+			sendResponse({itemName: $("span#productTitle").text().trim()});
 		}
 		else if(request.store == "cdiscount"){
 			sendResponse({itemName: $("h1[itemprop=name").text().trim()});
@@ -172,9 +178,23 @@ function processUndiz() {
 function processRomwe() {
 	var lasturlpart = getLastUrlPart(window.location.pathname);
 
-	console.log(document.domain);
-
 	var price = $("span#spanSubTotal_").last().text().trim().replace(/€/g, "");
 	//console.log("prid " + price + "  " + lasturlpart);
 	sendToDB("romwe", lasturlpart, price);
+}
+
+function processAmazonfr() {
+	var shorturl = getUrlPart(window.location.pathname, 3);
+	//This may be correct, but in some cases this is also the last part 
+	//So we have to remove additional anchors/GET parameters
+
+	var n = shorturl.indexOf('#');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+
+	n = shorturl.indexOf('?');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+
+	var price = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".");
+	console.log("prid " + price + "  " + shorturl);
+	sendToDB("amazonfr", shorturl, price);
 }

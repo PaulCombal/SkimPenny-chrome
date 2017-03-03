@@ -10,7 +10,8 @@
           "*://store.nike.com/*/pid-*/pgid-*",
           "*://www.grosbill.com/4-*",
           "*://www.undiz.com/*/*/*.html",
-          "*://*.romwe.com/*-p-*-cat-*.html*" ]
+          "*://*.romwe.com/*-p-*-cat-*.html*",
+          "*://www.amazon.fr/*/dp/*" ]
       }],
    
    "icons": {
@@ -28,7 +29,7 @@
 
    "permissions": [ "storage", "tabs", "*://waxence.fr/*"],
 
-   "version": "0.5.0.2",
+   "version": "0.5.0.3",
 
    "page_action": {
       "default_title": "Worth buying?",
