@@ -195,8 +195,8 @@ function processAmazonfr() {
 	n = shorturl.indexOf('?');
 	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
 
-	var price = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".");
-	//console.log("prid " + price + "  " + shorturl);
+	var price = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
+	console.log("prid " + price + "  " + shorturl);
 	sendToDB("amazonfr", shorturl, price);
 }
 

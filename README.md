@@ -19,4 +19,4 @@ For now, supported sites are:
 
 I am very open to any kind of feedback, and if you want to ask for a new store support, just go to the issues tab, and make your request!
 
-Credits go to me, PaulCombal, my friend DMaxence for helping me making the site and providing hosting, and /u/ThePwnter for suggesting the name :)
+Credits go to me, PaulCombal, my friend DMaxence for helping me making the site and providing hosting, /u/ThePwnter for suggesting the name, and /u/DrewKxng for upgrading the icon :)
