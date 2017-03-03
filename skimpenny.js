@@ -9,6 +9,7 @@ $(document).ready(function() {
 	}
 	else if (document.domain.endsWith("amazon.fr")) {
 		processAmazonfr();
+		processAmazonfrAjaxEvents();
 	}
 	else if (document.domain.endsWith("cdiscount.com")) {
 		processCdiscount();
@@ -195,6 +196,17 @@ function processAmazonfr() {
 	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
 
 	var price = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".");
-	console.log("prid " + price + "  " + shorturl);
+	//console.log("prid " + price + "  " + shorturl);
 	sendToDB("amazonfr", shorturl, price);
+}
+
+function processAmazonfrAjaxEvents() {
+	var title = $("input#cerberus-metrics").attr("value");
+	setInterval(()=>{
+		if (title !== $("input#cerberus-metrics").attr("value")) {
+			title = $("input#cerberus-metrics").attr("value");
+			processAmazonfr();
+		}
+	},
+	1000);
 }

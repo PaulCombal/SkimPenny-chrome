@@ -275,7 +275,15 @@ function processRomwe(fullurl){
 }
 
 function processAmazonfr(fullurl){
+
 	var shorturl = getUrlPart(fullurl, 3);
+
+	/*if (fullurl.includes("amazon.fr/gp/product")) {
+
+	}
+	else if (fullurl.includes("/dp/")) {
+		
+	}*/
 	//This may be correct, but in some cases this is also the last part 
 	//So we have to remove additional anchors/GET parameters
 
