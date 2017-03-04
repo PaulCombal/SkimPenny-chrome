@@ -12,7 +12,8 @@
           "*://www.undiz.com/*/*/*.html",
           "*://*.romwe.com/*-p-*-cat-*.html*",
           "*://www.amazon.fr/*/dp/*",
-          "*://www.amazon.fr/gp/product/*" ]
+          "*://www.amazon.fr/gp/product/*",
+          "*://www.amazon.fr/dp/*" ]
       }],
    
    "icons": {
@@ -30,7 +31,7 @@
 
    "permissions": [ "storage", "tabs", "*://waxence.fr/*"],
 
-   "version": "0.5.0.4",
+   "version": "0.5.0.5",
 
    "page_action": {
       "default_title": "Worth buying?",

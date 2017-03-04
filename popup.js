@@ -276,22 +276,20 @@ function processRomwe(fullurl){
 
 function processAmazonfr(fullurl){
 
-	var shorturl = getUrlPart(fullurl, 3);
-
-	/*if (fullurl.includes("amazon.fr/gp/product")) {
-
-	}
-	else if (fullurl.includes("/dp/")) {
-		
-	}*/
-	//This may be correct, but in some cases this is also the last part 
-	//So we have to remove additional anchors/GET parameters
+	var shorturl = fullurl;
 
 	var n = shorturl.indexOf('#');
 	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
 
 	n = shorturl.indexOf('?');
 	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+	
+	if (shorturl.includes("www.amazon.fr/dp/"))
+		shorturl = getUrlPart(shorturl, 2);
+	else
+		shorturl = getUrlPart(shorturl, 3);
+
+	console.log("Gonna ask for amazon.fr " + shorturl);
 
 	getPriceCurve("amazonfr", shorturl);
 	return shorturl;

@@ -185,28 +185,26 @@ function processRomwe() {
 }
 
 function processAmazonfr() {
-	var shorturl = getUrlPart(window.location.pathname, 3);
+	var pathname = window.location.pathname;
+	if (pathname.startsWith("/dp/"))
+		pathname = getUrlPart(pathname, 2);
+	else
+		pathname = getUrlPart(pathname, 3);
 	//This may be correct, but in some cases this is also the last part 
 	//So we have to remove additional anchors/GET parameters
 
-	var n = shorturl.indexOf('#');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-
-	n = shorturl.indexOf('?');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-
 	var price = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
-	console.log("prid " + price + "  " + shorturl);
-	sendToDB("amazonfr", shorturl, price);
+	console.log("prid " + price + "  " + pathname);
+	sendToDB("amazonfr", pathname, price);
 }
 
 function processAmazonfrAjaxEvents() {
-	var title = $("input#cerberus-metrics").attr("value");
+	var pathname = window.location.pathname;
 	setInterval(()=>{
-		if (title !== $("input#cerberus-metrics").attr("value")) {
-			title = $("input#cerberus-metrics").attr("value");
+		if (pathname !== window.location.pathname) {
+			pathname = window.location.pathname;
 			processAmazonfr();
 		}
 	},
-	1000);
+	2000);
 }

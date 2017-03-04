@@ -1,6 +1,6 @@
 let matches = [	/.*:\/\/.*ldlc.com\/fiche\/.*(\.html)$/g, 
 				/.*:\/\/.*shop\.hardware\.fr\/fiche\/.*(\.html)$/g, 
-				/.*:\/\/www\.amazon\.fr\/(.*\/dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g, 
+				/.*:\/\/www\.amazon\.fr\/((.*\/)?dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g, 
 				/.*:\/\/.*cdiscount\.com\/.*(\/f-[0-9]+-.*\.html((#|\?).*)?)$/g,
 				/.*:\/\/.*conrad\.fr\/ce\/fr\/product\/[0-9]+\/.+/g,
 				/.*\/\/store\.nike\.com\/.*\/pgid-[0-9]{8}/g,
