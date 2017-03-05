@@ -164,7 +164,12 @@ function buildSelectGraph(datadiv = "#maindiv", selector = "#chart", mini = fals
 			return $.trim($(this).text());
 			}).get();
 
-	buildGraph(pricearray, datearray, selector, mini);
+	if (typeof pricearray !== 'undefined' && pricearray.length > 0) {
+		buildGraph(pricearray, datearray, selector, mini);
+	}
+	else{
+		$(selector).empty().append("<div>Something went wrong :( <br> If this message appears again on this product, send us an email!</div>");
+	}
 }
 
 function buildGraph(pricearray, datearray, selector, mini = false){
@@ -173,36 +178,36 @@ function buildGraph(pricearray, datearray, selector, mini = false){
 
 	var chart = c3.generate({
 		bindto: selector,
-	    data: {
-	        x: 'x',
-	        columns: [
-	            $.merge(['x'], datearray),
-	            $.merge(['Price evolution'], pricearray)
-	        ]
-	    },
-	    size: {
-	    	height: mini ? 197 : 500,
-	    	width: mini ? 310 : 750
-	    },
-	    padding: {
-	    	//We add this padding to prevent labels from getting cropped
-	    	right: 30
-	    },
-	    axis: {
-	        x: {
-	            type: 'timeseries',
-	            show: !mini,
-	            tick: {
-	                format: '%Y-%m-%d'
-	            }
-	        },
-	        y: {
-	        	show: !mini
-	        }
-	    },
-	    interaction: {
-	    	enabled: !mini
-	    }
+		data: {
+			x: 'x',
+			columns: [
+				$.merge(['x'], datearray),
+				$.merge(['Price evolution'], pricearray)
+			]
+		},
+		size: {
+			height: mini ? 197 : 500,
+			width: mini ? 310 : 750
+		},
+		padding: {
+			//We add this padding to prevent labels from getting cropped
+			right: 30
+		},
+		axis: {
+			x: {
+				type: 'timeseries',
+				show: !mini,
+				tick: {
+					format: '%d/%m/%Y'
+				}
+			},
+			y: {
+				show: !mini
+			}
+		},
+		interaction: {
+			enabled: !mini
+		}
 	});
 }
 

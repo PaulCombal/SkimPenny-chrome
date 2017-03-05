@@ -5,7 +5,7 @@ $(document).ready(function() {
 		processLDLC();
 	}
 	else if (document.domain.endsWith("shop.hardware.fr")) {
-		processHardwarefr();
+		setTimeout(processHardwarefr, 2000);
 	}
 	else if (document.domain.endsWith("amazon.fr")) {
 		processAmazonfr();
@@ -116,8 +116,12 @@ function processLDLC(){
 
 function processHardwarefr(){
 	//Only triggers when browsing /fiche url!!
-	var price = $("#stockPriceBlock .prix").text().replace(/€/g, '.').trim();
-	sendToDB("hardwarefr", window.location.pathname /*+ window.location.search*/, price);
+	var price = $("#stockPriceBlock .prix .new-price").text().replace(/€/g, '.').trim();
+	if (price.length === 0) {
+		price = $("#stockPriceBlock .prix").text().replace(/€/g, '.').trim();
+	}
+
+	sendToDB("hardwarefr", window.location.pathname, price);
 }
 
 function processCdiscount() {
