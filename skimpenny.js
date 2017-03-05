@@ -7,6 +7,10 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("shop.hardware.fr")) {
 		setTimeout(processHardwarefr, 2000);
 	}
+	else if (document.domain.endsWith("amazon.com")) {
+		processAmazoncom();
+		processAmazoncomAjaxEvents();
+	}
 	else if (document.domain.endsWith("amazon.fr")) {
 		processAmazonfr();
 		processAmazonfrAjaxEvents();
@@ -42,6 +46,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		else if(request.store == "hardwarefr"){
 			sendResponse({itemName: $("#description h1").first().text().trim()});
 		}
+		else if(request.store == "amazoncom"){
+			sendResponse({itemName: $("span#productTitle").text().trim()});
+		}
 		else if(request.store == "amazonfr"){
 			sendResponse({itemName: $("span#productTitle").text().trim()});
 		}
@@ -68,7 +75,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 	}
 	else
-		sendResponse({error: "Unexpected message on scrooje.js"});
+		sendResponse({error: "Unexpected message on skimpenny.js"});
 });
 
 //SendToDB just tells chrome to send a post request
@@ -197,7 +204,12 @@ function processAmazonfr() {
 	//This may be correct, but in some cases this is also the last part 
 	//So we have to remove additional anchors/GET parameters
 
-	var price = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
+	var price = $('span#priceblock_dealprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
+	if (price.length === 0)
+		price = $('span#priceblock_saleprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
+	if (price.length === 0)
+		price = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
+
 	console.log("prid " + price + "  " + pathname);
 	sendToDB("amazonfr", pathname, price);
 }
@@ -208,6 +220,36 @@ function processAmazonfrAjaxEvents() {
 		if (pathname !== window.location.pathname) {
 			pathname = window.location.pathname;
 			processAmazonfr();
+		}
+	},
+	2000);
+}
+
+function processAmazoncom() {
+	var pathname = window.location.pathname;
+	if (pathname.startsWith("/dp/"))
+		pathname = getUrlPart(pathname, 2);
+	else
+		pathname = getUrlPart(pathname, 3);
+	//This may be correct, but in some cases this is also the last part 
+	//So we have to remove additional anchors/GET parameters
+
+	var price = $('span#priceblock_saleprice').text().trim().replace(/\$/g, "");
+	if (price.length === 0)
+		price = $('span#priceblock_dealprice').text().trim().replace(/\$/g, "");
+	if (price.length === 0)
+		price = $('span#priceblock_ourprice').text().trim().replace(/\$/g, "");
+
+	console.log("prid " + price + "  " + pathname);
+	sendToDB("amazoncom", pathname, price);
+}
+
+function processAmazoncomAjaxEvents() {
+	var pathname = window.location.pathname;
+	setInterval(()=>{
+		if (pathname !== window.location.pathname) {
+			pathname = window.location.pathname;
+			processAmazoncom();
 		}
 	},
 	2000);

@@ -8,6 +8,9 @@ $(document).ready(function() {
 		if(getStoreFromURL(tabs[0].url) === "LDLC"){
 			shorturl = processLDLC(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "amazoncom"){
+			shorturl = processAmazoncom(tabs[0].url);
+		}
 		else if(getStoreFromURL(tabs[0].url) === "amazonfr"){
 			shorturl = processAmazonfr(tabs[0].url);
 		}
@@ -72,6 +75,9 @@ function isInFavorites(favArray, fullurl) {
 function getStoreFromURL(fullurl){
 	if (fullurl.includes("ldlc.com/fiche/")) {
 		return "LDLC";
+	}
+	else if (fullurl.includes("://www.amazon.com/")) {
+		return "amazoncom";
 	}
 	else if (fullurl.includes("shop.hardware.fr/fiche/")) {
 		return "hardwarefr";
@@ -294,9 +300,29 @@ function processAmazonfr(fullurl){
 	else
 		shorturl = getUrlPart(shorturl, 3);
 
-	console.log("Gonna ask for amazon.fr " + shorturl);
 
 	getPriceCurve("amazonfr", shorturl);
+	return shorturl;
+}
+
+function processAmazoncom(fullurl){
+
+	var shorturl = fullurl;
+
+	var n = shorturl.indexOf('#');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+
+	n = shorturl.indexOf('?');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+	
+	if (shorturl.includes("www.amazon.com/dp/"))
+		shorturl = getUrlPart(shorturl, 2);
+	else
+		shorturl = getUrlPart(shorturl, 3);
+
+	console.log("Gonna ask for amazon.com " + shorturl);
+
+	getPriceCurve("amazoncom", shorturl);
 	return shorturl;
 }
 
