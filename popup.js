@@ -35,6 +35,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "romwe"){
 			shorturl = processRomwe(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "zalandofr"){
+			shorturl = processZalandofr(tabs[0].url);
+		}
 		else{
 			console.log("Warning: Unknown store for page " + tabs[0].url);
 			shorturl = "Error, unknown store";
@@ -102,6 +105,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("://www.amazon.fr/")) {
 		return "amazonfr";
+	}
+	else if (fullurl.includes("://www.zalando.fr/")) {
+		return "zalandofr";
 	}
 	else{
 		return "Unknown store";
@@ -325,6 +331,13 @@ function processAmazoncom(fullurl){
 	getPriceCurve("amazoncom", shorturl);
 	return shorturl;
 }
+
+function processZalandofr(fullurl){
+	var shorturl = getLastUrlPart(fullurl);
+	getPriceCurve("zalandofr", shorturl);
+	return shorturl;
+}
+
 
 /* ****************************************************** */
 /* All the following is only for presenting the HTML page */

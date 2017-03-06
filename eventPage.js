@@ -7,7 +7,8 @@ let matches = [	/.*:\/\/.*ldlc.com\/fiche\/.*(\.html)$/g,
 				/.*\/\/store\.nike\.com\/.*\/pgid-[0-9]{8}/g,
 				/.*\/\/www\.grosbill\.com\/4-.*/g,
 				/.*\/\/www\.undiz\.com\/.*\/.*\/.*([0-9]\.html)$/g,
-				/.*(fr|es|de)\.romwe\.com\/.*-p-[0-9]*-cat-[0-9]*\.html.*/g];
+				/.*(fr|es|de)\.romwe\.com\/.*-p-[0-9]*-cat-[0-9]*\.html.*/g,
+				/.*\/\/www\.zalando\.fr\/.*\.html.*/g];
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 	for (let i in matches) {

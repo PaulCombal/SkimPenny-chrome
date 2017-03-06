@@ -31,6 +31,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("undiz.com")) {
 		processUndiz();
 	}
+	else if (document.domain.endsWith("zalando.fr")) {
+		processZalandofr();
+	}
 	else if (document.domain.endsWith("romwe.com") && !document.domain.startsWith("www")) { // www. -> english site
 		processRomwe();
 	}
@@ -66,6 +69,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "undiz"){
 			sendResponse({itemName: $('p.product-name').text().trim()});
+		}
+		else if(request.store == "zalandofr"){
+			sendResponse({itemName: $(".z-vegas-ui_text.z-vegas-ui_text-vegas-detail-title").text().trim()});
 		}
 		else if(request.store == "romwe"){
 			sendResponse({itemName: $('h1').text().trim()});
@@ -253,4 +259,13 @@ function processAmazoncomAjaxEvents() {
 		}
 	},
 	2000);
+}
+
+
+function processZalandofr() {
+	var lasturlpart = getLastUrlPart(window.location.pathname);
+
+	var price = $("span.zvui_price_priceWrapper").last().text().trim().replace(/\s+€/g, "").replace(/,/g, ".");
+	console.log("prid " + price + "  " + lasturlpart);
+	sendToDB("zalandofr", lasturlpart, price);
 }

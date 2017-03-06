@@ -16,7 +16,8 @@
           "*://www.amazon.fr/dp/*",
           "*://www.amazon.com/*/dp/*",
           "*://www.amazon.com/gp/product/*",
-          "*://www.amazon.com/dp/*" ]
+          "*://www.amazon.com/dp/*",
+          "*://www.zalando.fr/*.html*" ]
       }],
    
    "icons": {
@@ -34,7 +35,7 @@
 
    "permissions": [ "storage", "tabs", "*://waxence.fr/*"],
 
-   "version": "0.5.0.6",
+   "version": "0.5.0.7",
 
    "page_action": {
       "default_title": "Worth buying?",
