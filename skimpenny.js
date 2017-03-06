@@ -31,6 +31,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("undiz.com")) {
 		processUndiz();
 	}
+	else if (document.domain.endsWith("caseking.de")) {
+		processCasekingde();
+	}
 	else if (document.domain.endsWith("zalando.fr")) {
 		processZalandofr();
 	}
@@ -75,6 +78,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "romwe"){
 			sendResponse({itemName: $('h1').text().trim()});
+		}
+		else if(request.store == "casekingde"){
+			sendResponse({itemName: $('h1').clone().children().remove().end().text().trim()});
 		}
 		else{
 			sendResponse({itemName: "Unknown store"});
@@ -268,4 +274,15 @@ function processZalandofr() {
 	var price = $("span.zvui_price_priceWrapper").last().text().trim().replace(/\s+€/g, "").replace(/,/g, ".");
 	console.log("prid " + price + "  " + lasturlpart);
 	sendToDB("zalandofr", lasturlpart, price);
+}
+
+function processCasekingde() {
+	var lasturlpart = getLastUrlPart(window.location.pathname);
+
+	var price = $(".article_details_price2").first().find("strong").text().trim().replace(/\s+€\*/g, "").replace(/,/g, ".");
+	if (price.length === 0)
+		price = $(".article_details_price").first().text().trim().replace(/\s+€\*/g, "").replace(/,/g, ".");
+
+	console.log("prid " + price + "  " + lasturlpart);
+	sendToDB("casekingde", lasturlpart, price);
 }

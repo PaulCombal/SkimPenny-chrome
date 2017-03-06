@@ -35,6 +35,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "romwe"){
 			shorturl = processRomwe(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "casekingde"){
+			shorturl = processCasekingde(tabs[0].url);
+		}
 		else if(getStoreFromURL(tabs[0].url) === "zalandofr"){
 			shorturl = processZalandofr(tabs[0].url);
 		}
@@ -105,6 +108,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("://www.amazon.fr/")) {
 		return "amazonfr";
+	}
+	else if (fullurl.includes("://www.caseking.de/")) {
+		return "casekingde";
 	}
 	else if (fullurl.includes("://www.zalando.fr/")) {
 		return "zalandofr";
@@ -326,8 +332,6 @@ function processAmazoncom(fullurl){
 	else
 		shorturl = getUrlPart(shorturl, 3);
 
-	console.log("Gonna ask for amazon.com " + shorturl);
-
 	getPriceCurve("amazoncom", shorturl);
 	return shorturl;
 }
@@ -338,6 +342,11 @@ function processZalandofr(fullurl){
 	return shorturl;
 }
 
+function processCasekingde(fullurl){
+	var shorturl = getLastUrlPart(fullurl);
+	getPriceCurve("casekingde", shorturl);
+	return shorturl;
+}
 
 /* ****************************************************** */
 /* All the following is only for presenting the HTML page */
