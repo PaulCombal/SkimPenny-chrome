@@ -37,6 +37,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("zalando.fr")) {
 		processZalandofr();
 	}
+	else if (document.domain.endsWith("gearbest.com")) {
+		setTimeout(processGearbestcom, 2000);
+	}
 	else if (document.domain.endsWith("romwe.com") && !document.domain.startsWith("www")) { // www. -> english site
 		processRomwe();
 	}
@@ -69,6 +72,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "grosbill"){
 			sendResponse({itemName: $('h1[itemprop=name]').text().trim()});
+		}
+		else if(request.store == "gearbestcom"){
+			sendResponse({itemName: $('h1').first().text().trim()});
 		}
 		else if(request.store == "undiz"){
 			sendResponse({itemName: $('p.product-name').text().trim()});
@@ -285,4 +291,18 @@ function processCasekingde() {
 
 	console.log("prid " + price + "  " + lasturlpart);
 	sendToDB("casekingde", lasturlpart, price);
+}
+
+function processGearbestcom() {
+	var lasturlpart = getLastUrlPart(window.location.pathname);
+
+	var price = $("#unit_price").text().trim();
+	if (price.includes("€")) {
+		price = price.replace(/€/g, "");
+		console.log("prid " + price + "  " + lasturlpart);
+		sendToDB("gearbestcom", lasturlpart, price);
+	}
+	else{
+		console.log("For now, this extension only supports pricing in euros. Contact us if you desire support for another currency!");
+	}
 }

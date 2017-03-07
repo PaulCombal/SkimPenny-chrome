@@ -41,6 +41,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "zalandofr"){
 			shorturl = processZalandofr(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "gearbestcom"){
+			shorturl = processGearbestcom(tabs[0].url);
+		}
 		else{
 			console.log("Warning: Unknown store for page " + tabs[0].url);
 			shorturl = "Error, unknown store";
@@ -114,6 +117,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("://www.zalando.fr/")) {
 		return "zalandofr";
+	}
+	else if (fullurl.includes("://www.gearbest.com/")) {
+		return "gearbestcom";
 	}
 	else{
 		return "Unknown store";
@@ -345,6 +351,12 @@ function processZalandofr(fullurl){
 function processCasekingde(fullurl){
 	var shorturl = getLastUrlPart(fullurl);
 	getPriceCurve("casekingde", shorturl);
+	return shorturl;
+}
+
+function processGearbestcom(fullurl){
+	var shorturl = getLastUrlPart(fullurl);
+	getPriceCurve("gearbestcom", shorturl);
 	return shorturl;
 }
 
