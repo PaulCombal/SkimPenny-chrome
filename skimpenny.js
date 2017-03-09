@@ -15,6 +15,10 @@ $(document).ready(function() {
 		processAmazonfr();
 		processAmazonfrAjaxEvents();
 	}
+	else if (document.domain.endsWith("amazon.co.uk")) {
+		processAmazoncouk();
+		processAmazoncoukAjaxEvents();
+	}
 	else if (document.domain.endsWith("cdiscount.com")) {
 		processCdiscount();
 	}
@@ -59,6 +63,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 			sendResponse({itemName: $("span#productTitle").text().trim()});
 		}
 		else if(request.store == "amazonfr"){
+			sendResponse({itemName: $("span#productTitle").text().trim()});
+		}
+		else if(request.store == "amazoncouk"){
 			sendResponse({itemName: $("span#productTitle").text().trim()});
 		}
 		else if(request.store == "cdiscount"){
@@ -268,6 +275,36 @@ function processAmazoncomAjaxEvents() {
 		if (pathname !== window.location.pathname) {
 			pathname = window.location.pathname;
 			processAmazoncom();
+		}
+	},
+	2000);
+}
+
+function processAmazoncouk() {
+	var pathname = window.location.pathname;
+	if (pathname.startsWith("/dp/"))
+		pathname = getUrlPart(pathname, 2);
+	else
+		pathname = getUrlPart(pathname, 3);
+	//This may be correct, but in some cases this is also the last part 
+	//So we have to remove additional anchors/GET parameters
+
+	var price = $('span#priceblock_saleprice').text().trim().replace(/£/g, "");
+	if (price.length === 0)
+		price = $('span#priceblock_dealprice').text().trim().replace(/£/g, "");
+	if (price.length === 0)
+		price = $('span#priceblock_ourprice').text().trim().replace(/£/g, "");
+
+	console.log("prid " + price + "  " + pathname);
+	sendToDB("amazoncouk", pathname, price);
+}
+
+function processAmazoncoukAjaxEvents() {
+	var pathname = window.location.pathname;
+	setInterval(()=>{
+		if (pathname !== window.location.pathname) {
+			pathname = window.location.pathname;
+			processAmazoncouk();
 		}
 	},
 	2000);

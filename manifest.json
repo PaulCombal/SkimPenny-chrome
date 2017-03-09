@@ -17,6 +17,9 @@
           "*://www.amazon.com/*/dp/*",
           "*://www.amazon.com/gp/product/*",
           "*://www.amazon.com/dp/*",
+          "*://www.amazon.co.uk/*/dp/*",
+          "*://www.amazon.co.uk/gp/product/*",
+          "*://www.amazon.co.uk/dp/*",
           "*://www.zalando.fr/*.html*",
           "*://www.caseking.de/*.html*",
           "*://www.gearbest.com/*/pp_*.html*" ]
@@ -37,7 +40,7 @@
 
    "permissions": [ "storage", "tabs", "*://waxence.fr/*"],
 
-   "version": "0.5.0.9",
+   "version": "0.5.0.10",
 
    "page_action": {
       "default_title": "Worth buying?",

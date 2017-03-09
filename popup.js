@@ -11,6 +11,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "amazoncom"){
 			shorturl = processAmazoncom(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "amazoncouk"){
+			shorturl = processAmazoncouk(tabs[0].url);
+		}
 		else if(getStoreFromURL(tabs[0].url) === "amazonfr"){
 			shorturl = processAmazonfr(tabs[0].url);
 		}
@@ -87,6 +90,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("://www.amazon.com/")) {
 		return "amazoncom";
+	}
+	else if (fullurl.includes("://www.amazon.co.uk/")) {
+		return "amazoncouk";
 	}
 	else if (fullurl.includes("shop.hardware.fr/fiche/")) {
 		return "hardwarefr";
@@ -339,6 +345,25 @@ function processAmazoncom(fullurl){
 		shorturl = getUrlPart(shorturl, 3);
 
 	getPriceCurve("amazoncom", shorturl);
+	return shorturl;
+}
+
+function processAmazoncouk(fullurl){
+
+	var shorturl = fullurl;
+
+	var n = shorturl.indexOf('#');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+
+	n = shorturl.indexOf('?');
+	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
+	
+	if (shorturl.includes("www.amazon.co.uk/dp/"))
+		shorturl = getUrlPart(shorturl, 2);
+	else
+		shorturl = getUrlPart(shorturl, 3);
+
+	getPriceCurve("amazoncouk", shorturl);
 	return shorturl;
 }
 

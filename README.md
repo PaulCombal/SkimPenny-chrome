@@ -17,6 +17,7 @@ For now, supported sites are:
 * romwe.com (non-english only)
 * amazon.fr
 * amazon.com
+* amazon.co.uk
 * zalando.fr
 * caseking.de
 * gearbest.com (only euro currency)
