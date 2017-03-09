@@ -38,6 +38,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("caseking.de")) {
 		processCasekingde();
 	}
+	else if (document.domain.endsWith("newegg.com")) {
+		processNeweggcom();
+	}
 	else if (document.domain.endsWith("zalando.fr")) {
 		processZalandofr();
 	}
@@ -94,6 +97,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "casekingde"){
 			sendResponse({itemName: $('h1').clone().children().remove().end().text().trim()});
+		}
+		else if(request.store == "neweggcom"){
+			sendResponse({itemName: $('#grpDescrip_h').text().trim()});
 		}
 		else{
 			sendResponse({itemName: "Unknown store"});
@@ -317,6 +323,19 @@ function processZalandofr() {
 	var price = $("span.zvui_price_priceWrapper").last().text().trim().replace(/\s+€/g, "").replace(/,/g, ".");
 	console.log("prid " + price + "  " + lasturlpart);
 	sendToDB("zalandofr", lasturlpart, price);
+}
+
+function processNeweggcom() {
+	var lasturlpart = window.location.search.match(/N([A-Z]|[0-9]){14}/g);
+	if(lasturlpart.length === 0){
+		console.log("An error occurred getting the ID of this item, please let the devs know about it!");
+		return;
+	}
+	lasturlpart = lasturlpart[0];
+
+	var price = $("#landingpage-price li.price-current").last().text().trim().replace(/\$/g, "");
+	console.log("prid " + price + "  " + lasturlpart);
+	sendToDB("neweggcom", lasturlpart, price);
 }
 
 function processCasekingde() {

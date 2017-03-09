@@ -44,6 +44,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "zalandofr"){
 			shorturl = processZalandofr(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "neweggcom"){
+			shorturl = processNeweggcom(tabs[0].url);
+		}
 		else if(getStoreFromURL(tabs[0].url) === "gearbestcom"){
 			shorturl = processGearbestcom(tabs[0].url);
 		}
@@ -126,6 +129,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("://www.gearbest.com/")) {
 		return "gearbestcom";
+	}
+	else if (fullurl.includes("://www.newegg.com/")) {
+		return "neweggcom";
 	}
 	else{
 		return "Unknown store";
@@ -382,6 +388,17 @@ function processCasekingde(fullurl){
 function processGearbestcom(fullurl){
 	var shorturl = getLastUrlPart(fullurl);
 	getPriceCurve("gearbestcom", shorturl);
+	return shorturl;
+}
+
+function processNeweggcom(fullurl){
+	var shorturl = fullurl.match(/N([A-Z]|[0-9]){14}/g);
+	if(shorturl.length === 0){
+		$("#chart").append("An error occurred getting the ID of this item, please let the devs know about it!");
+		return;
+	}
+	shorturl = shorturl[0];
+	getPriceCurve("neweggcom", shorturl);
 	return shorturl;
 }
 

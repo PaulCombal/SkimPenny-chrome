@@ -10,7 +10,8 @@ let matches = [	/.*:\/\/.*ldlc.com\/fiche\/.*(\.html)$/g,
 				/.*\/\/www\.undiz\.com\/.*\/.*\/.*([0-9]\.html)$/g,
 				/.*(fr|es|de)\.romwe\.com\/.*-p-[0-9]*-cat-[0-9]*\.html.*/g,
 				/.*\/\/www\.zalando\.fr\/.*\.html.*/g,
-				/.*\/\/www\.gearbest\.com\/.*\/pp_[0-9]{6}\.html.*/g];
+				/.*\/\/www\.gearbest\.com\/.*\/pp_[0-9]{6}\.html.*/g,
+				/.*\/\/www\.newegg\.com\/Product\/Product\.aspx\?(i|I)tem=.*/g];
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 	for (let i in matches) {
