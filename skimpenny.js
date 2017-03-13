@@ -50,6 +50,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("topachat.com")) {
 		processTopachatcom();
 	}
+	else if (document.domain.endsWith("rueducommerce.fr")) {
+		processRueducommercefr();
+	}
 	else if (document.domain.endsWith("romwe.com") && !document.domain.startsWith("www")) { // www. -> english site
 		processRomwe();
 	}
@@ -106,6 +109,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "topachatcom"){
 			sendResponse({itemName: $("h1[itemprop=name").text().trim()});
+		}
+		else if(request.store == "rueducommercefr"){
+			sendResponse({itemName: $("h1 span[itemprop=name").text().trim()});
 		}
 		else{
 			sendResponse({itemName: "Unknown store"});
@@ -307,7 +313,6 @@ function processAmazoncouk() {
 	if (price.length === 0)
 		price = $('span#priceblock_ourprice').text().trim().replace(/£/g, "");
 
-	console.log("prid " + price + "  " + pathname);
 	sendToDB("amazoncouk", pathname, price);
 }
 
@@ -357,6 +362,14 @@ function processTopachatcom() {
 	var price = $("span.priceFinal[itemprop=price]").attr("content");
 
 	sendToDB("topachatcom", lasturlpart, price);
+}
+
+function processRueducommercefr() {
+	var lasturlpart = getLastUrlPart(window.location.pathname);
+	var price = $("meta[itemprop=price]").attr("content").replace(/,/g, ".");
+
+	console.log("prid " + price + "  " + lasturlpart);
+	sendToDB("rueducommercefr", lasturlpart, price);
 }
 
 function processGearbestcom() {

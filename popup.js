@@ -53,6 +53,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "topachatcom"){
 			shorturl = processTopachatcom(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "rueducommercefr"){
+			shorturl = processRueducommercefr(tabs[0].url);
+		}
 		else{
 			console.log("Warning: Unknown store for page " + tabs[0].url);
 			shorturl = "Error, unknown store";
@@ -138,6 +141,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("://www.topachat.com/")) {
 		return "topachatcom";
+	}
+	else if (fullurl.includes("://www.rueducommerce.fr/")) {
+		return "rueducommercefr";
 	}
 	else{
 		return "Unknown store";
@@ -400,6 +406,12 @@ function processGearbestcom(fullurl){
 function processTopachatcom(fullurl){
 	var shorturl = getLastUrlPart(fullurl);
 	getPriceCurve("topachatcom", shorturl);
+	return shorturl;
+}
+
+function processRueducommercefr(fullurl){
+	var shorturl = getLastUrlPart(fullurl);
+	getPriceCurve("rueducommercefr", shorturl);
 	return shorturl;
 }
 
