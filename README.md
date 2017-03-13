@@ -22,6 +22,7 @@ For now, supported sites are:
 * caseking.de
 * gearbest.com (only euro currency)
 * newegg.com
+* topachat.com
 
 I am very open to any kind of feedback, and if you want to ask for a new store support, just go to the issues tab, and make your request!
 

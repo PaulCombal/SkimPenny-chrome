@@ -50,6 +50,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "gearbestcom"){
 			shorturl = processGearbestcom(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "topachatcom"){
+			shorturl = processTopachatcom(tabs[0].url);
+		}
 		else{
 			console.log("Warning: Unknown store for page " + tabs[0].url);
 			shorturl = "Error, unknown store";
@@ -132,6 +135,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("://www.newegg.com/")) {
 		return "neweggcom";
+	}
+	else if (fullurl.includes("://www.topachat.com/")) {
+		return "topachatcom";
 	}
 	else{
 		return "Unknown store";
@@ -388,6 +394,12 @@ function processCasekingde(fullurl){
 function processGearbestcom(fullurl){
 	var shorturl = getLastUrlPart(fullurl);
 	getPriceCurve("gearbestcom", shorturl);
+	return shorturl;
+}
+
+function processTopachatcom(fullurl){
+	var shorturl = getLastUrlPart(fullurl);
+	getPriceCurve("topachatcom", shorturl);
 	return shorturl;
 }
 

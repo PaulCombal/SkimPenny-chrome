@@ -23,7 +23,8 @@
           "*://www.zalando.fr/*.html*",
           "*://www.caseking.de/*.html*",
           "*://www.newegg.com/Product/Product.aspx?*",
-          "*://www.gearbest.com/*/pp_*.html*" ]
+          "*://www.gearbest.com/*/pp_*.html*",
+          "*://www.topachat.com/pages/detail2_cat_*.html*" ]
       }],
    
    "icons": {
@@ -41,7 +42,7 @@
 
    "permissions": [ "storage", "tabs", "*://waxence.fr/*"],
 
-   "version": "0.5.0.11",
+   "version": "0.5.0.12",
 
    "page_action": {
       "default_title": "Worth buying?",

@@ -47,6 +47,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("gearbest.com")) {
 		setTimeout(processGearbestcom, 2000);
 	}
+	else if (document.domain.endsWith("topachat.com")) {
+		processTopachatcom();
+	}
 	else if (document.domain.endsWith("romwe.com") && !document.domain.startsWith("www")) { // www. -> english site
 		processRomwe();
 	}
@@ -100,6 +103,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "neweggcom"){
 			sendResponse({itemName: $('#grpDescrip_h').text().trim()});
+		}
+		else if(request.store == "topachatcom"){
+			sendResponse({itemName: $("h1[itemprop=name").text().trim()});
 		}
 		else{
 			sendResponse({itemName: "Unknown store"});
@@ -321,7 +327,6 @@ function processZalandofr() {
 	var lasturlpart = getLastUrlPart(window.location.pathname);
 
 	var price = $("span.zvui_price_priceWrapper").last().text().trim().replace(/\s+€/g, "").replace(/,/g, ".");
-	console.log("prid " + price + "  " + lasturlpart);
 	sendToDB("zalandofr", lasturlpart, price);
 }
 
@@ -334,7 +339,6 @@ function processNeweggcom() {
 	lasturlpart = lasturlpart[0];
 
 	var price = $("#landingpage-price li.price-current").last().text().trim().replace(/\$/g, "");
-	console.log("prid " + price + "  " + lasturlpart);
 	sendToDB("neweggcom", lasturlpart, price);
 }
 
@@ -345,8 +349,14 @@ function processCasekingde() {
 	if (price.length === 0)
 		price = $(".article_details_price").first().text().trim().replace(/\s+€\*/g, "").replace(/,/g, ".");
 
-	console.log("prid " + price + "  " + lasturlpart);
 	sendToDB("casekingde", lasturlpart, price);
+}
+
+function processTopachatcom() {
+	var lasturlpart = getLastUrlPart(window.location.pathname);
+	var price = $("span.priceFinal[itemprop=price]").attr("content");
+
+	sendToDB("topachatcom", lasturlpart, price);
 }
 
 function processGearbestcom() {
@@ -355,7 +365,7 @@ function processGearbestcom() {
 	var price = $("#unit_price").text().trim();
 	if (price.includes("€")) {
 		price = price.replace(/€/g, "");
-		console.log("prid " + price + "  " + lasturlpart);
+
 		sendToDB("gearbestcom", lasturlpart, price);
 	}
 	else{
