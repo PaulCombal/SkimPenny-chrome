@@ -56,6 +56,9 @@ $(document).ready(function() {
 		else if(getStoreFromURL(tabs[0].url) === "rueducommercefr"){
 			shorturl = processRueducommercefr(tabs[0].url);
 		}
+		else if(getStoreFromURL(tabs[0].url) === "materielnet"){
+			shorturl = processMaterielnet(tabs[0].url);
+		}
 		else{
 			console.log("Warning: Unknown store for page " + tabs[0].url);
 			shorturl = "Error, unknown store";
@@ -144,6 +147,9 @@ function getStoreFromURL(fullurl){
 	}
 	else if (fullurl.includes("://www.rueducommerce.fr/")) {
 		return "rueducommercefr";
+	}
+	else if (fullurl.includes("://www.materiel.net/")) {
+		return "materielnet";
 	}
 	else{
 		return "Unknown store";
@@ -412,6 +418,12 @@ function processTopachatcom(fullurl){
 function processRueducommercefr(fullurl){
 	var shorturl = getLastUrlPart(fullurl);
 	getPriceCurve("rueducommercefr", shorturl);
+	return shorturl;
+}
+
+function processMaterielnet(fullurl){
+	var shorturl = getLastUrlPart(fullurl);
+	getPriceCurve("materielnet", shorturl);
 	return shorturl;
 }
 

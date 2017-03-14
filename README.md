@@ -24,6 +24,7 @@ For now, supported sites are:
 * newegg.com
 * topachat.com
 * rueducommerce.fr
+* materiel.net
 
 I am very open to any kind of feedback, and if you want to ask for a new store support, just go to the issues tab, and make your request!
 

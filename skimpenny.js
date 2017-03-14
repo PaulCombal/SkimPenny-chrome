@@ -53,6 +53,9 @@ $(document).ready(function() {
 	else if (document.domain.endsWith("rueducommerce.fr")) {
 		processRueducommercefr();
 	}
+	else if (document.domain.endsWith("materiel.net")) {
+		processMaterielnet();
+	}
 	else if (document.domain.endsWith("romwe.com") && !document.domain.startsWith("www")) { // www. -> english site
 		processRomwe();
 	}
@@ -112,6 +115,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 		else if(request.store == "rueducommercefr"){
 			sendResponse({itemName: $("h1 span[itemprop=name").text().trim()});
+		}
+		else if(request.store == "materielnet"){
+			sendResponse({itemName: $("#breadcrumb li").last().text().trim()});
 		}
 		else{
 			sendResponse({itemName: "Unknown store"});
@@ -370,6 +376,14 @@ function processRueducommercefr() {
 
 	console.log("prid " + price + "  " + lasturlpart);
 	sendToDB("rueducommercefr", lasturlpart, price);
+}
+
+function processMaterielnet() {
+	var lasturlpart = getLastUrlPart(window.location.pathname);
+	var price = $("#ProdInfoPrice span").text().trim().replace(/€ TTC/g, "").replace(/,/g, ".").replace(/\s+/g, "");
+
+	console.log("prid " + price + "  " + lasturlpart);
+	sendToDB("materielnet", lasturlpart, price);
 }
 
 function processGearbestcom() {
