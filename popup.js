@@ -316,13 +316,13 @@ function processNike(fullurl){
 }
 
 function processGrosbill(fullurl){
-	var shorturl = getUrlPart(fullurl, 1);
+	var shorturl = getLastUrlPart(fullurl);
 	getPriceCurve("grosbill", shorturl);
 	return shorturl;
 }
 
 function processUndiz(fullurl){
-	var shorturl = getUrlPart(fullurl, 3);
+	var shorturl = getLastUrlPart(fullurl);
 	getPriceCurve("undiz", shorturl);
 	return shorturl;
 }
@@ -384,6 +384,8 @@ function processAmazoncouk(fullurl){
 	
 	if (shorturl.includes("www.amazon.co.uk/dp/"))
 		shorturl = getUrlPart(shorturl, 2);
+	else if (shorturl.includes("www.amazon.co.uk/d/"))
+		shorturl = getUrlPart(shorturl, 4);
 	else
 		shorturl = getUrlPart(shorturl, 3);
 

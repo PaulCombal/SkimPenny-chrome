@@ -1,7 +1,7 @@
 {
   "content_scripts": [ 
     {
-        "js": [ "jquery.min.js", "skimpenny.js" ],
+        "js": [ "jquery.min.js", "SPAPI.js", "skimpenny.js" ],
         "matches": [ "*://www.ldlc.com/fiche/*", 
           "*://ldlc.com/fiche/*", 
           "*://shop.hardware.fr/fiche/*", 
@@ -9,7 +9,7 @@
           "*://www.conrad.fr/ce/fr/product/*/*",
           "*://store.nike.com/*/pid-*/pgid-*",
           "*://www.grosbill.com/4-*",
-          "*://www.undiz.com/*/*/*.html",
+          "*://www.undiz.com/*/*/*.html*",
           "*://*.romwe.com/*-p-*-cat-*.html*",
           "*://www.amazon.fr/*/dp/*",
           "*://www.amazon.fr/gp/product/*",
@@ -20,6 +20,7 @@
           "*://www.amazon.co.uk/*/dp/*",
           "*://www.amazon.co.uk/gp/product/*",
           "*://www.amazon.co.uk/dp/*",
+          "*://www.amazon.co.uk/d/*/*/*",
           "*://www.zalando.fr/*.html*",
           "*://www.caseking.de/*.html*",
           "*://www.newegg.com/Product/Product.aspx?*",
