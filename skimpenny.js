@@ -1,6 +1,10 @@
 $(document).ready(function() {
 	
-	//First thing to do: detect whe website we're browsing
+	//For eah different store, there is a different thing to do to 
+	//find the price, currency, and item ID. Beause of that, you 
+	//have to use anonymous functions to retrieve those elements, and pass
+	//them in the AddPriceRecord function, which will execute them and 
+	//send the data to the database
 	if(storeDomainIs("ldlc.com")){
 		addPriceRecord("LDLC", 
 			()=>{ return window.location.pathname;},
