@@ -5,68 +5,149 @@ $(document).ready(function() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		//shorturl aka unique ID for store
 		var shorturl;
-		if(getStoreFromURL(tabs[0].url) === "LDLC"){
-			shorturl = processLDLC(tabs[0].url);
+		var fullurl = tabs[0].url;
+		if(getStoreFromURL(fullurl) === "LDLC"){
+			shorturl = buildGraphFromStoreAndID("LDLC", ()=>{
+				return fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length)
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "amazoncom"){
-			shorturl = processAmazoncom(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "amazoncom"){
+			shorturl = buildGraphFromStoreAndID("amazoncom", ()=>{
+				var n = fullurl.indexOf('#');
+				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
+
+				n = fullurl.indexOf('?');
+				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
+				
+				if (fullurl.includes("www.amazon.com/dp/"))
+					fullurl = getUrlPart(fullurl, 2);
+				else if (fullurl.includes("www.amazon.com/d/"))
+					fullurl = getUrlPart(fullurl, 4);
+				else
+					fullurl = getUrlPart(fullurl, 3);
+
+				return fullurl;
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "amazoncouk"){
-			shorturl = processAmazoncouk(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "amazoncouk"){
+			shorturl = buildGraphFromStoreAndID("amazoncouk", ()=>{
+				var n = fullurl.indexOf('#');
+				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
+
+				n = fullurl.indexOf('?');
+				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
+				
+				if (fullurl.includes("www.amazon.com/dp/"))
+					fullurl = getUrlPart(fullurl, 2);
+				else if (fullurl.includes("www.amazon.com/d/"))
+					fullurl = getUrlPart(fullurl, 4);
+				else
+					fullurl = getUrlPart(fullurl, 3);
+
+				return fullurl;
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "amazonfr"){
-			shorturl = processAmazonfr(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "amazonfr"){
+			shorturl = buildGraphFromStoreAndID("amazonfr", ()=>{
+				var n = fullurl.indexOf('#');
+				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
+
+				n = fullurl.indexOf('?');
+				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
+				
+				if (fullurl.includes("www.amazon.com/dp/"))
+					fullurl = getUrlPart(fullurl, 2);
+				else if (fullurl.includes("www.amazon.com/d/"))
+					fullurl = getUrlPart(fullurl, 4);
+				else
+					fullurl = getUrlPart(fullurl, 3);
+
+				return fullurl;
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "hardwarefr"){
-			shorturl = processHardwarefr(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "hardwarefr"){
+			shorturl = buildGraphFromStoreAndID("hardwarefr", ()=>{
+				return fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length)
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "cdiscount"){
-			shorturl = processCdiscount(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "cdiscount"){
+			shorturl = buildGraphFromStoreAndID("cdiscount", ()=>{
+				return getLastUrlPart(fullurl);
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "conradfr"){
-			shorturl = processConradfr(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "conradfr"){
+			shorturl = buildGraphFromStoreAndID("conradfr", ()=>{
+				return getLastUrlPart(fullurl);
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "nike"){
-			shorturl = processNike(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "nike"){
+			shorturl = buildGraphFromStoreAndID("nike", ()=>{
+				return getUrlPart(fullurl, 5);
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "grosbill"){
-			shorturl = processGrosbill(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "grosbill"){
+			shorturl = buildGraphFromStoreAndID("cdiscount", ()=>{
+				return getLastUrlPart(fullurl);
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "undiz"){
-			shorturl = processUndiz(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "undiz"){
+			shorturl = buildGraphFromStoreAndID("undiz", ()=>{
+				return getLastUrlPart(fullurl);
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "romwe"){
-			shorturl = processRomwe(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "romwe"){
+			shorturl = buildGraphFromStoreAndID("romwe", ()=>{
+				return getLastUrlPart(fullurl);
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "casekingde"){
-			shorturl = processCasekingde(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "casekingde"){
+			shorturl = buildGraphFromStoreAndID("casekingde", ()=>{
+				return getLastUrlPart(fullurl);
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "zalandofr"){
-			shorturl = processZalandofr(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "zalandofr"){
+			shorturl = buildGraphFromStoreAndID("zalandofr", ()=>{
+				return getLastUrlPart(fullurl);
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "neweggcom"){
-			shorturl = processNeweggcom(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "neweggcom"){
+			shorturl = buildGraphFromStoreAndID("neweggcom", ()=>{
+				var shorturl = fullurl.match(/N([A-Z]|[0-9]){14}/g);
+				if(shorturl.length === 0){
+					$("#chart").append("An error occurred getting the ID of this item, please let the devs know about it!");
+					return;
+				}
+				return shorturl[0];
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "gearbestcom"){
-			shorturl = processGearbestcom(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "gearbestcom"){
+			shorturl = buildGraphFromStoreAndID("gearbestcom", ()=>{
+				return getLastUrlPart(fullurl);
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "topachatcom"){
-			shorturl = processTopachatcom(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "topachatcom"){
+			shorturl = buildGraphFromStoreAndID("topachatcom", ()=>{
+				return getLastUrlPart(fullurl);
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "rueducommercefr"){
-			shorturl = processRueducommercefr(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "rueducommercefr"){
+			shorturl = buildGraphFromStoreAndID("rueducommercefr", ()=>{
+				return getLastUrlPart(fullurl);
+			});
 		}
-		else if(getStoreFromURL(tabs[0].url) === "materielnet"){
-			shorturl = processMaterielnet(tabs[0].url);
+		else if(getStoreFromURL(fullurl) === "materielnet"){
+			shorturl = buildGraphFromStoreAndID("materielnet", ()=>{
+				return getLastUrlPart(fullurl);
+			});
 		}
 		else{
-			console.log("Warning: Unknown store for page " + tabs[0].url);
+			console.log("Warning: Unknown store for page " + tfullurl);
 			shorturl = "Error, unknown store";
 		}
 
 		//Now let's take care of the page elements
 		$("#sett_button").click(showOptionsDropMenu);
-		$("#fav_button").click(function(){favoritesClicked(tabs[0].url, shorturl);});
+		$("#fav_button").click(function(){favoritesClicked(fullurl, shorturl);});
 		$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
 		$("#seeMyFavorites").click(showFavorites);
 		//BUG: clicking show favorites when the page is still loading does nothing
@@ -82,20 +163,8 @@ $(document).ready(function() {
 
 }); //End of document.ready callback
 
-function isInFavorites(favArray, fullurl) {
-
-	if (favArray !== undefined) {
-		var result = false;
-		$.each(favArray, (index, favorite) =>{
-			if (favorite["fullurl"] == fullurl) {
-				return result = true;
-			}
-		 });
-		return result;
-	}
-	return false;
-}
-
+//getStoreFromURL
+//Feed it a url, and returns the store name
 function getStoreFromURL(fullurl){
 	if (fullurl.includes("ldlc.com/fiche/")) {
 		return "LDLC";
@@ -156,289 +225,6 @@ function getStoreFromURL(fullurl){
 	}
 }
 
-/////////////////////////////////////////////////
-//Below are funcs to get data from the database//
-/////////////////////////////////////////////////
-
-function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = "#chart", mini = false){
-
-	//This chrome message gets the item name from the loaded page
-	//This message MUST be read in the script injected in the store page
-	chrome.tabs.getSelected(null, function(tab) {
-		chrome.tabs.sendMessage(tab.id, {action: "getItemName", store: storeName}, function(response) {
-			if (response === undefined) {
-				$("header span").text("Error loading item name");
-				//We don't want undefined favorites
-				$("#fav_button")
-				.off("click")
-				.css("opacity", "0")
-				.css("cursor", "auto")
-				.find("img")
-				.css("cursor", "auto");
-			}
-			else{
-				$("header span").text(response.itemName);
-			}
-		});
-	});
-
-	//This post request gets us the prices and dates for the item
-	$.post("http://waxence.fr/skimpenny/get.php", 
-		{
-			store : storeName,
-			product : productPage,
-		},
-		(data) => {showResults(data, datadiv, selector, mini);},
-		'text')
-	.fail(function(xhr, status, error){
-		$("#maindiv").html("Hacking didn't go so well..<br><span style=\"font-size: smaller\">Are you connected to the internet?</span>")
-		.css("animation", "none")
-		.css("line-height", "100px");
-
-		console.log("Error codes:");
-		console.log(status);
-		console.log(error);
-	});
-}
-
-/*text: the data retrieved from the server
-  datadiv: where to write the data on the page. The css will force it to not be displayed
-  selector: in what block to build the graph*/
-function showResults(text, datadiv, selector, mini = false){
-	$(datadiv).empty().append(text).css("display", "none");
-	buildSelectGraph(datadiv, selector, mini);
-}
-
-function buildSelectGraph(datadiv = "#maindiv", selector = "#chart", mini = false){
-	var pricearray = $(datadiv + ' .priceentry .price').map(function(){
-			return $.trim($(this).text());
-			}).get();
-
-	var datearray = $(datadiv + ' .priceentry .date').map(function(){
-			return $.trim($(this).text());
-			}).get();
-
-	if (typeof pricearray !== 'undefined' && pricearray.length > 0) {
-		buildGraph(pricearray, datearray, selector, mini);
-	}
-	else{
-		$(selector).empty().append("<div>Something went wrong :( <br> If this message appears again on this product, send us an email!</div>");
-	}
-}
-
-function buildGraph(pricearray, datearray, selector, mini = false){
-
-	// Create a simple line chart
-
-	var chart = c3.generate({
-		bindto: selector,
-		data: {
-			x: 'x',
-			columns: [
-				$.merge(['x'], datearray),
-				$.merge(['Price evolution'], pricearray)
-			]
-		},
-		size: {
-			height: mini ? 197 : 500,
-			width: mini ? 310 : 750
-		},
-		padding: {
-			//We add this padding to prevent labels from getting cropped
-			right: 30
-		},
-		axis: {
-			x: {
-				type: 'timeseries',
-				show: !mini,
-				tick: {
-					format: '%d/%m/%Y'
-				}
-			},
-			y: {
-				show: !mini
-			}
-		},
-		interaction: {
-			enabled: !mini
-		}
-	});
-}
-
-//This func only keeps whats behind the last slash of the url and removes anchors
-//and GET parameters
-function getLastUrlPart(fullurl) {
-	var shorturl = fullurl.substr(fullurl.lastIndexOf('/') + 1);
-
-	var n = shorturl.indexOf('#');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-
-	n = shorturl.indexOf('?');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-
-	return shorturl;
-}
-
-function getUrlPart(url, index) {
-   return url.replace(/^https?:\/\//, '').split('/')[index];
-}
-
-
-function processLDLC(fullurl){
-	//shortUrl aka unique ID for the database
-	var shorturl = fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length);
-	getPriceCurve("LDLC", shorturl);
-	return shorturl;
-}
-
-function processHardwarefr(fullurl){
-	var shorturl = fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length);
-	getPriceCurve("hardwarefr", shorturl);
-	return shorturl;
-} 
-
-function processCdiscount(fullurl){
-	var shorturl = getLastUrlPart(fullurl);
-	getPriceCurve("cdiscount", shorturl);
-	return shorturl;
-}
-
-function processConradfr(fullurl){
-	var shorturl = getLastUrlPart(fullurl);
-	getPriceCurve("conradfr", shorturl);
-	return shorturl;
-}
-
-function processNike(fullurl){
-	var shorturl = getUrlPart(fullurl, 5);
-	getPriceCurve("nike", shorturl);
-	return shorturl;
-}
-
-function processGrosbill(fullurl){
-	var shorturl = getLastUrlPart(fullurl);
-	getPriceCurve("grosbill", shorturl);
-	return shorturl;
-}
-
-function processUndiz(fullurl){
-	var shorturl = getLastUrlPart(fullurl);
-	getPriceCurve("undiz", shorturl);
-	return shorturl;
-}
-
-function processRomwe(fullurl){
-	var shorturl = getLastUrlPart(fullurl);
-	getPriceCurve("romwe", shorturl);
-	return shorturl;
-}
-
-function processAmazonfr(fullurl){
-
-	var shorturl = fullurl;
-
-	var n = shorturl.indexOf('#');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-
-	n = shorturl.indexOf('?');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-	
-	if (shorturl.includes("www.amazon.fr/dp/"))
-		shorturl = getUrlPart(shorturl, 2);
-	else
-		shorturl = getUrlPart(shorturl, 3);
-
-
-	getPriceCurve("amazonfr", shorturl);
-	return shorturl;
-}
-
-function processAmazoncom(fullurl){
-
-	var shorturl = fullurl;
-
-	var n = shorturl.indexOf('#');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-
-	n = shorturl.indexOf('?');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-	
-	if (shorturl.includes("www.amazon.com/dp/"))
-		shorturl = getUrlPart(shorturl, 2);
-	else
-		shorturl = getUrlPart(shorturl, 3);
-
-	getPriceCurve("amazoncom", shorturl);
-	return shorturl;
-}
-
-function processAmazoncouk(fullurl){
-
-	var shorturl = fullurl;
-
-	var n = shorturl.indexOf('#');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-
-	n = shorturl.indexOf('?');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-	
-	if (shorturl.includes("www.amazon.co.uk/dp/"))
-		shorturl = getUrlPart(shorturl, 2);
-	else if (shorturl.includes("www.amazon.co.uk/d/"))
-		shorturl = getUrlPart(shorturl, 4);
-	else
-		shorturl = getUrlPart(shorturl, 3);
-
-	getPriceCurve("amazoncouk", shorturl);
-	return shorturl;
-}
-
-function processZalandofr(fullurl){
-	var shorturl = getLastUrlPart(fullurl);
-	getPriceCurve("zalandofr", shorturl);
-	return shorturl;
-}
-
-function processCasekingde(fullurl){
-	var shorturl = getLastUrlPart(fullurl);
-	getPriceCurve("casekingde", shorturl);
-	return shorturl;
-}
-
-function processGearbestcom(fullurl){
-	var shorturl = getLastUrlPart(fullurl);
-	getPriceCurve("gearbestcom", shorturl);
-	return shorturl;
-}
-
-function processTopachatcom(fullurl){
-	var shorturl = getLastUrlPart(fullurl);
-	getPriceCurve("topachatcom", shorturl);
-	return shorturl;
-}
-
-function processRueducommercefr(fullurl){
-	var shorturl = getLastUrlPart(fullurl);
-	getPriceCurve("rueducommercefr", shorturl);
-	return shorturl;
-}
-
-function processMaterielnet(fullurl){
-	var shorturl = getLastUrlPart(fullurl);
-	getPriceCurve("materielnet", shorturl);
-	return shorturl;
-}
-
-function processNeweggcom(fullurl){
-	var shorturl = fullurl.match(/N([A-Z]|[0-9]){14}/g);
-	if(shorturl.length === 0){
-		$("#chart").append("An error occurred getting the ID of this item, please let the devs know about it!");
-		return;
-	}
-	shorturl = shorturl[0];
-	getPriceCurve("neweggcom", shorturl);
-	return shorturl;
-}
 
 /* ****************************************************** */
 /* All the following is only for presenting the HTML page */

@@ -236,6 +236,7 @@ $(document).ready(function() {
 
 //If the popup is opened, it will ask for the item name
 //Here we answer what th item name is
+//Simply have a look to what have been done, and do the same for your store
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.action == "getItemName"){
 	 	if(request.store == "LDLC"){
