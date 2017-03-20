@@ -1,31 +1,83 @@
 $(document).ready(function() {
+
+	//First, we have to make sure this script is injected in a product page.
+	//It should always be, but with the chrome manifest regex, it's not always possible
+	let matches = [	/.*:\/\/.*ldlc.com\/fiche\/.*(\.html)$/g, 
+				/.*:\/\/.*shop\.hardware\.fr\/fiche\/.*(\.html)$/g, 
+				/.*:\/\/www\.amazon\.fr\/((.*\/)?dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g, 
+				/.*:\/\/www\.amazon\.com\/((.*\/)?dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g, 
+				/.*:\/\/www\.amazon\.co\.uk\/((.*\/)?dp\/|gp\/product\/|d\/.*\/.*\/)([0-9]|[A-Z]){10}(\/.*)?/g, 
+				/.*:\/\/.*cdiscount\.com\/.*(\/f-[0-9]+-.*\.html((#|\?).*)?)$/g,
+				/.*:\/\/www\.topachat\.com\/pages\/detail2_cat_.*\.html(((#|\?).*)?)$/g,
+				/.*:\/\/.*conrad\.fr\/ce\/fr\/product\/[0-9]+\/.+/g,
+				/.*\/\/store\.nike\.com\/.*\/pgid-[0-9]{8}/g,
+				/.*\/\/www\.grosbill\.com\/4-.*/g,
+				/.*\/\/www\.undiz\.com\/.*\/.*\/.*([0-9]\.html(.*)?)$/g,
+				/.*(fr|es|de)\.romwe\.com\/.*-p-[0-9]*-cat-[0-9]*\.html.*/g,
+				/.*\/\/www\.zalando\.fr\/.*\.html.*/g,
+				/.*\/\/www\.rueducommerce\.fr\/(m\/ps\/mpid:MP-.*|.*\/.*\/.*\/.*\/.*\.htm(#.*)?)/g,
+				/.*\/\/www\.gearbest\.com\/.*\/pp_[0-9]{6}\.html.*/g,
+				/.*\/\/www\.newegg\.com\/Product\/Product\.aspx\?(i|I)tem=.*/g,
+				/.*\/\/www\.materiel\.net\/.*\/.*[0-9]{6}\.html.*/g,
+				/.*\/\/www\.caseking\.de\/.*\.html.*/g];
+
+	for (let i in matches) {
+		if (window.location.href.match(matches[i])){
+			//We're definitely in a product page. Let's ask for the page action to show
+			sendItemData();
+			chrome.runtime.sendMessage({
+				action: 'showPageAction'
+			});
+			break;
+		}
+	}
+});
+
+//payload will contain the data to send
+//More details before the sendItemData declaration
+//Default values are:
+//timeout: milliseconds to wait before sendig the data (pretty useless i guess, unless you use it otherwise)
+//executeOnLoad: whether or not the data must be sent at the end of the function
+// If you need to manually send the data (to handle ajax events for exemple), you
+// can use the addPriceRecord function directly, and the automatic submission will
+// be skipped
+var payload = {};
+payload.timeout = 0;
+payload.executeOnLoad = true;
+
+//This function gathers all the data about the item, and stores in in payload.
+//Payload MUST contain the following values:
+// storeName: The store name
+// itemID: the unique identifier of the item
+// itemPrice: the price of the item (format NNN.NN)
+// itemCurrency: the currency of the item ("EUR|USDOLL|TODODDODODO")
+// itemName: the name to display on the popup
+function sendItemData(){
 	
-	//For eah different store, there is a different thing to do to 
-	//find the price, currency, and item ID. Beause of that, you 
-	//have to use anonymous functions to retrieve those elements, and pass
-	//them in the AddPriceRecord function, which will execute them and 
-	//send the data to the database
 	if(storeDomainIs("ldlc.com")){
-		addPriceRecord("LDLC", 
-			()=>{ return window.location.pathname;},
-			()=>{ return $("#productshipping meta[itemprop=price]").attr("content").replace(/,/g, '.');},
-			()=>{ return "EUR";});
+		payload.storeName = "LDLC";
+		payload.itemID = window.location.pathname;
+		payload.itemPrice = $("#productshipping meta[itemprop=price]").attr("content").replace(/,/g, '.');
+		payload.itemCurrency = "EUR";
+		payload.itemName = $("span.fn.designation_courte").first().text().trim();
 	}
 	else if (storeDomainIs("shop.hardware.fr")) {
+		payload.executeOnLoad = false; //Price and more info loaded by Ajax and not on page load
+		payload.timeout = 2000;
+
 		setTimeout(()=>{
-			addPriceRecord("hardwarefr", 
-				()=>{ return window.location.pathname;},
-				()=>{ 
-					var price = $("#stockPriceBlock .prix .new-price").text().replace(/€/g, '.').trim();
-					if (price.length === 0) {
-						price = $("#stockPriceBlock .prix").text().replace(/€/g, '.').trim();
-					}
-					return price;
-				},
-				()=>{ return "EUR";}
-			);
-		}, 
-		2000);
+			payload.storeName = "hardwarefr";
+			payload.itemID = window.location.pathname;
+			payload.itemCurrency = "EUR";
+			payload.itemName = "TODODDODODO";
+			
+			payload.itemPrice = $("#stockPriceBlock .prix .new-price").text().replace(/€/g, '.').trim();
+			if (payload.itemPrice.length === 0) {
+				payload.itemPrice = $("#stockPriceBlock .prix").text().replace(/€/g, '.').trim();
+			}
+		},
+		payload.timeout);
+
 	}
 	else if (storeDomainIs("amazon.com")) {
 		//The idea here is to check every 2 seconds if the URL changed
@@ -33,93 +85,123 @@ $(document).ready(function() {
 		//as soon as the page is loaded
 		//Note that it might not work with other stores as some don't update their URL
 
+		//Set the loop/delay parameters
 		var pathname = "";
+		payload.executeOnLoad = false;
+		payload.timeout = 2000;
+
+		payload.storeName = "amazoncom";
 
 		setInterval(()=>{
 			if (pathname !== window.location.pathname) {
 				pathname = window.location.pathname;
-				addPriceRecord("amazoncom", 
-					()=>{
-						if (window.location.pathname.startsWith("/dp/"))
-							return getUrlPart(window.location.pathname, 2);
-						else
-							return getUrlPart(window.location.pathname, 3);
-						//This may be correct, but in some cases this is also the last part 
-						//So we have to remove additional anchors/GET parameters
-					},
-					()=>{
-						var price = $('span#priceblock_saleprice').text().trim().replace(/\$/g, "");
-						if (price.length === 0)
-							price = $('span#priceblock_dealprice').text().trim().replace(/\$/g, "");
-						if (price.length === 0)
-							price = $('span#priceblock_ourprice').text().trim().replace(/\$/g, "");
-						return price;
-					},
-					()=>{ return "USDOLL";}
+				
+				//Item is updated, got to update the payload data
+
+				if (window.location.pathname.startsWith("/dp/"))
+					payload.itemID = getUrlPart(window.location.pathname, 2);
+				else if (window.location.pathname.startsWith("/d/"))
+					payload.itemID =  getUrlPart(window.location.pathname, 4);
+				else
+					payload.itemID =  getUrlPart(window.location.pathname, 3);
+
+				payload.itemPrice = $('span#priceblock_saleprice').text().trim().replace(/\$/g, "");
+				if (payload.itemPrice.length === 0)
+					payload.itemPrice = $('span#priceblock_dealprice').text().trim().replace(/\$/g, "");
+				if (payload.itemPrice.length === 0)
+					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/\$/g, "");
+				
+				payload.itemName = "TODODDODODO";
+				payload.itemCurrency = "USDOLL";
+
+				addPriceRecord(
+					payload.storeName, 
+					payload.itemID,
+					payload.itemPrice,
+					payload.itemCurrency
 				);
 			}
 		},
-		2000);
+		payload.timeout);
 	}
 	else if (storeDomainIs("amazon.fr")) {
 		var pathname = "";
+		payload.executeOnLoad = false;
+		payload.timeout = 2000;
+
+		payload.storeName = "amazonfr";
 
 		setInterval(()=>{
 			if (pathname !== window.location.pathname) {
 				pathname = window.location.pathname;
-				addPriceRecord("amazonfr", 
-					()=>{
-						if (window.location.pathname.startsWith("/dp/"))
-							return getUrlPart(window.location.pathname, 2);
-						else
-							return getUrlPart(window.location.pathname, 3);
-						//This may be correct, but in some cases this is also the last part 
-						//So we have to remove additional anchors/GET parameters
-					},
-					()=>{
-						var price = $('span#priceblock_dealprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
-						if (price.length === 0)
-							price = $('span#priceblock_saleprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
-						if (price.length === 0)
-							price = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
-						return price;
-					},
-					()=>{ return "EUR";}
+				
+				//Item is updated, got to update the payload data
+
+				if (window.location.pathname.startsWith("/dp/"))
+					payload.itemID = getUrlPart(window.location.pathname, 2);
+				else if (window.location.pathname.startsWith("/d/"))
+					payload.itemID =  getUrlPart(window.location.pathname, 4);
+				else
+					payload.itemID =  getUrlPart(window.location.pathname, 3);
+
+				payload.itemPrice = $('span#priceblock_dealprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
+				if (payload.itemPrice.length === 0)
+					payload.itemPrice = $('span#priceblock_saleprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
+				if (payload.itemPrice.length === 0)
+					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
+		
+				payload.itemName = "TODODDODODO";
+				payload.itemCurrency = "EUR";
+
+				addPriceRecord(
+					payload.storeName, 
+					payload.itemID,
+					payload.itemPrice,
+					payload.itemCurrency
 				);
 			}
 		},
-		2000);
+		payload.timeout);
 	}
 	else if (storeDomainIs("amazon.co.uk")) {
+
 		var pathname = "";
+		payload.executeOnLoad = false;
+		payload.timeout = 2000;
+
+		payload.storeName = "amazoncouk";
 
 		setInterval(()=>{
 			if (pathname !== window.location.pathname) {
 				pathname = window.location.pathname;
-				addPriceRecord("amazoncouk", 
-					()=>{
-						if (window.location.pathname.startsWith("/dp/"))
-							return getUrlPart(window.location.pathname, 2);
-						else if (window.location.pathname.startsWith("/d/"))
-							return getUrlPart(window.location.pathname, 4);
-						else
-							return getUrlPart(window.location.pathname, 3);
-						//This may be correct, but in some cases this is also the last part 
-						//So we have to remove additional anchors/GET parameters
-					},
-					()=>{
-							var price = $('span#priceblock_saleprice').text().trim().replace(/£/g, "");
-							if (price.length === 0)
-								price = $('span#priceblock_dealprice').text().trim().replace(/£/g, "");
-							if (price.length === 0)
-								price = $('span#priceblock_ourprice').text().trim().replace(/£/g, "");
-							return price;
-					},
-					()=>{ return "STERLING";}
+				
+				//Item is updated, got to update the payload data
+
+				if (window.location.pathname.startsWith("/dp/"))
+					payload.itemID = getUrlPart(window.location.pathname, 2);
+				else if (window.location.pathname.startsWith("/d/"))
+					payload.itemID =  getUrlPart(window.location.pathname, 4);
+				else
+					payload.itemID =  getUrlPart(window.location.pathname, 3);
+
+				payload.itemPrice = $('span#priceblock_saleprice').text().trim().replace(/£/g, "");
+				if (payload.itemPrice.length === 0)
+					payload.itemPrice = $('span#priceblock_dealprice').text().trim().replace(/£/g, "");
+				if (payload.itemPrice.length === 0)
+					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/£/g, "");		
+				
+				payload.itemName = "TODODDODODO";
+				payload.itemCurrency = "STERLING";
+
+				addPriceRecord(
+					payload.storeName, 
+					payload.itemID,
+					payload.itemPrice,
+					payload.itemCurrency
 				);
 			}
 		},
-		2000);
+		payload.timeout);
 	}
 	else if (storeDomainIs("cdiscount.com")) {
 		addPriceRecord("cdiscount", 
@@ -236,7 +318,20 @@ $(document).ready(function() {
 			()=>{ return $("span#spanSubTotal_").last().text().trim().replace(/€/g, "");},
 			()=>{ return "EUR";});
 	}
-});
+	else{
+		console.log("Couldnt find appropriate store :(");
+		return;
+	}
+
+	if(payload.executeOnLoad){
+		setTimeout(()=>{addPriceRecord(
+			payload.storeName,
+			payload.itemID,
+			payload.itemPrice,
+			payload.itemCurrency);}, 
+		payload.timeout);
+	}
+}
 
 //If the popup is opened, it will ask for the item name
 //Here we answer what th item name is

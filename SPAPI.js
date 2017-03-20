@@ -19,6 +19,7 @@ function getLastUrlPart(fullurl) {
 /* FUNCTIONS FOR SKIMPENNY.JS */
 
 //Sends a price record to the database.
+//Parameters:
 //string storeName: The store's name. Not the URL or anything, just its name
 // eg: amazon.com => "amazoncom", topachat.com => "topachatcom"
 //function itemName: a function that will return the item's ID
@@ -28,9 +29,9 @@ function addPriceRecord(storeName, itemName, price, currency) {
 	chrome.runtime.sendMessage({
 		action: 'xhttp',
 		storeName: storeName,
-		productPage: itemName(),
-		price: price(),
-		currency: currency()
+		productPage: itemName,
+		price: price,
+		currency: currency
 	});
 }
 
