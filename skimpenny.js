@@ -69,7 +69,7 @@ function sendItemData(){
 			payload.storeName = "hardwarefr";
 			payload.itemID = window.location.pathname;
 			payload.itemCurrency = "EUR";
-			payload.itemName = "TODODDODODO";
+			payload.itemName = $("#description h1").first().text().trim();
 			
 			payload.itemPrice = $("#stockPriceBlock .prix .new-price").text().replace(/€/g, '.').trim();
 			if (payload.itemPrice.length === 0) {
@@ -111,7 +111,7 @@ function sendItemData(){
 				if (payload.itemPrice.length === 0)
 					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/\$/g, "");
 				
-				payload.itemName = "TODODDODODO";
+				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "USDOLL";
 
 				addPriceRecord(
@@ -150,7 +150,7 @@ function sendItemData(){
 				if (payload.itemPrice.length === 0)
 					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
 		
-				payload.itemName = "TODODDODODO";
+				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "EUR";
 
 				addPriceRecord(
@@ -190,7 +190,7 @@ function sendItemData(){
 				if (payload.itemPrice.length === 0)
 					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/£/g, "");		
 				
-				payload.itemName = "TODODDODODO";
+				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "STERLING";
 
 				addPriceRecord(
@@ -204,23 +204,35 @@ function sendItemData(){
 		payload.timeout);
 	}
 	else if (storeDomainIs("cdiscount.com")) {
-		addPriceRecord("cdiscount", 
-			()=>{ return getLastUrlPart(window.location.pathname);},
-			()=>{ return $("span.price[itemprop=price]").attr("content");},
-			()=>{ return "EUR";});
+		payload.storeName = "cdiscount";
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemPrice = $("span.price[itemprop=price]").attr("content");
+		payload.itemCurrency = "EUR";
+		payload.itemName = $("h1[itemprop=name").text().trim();
 	}
 	else if (storeDomainIs("conrad.fr")) {
-		addPriceRecord("conradfr", 
-			()=>{ return getLastUrlPart(window.location.pathname);},
-			()=>{ return $("span.price").text().trim();},
-			()=>{ return "EUR";});
+		payload.storeName = "conradfr";
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemPrice = $("span.price").text().trim();
+		payload.itemCurrency = "EUR";
+		payload.itemName = $("a.fn[name=head_detail").text().trim();
 	}
 	else if (storeDomainIs("store.nike.com")) {
 		var DOMTimeout = null;
-		var processNike = ()=>{addPriceRecord("nike", 
-			()=>{ return getUrlPart(window.location.pathname, 5);},
-			()=>{ return $('.exp-pdp-product-price span').last().text().trim().replace("€", "").replace(",", ".").trim();},
-			()=>{ return "EUR";})
+		payload.storeName = "nike";
+		payload.executeOnLoad = false;
+		payload.timeout = 200;
+
+		var processNike = ()=>{
+			payload.itemID = getUrlPart(window.location.pathname, 5);
+			payload.itemPrice = $('.exp-pdp-product-price span').last().text().trim().replace("€", "").replace(",", ".").trim();
+			payload.itemCurrency = "EUR";
+			payload.itemName = $('h1.exp-product-title.nsg-font-family--platform').text().trim();
+
+			addPriceRecord(payload.storeName, 
+			payload.itemID,
+			payload.itemPrice,
+			payload.currency);
 		};
 
 		processNike();
@@ -229,94 +241,109 @@ function sendItemData(){
 			if(DOMTimeout)
 				clearTimeout(DOMTimeout);
 
-			DOMTimeout = setTimeout(() => { processNike(); console.log('processNike called'); }, 200);
+			DOMTimeout = setTimeout(() => { processNike(); console.log('processNike called'); }, payload.timeout);
 		});
 
 	}
 	else if (storeDomainIs("grosbill.com")) {
-		addPriceRecord("grosbill", 
-			()=>{ return getLastUrlPart(window.location.pathname);},
-			()=>{ return $('.datasheet_price_and_strike_price_wrapper div').first().text().trim().replace("€", ".");},
-			()=>{ return "EUR";});
+		payload.storeName = "grosbill";
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemPrice = $('.datasheet_price_and_strike_price_wrapper div').first().text().trim().replace("€", ".");
+		payload.itemCurrency = "EUR";
+		payload.itemName = $('h1[itemprop=name]').text().trim();
 	}
 	else if (storeDomainIs("undiz.com")) {
-		addPriceRecord("undiz", 
-			()=>{ return getLastUrlPart(window.location.pathname);},
-			()=>{ return $('span.price-sales.wishPrice').first().text().trim().replace(/ €/g, "").replace(/,/g, ".");},
-			()=>{ return "EUR";});
+		payload.storeName = "undiz";
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemPrice = $('span.price-sales.wishPrice').first().text().trim().replace(/ €/g, "").replace(/,/g, ".");
+		payload.itemCurrency = "EUR";
+		payload.itemName = $('p.product-name').text().trim();
 	}
 	else if (storeDomainIs("caseking.de")) {
-		addPriceRecord("casekingde", 
-			()=>{ return getLastUrlPart(window.location.pathname);},
-			()=>{ 
-				var price = $(".article_details_price2").first().find("strong").text().trim().replace(/\s+€\*/g, "").replace(/,/g, ".");
-				if (price.length === 0)
-					price = $(".article_details_price").first().text().trim().replace(/\s+€\*/g, "").replace(/,/g, ".");
-				return price;
-			},
-			()=>{ return "EUR";});
+		payload.storeName = "casekingde";
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemPrice = $(".article_details_price2").first().find("strong").text().trim().replace(/\s+€\*/g, "").replace(/,/g, ".");
+		if (payload.itemPrice.length === 0)
+			payload.itemPrice = $(".article_details_price").first().text().trim().replace(/\s+€\*/g, "").replace(/,/g, ".");
+		payload.itemCurrency = "EUR";
+		payload.itemName = $('h1').clone().children().remove().end().text().trim();
 	}
 	else if (storeDomainIs("newegg.com")) {
-		addPriceRecord("neweggcom", 
-			()=>{ 
-				var lasturlpart = window.location.search.match(/N([A-Z]|[0-9]){14}/g);
-				if(lasturlpart.length === 0){
-					console.log("An error occurred getting the ID of this item, please let the devs know about it!");
-					return;
-				}
-				return lasturlpart[0];
-			},
-			()=>{ return $("#landingpage-price li.price-current").last().text().trim().replace(/\$/g, "");},
-			()=>{ return "USDOLL";});
+		payload.storeName = "neweggcom";
+		payload.itemID = window.location.search.match(/N([A-Z]|[0-9]){14}/g);
+		if(payload.itemID.length === 0){
+			console.log("An error occurred getting the ID of this item, please let the devs know about it!");
+			return;
+		}
+		payload.itemID = lasturlpart[0];
+		payload.itemPrice = $("#landingpage-price li.price-current").last().text().trim().replace(/\$/g, "");
+		payload.itemCurrency = "USDOLL";
+		payload.itemName = $('#grpDescrip_h').text().trim();
 	}
 	else if (storeDomainIs("zalando.fr")) {
-		addPriceRecord("zalandofr", 
-			()=>{ return getLastUrlPart(window.location.pathname);},
-			()=>{ return $("span.zvui_price_priceWrapper").last().text().trim().replace(/\s+€/g, "").replace(/,/g, ".");},
-			()=>{ return "EUR";});
+		payload.storeName = "zalandofr";
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemPrice = $("span.zvui_price_priceWrapper").last().text().trim().replace(/\s+€/g, "").replace(/,/g, ".");
+		payload.itemCurrency = "EUR";
+		payload.itemName = $(".z-vegas-ui_text.z-vegas-ui_text-vegas-detail-title").text().trim();
 	}
 	else if (storeDomainIs("gearbest.com")) {
+		payload.executeOnLoad = false;
+		payload.timeout = 2000;
+		payload.storeName = "gearbestcom";
+
 		setTimeout(()=>{
-			addPriceRecord("gearbestcom", 
-				()=>{ return getLastUrlPart(window.location.pathname);},
-				()=>{ 
-					var price = $("#unit_price").text().trim();
-					if (price.includes("€")) {
-						price = price.replace(/€/g, "");
-						return price;
-					}
-					else{
-						console.log("For now, this extension only supports pricing in euros. Contact us if you desire support for another currency!");
-					}
-				},
-				()=>{ return "EUR";}
+
+			payload.itemID = getLastUrlPart(window.location.pathname);
+			payload.itemPrice = $("#unit_price").text().trim();
+			
+			if (payload.itemPrice.includes("€")) {
+				payload.itemPrice = payload.itemPrice.replace(/€/g, "");
+				payload.itemCurrency = "EUR";
+			}
+			else{
+				console.log("For now, this extension only supports pricing in euros. Contact us if you desire support for another currency!");
+				return;
+			}
+			
+			payload.itemName = $('h1').first().text().trim();
+
+			addPriceRecord(
+				payload.storeName, 
+				payload.itemID,
+				payload.itemPrice,
+				payload.itemCurrency
 			);
 		}, 
-		2000);
+		payload.timeout);
 	}
 	else if (storeDomainIs("topachat.com")) {
-		addPriceRecord("topachatcom", 
-			()=>{ return getLastUrlPart(window.location.pathname);},
-			()=>{ return $("span.priceFinal[itemprop=price]").attr("content");},
-			()=>{ return "EUR";});
+		payload.storeName = "topachatcom";
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemPrice = $("span.priceFinal[itemprop=price]").attr("content");
+		payload.itemCurrency = "EUR";
+		payload.itemName = $("h1[itemprop=name").text().trim();
 	}
 	else if (storeDomainIs("rueducommerce.fr")) {
-		addPriceRecord("rueducommercefr", 
-			()=>{ return getLastUrlPart(window.location.pathname);},
-			()=>{ return $("meta[itemprop=price]").attr("content").replace(/,/g, ".");},
-			()=>{ return "EUR";});
+		payload.storeName = "rueducommercefr";
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemPrice = $("meta[itemprop=price]").attr("content").replace(/,/g, ".");
+		payload.itemCurrency = "EUR";
+		payload.itemName = $("h1 span[itemprop=name").text().trim();
 	}
 	else if (storeDomainIs("materiel.net")) {
-		addPriceRecord("materielnet", 
-			()=>{ return getLastUrlPart(window.location.pathname);},
-			()=>{ return $("#ProdInfoPrice span").text().trim().replace(/€ TTC/g, "").replace(/,/g, ".").replace(/\s+/g, "");},
-			()=>{ return "EUR";});
+		payload.storeName = "materielnet";
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemPrice = $("#ProdInfoPrice span").text().trim().replace(/€ TTC/g, "").replace(/,/g, ".").replace(/\s+/g, "");
+		payload.itemCurrency = "EUR";
+		payload.itemName = $("#breadcrumb li").last().text().trim();
 	}
 	else if (storeDomainIs("romwe.com") && !document.domain.startsWith("www")) { // www. -> english site
-		addPriceRecord("romwe", 
-			()=>{ return getLastUrlPart(window.location.pathname);},
-			()=>{ return $("span#spanSubTotal_").last().text().trim().replace(/€/g, "");},
-			()=>{ return "EUR";});
+		payload.storeName = "romwe";
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemPrice = $("span#spanSubTotal_").last().text().trim().replace(/€/g, "");
+		payload.itemCurrency = "EUR";
+		payload.itemName = $('h1').text().trim();
 	}
 	else{
 		console.log("Couldnt find appropriate store :(");
@@ -338,63 +365,7 @@ function sendItemData(){
 //Simply have a look to what have been done, and do the same for your store
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.action == "getItemName"){
-	 	if(request.store == "LDLC"){
-			sendResponse({itemName: $("span.fn.designation_courte").first().text().trim()});
-		}
-		else if(request.store == "hardwarefr"){
-			sendResponse({itemName: $("#description h1").first().text().trim()});
-		}
-		else if(request.store == "amazoncom"){
-			sendResponse({itemName: $("span#productTitle").text().trim()});
-		}
-		else if(request.store == "amazonfr"){
-			sendResponse({itemName: $("span#productTitle").text().trim()});
-		}
-		else if(request.store == "amazoncouk"){
-			sendResponse({itemName: $("span#productTitle").text().trim()});
-		}
-		else if(request.store == "cdiscount"){
-			sendResponse({itemName: $("h1[itemprop=name").text().trim()});
-		}
-		else if(request.store == "conradfr"){
-			sendResponse({itemName: $("a.fn[name=head_detail").text().trim()});
-		}
-		else if(request.store == "nike"){
-			sendResponse({itemName: $('h1.exp-product-title.nsg-font-family--platform').text().trim()});
-		}
-		else if(request.store == "grosbill"){
-			sendResponse({itemName: $('h1[itemprop=name]').text().trim()});
-		}
-		else if(request.store == "gearbestcom"){
-			sendResponse({itemName: $('h1').first().text().trim()});
-		}
-		else if(request.store == "undiz"){
-			sendResponse({itemName: $('p.product-name').text().trim()});
-		}
-		else if(request.store == "zalandofr"){
-			sendResponse({itemName: $(".z-vegas-ui_text.z-vegas-ui_text-vegas-detail-title").text().trim()});
-		}
-		else if(request.store == "romwe"){
-			sendResponse({itemName: $('h1').text().trim()});
-		}
-		else if(request.store == "casekingde"){
-			sendResponse({itemName: $('h1').clone().children().remove().end().text().trim()});
-		}
-		else if(request.store == "neweggcom"){
-			sendResponse({itemName: $('#grpDescrip_h').text().trim()});
-		}
-		else if(request.store == "topachatcom"){
-			sendResponse({itemName: $("h1[itemprop=name").text().trim()});
-		}
-		else if(request.store == "rueducommercefr"){
-			sendResponse({itemName: $("h1 span[itemprop=name").text().trim()});
-		}
-		else if(request.store == "materielnet"){
-			sendResponse({itemName: $("#breadcrumb li").last().text().trim()});
-		}
-		else{
-			sendResponse({itemName: "Unknown store"});
-		}
+	 	sendResponse({itemName: payload.itemName});
 	}
 	else
 		sendResponse({error: "Unexpected message on skimpenny.js"});
