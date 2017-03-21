@@ -275,7 +275,7 @@ function sendItemData(){
 			console.log("An error occurred getting the ID of this item, please let the devs know about it!");
 			return;
 		}
-		payload.itemID = lasturlpart[0];
+		payload.itemID = payload.itemID[0];
 		payload.itemPrice = $("#landingpage-price li.price-current").last().text().trim().replace(/\$/g, "");
 		payload.itemCurrency = "USDOLL";
 		payload.itemName = $('#grpDescrip_h').text().trim();
