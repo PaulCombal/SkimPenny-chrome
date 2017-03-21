@@ -1,229 +1,39 @@
 $(document).ready(function() {
-	//First thing to do: detect whe website we're browsing
-	//also check the url from the tab, we can't use window, 
-	//as it will return the popup's location
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-		//shorturl aka unique ID for store
-		var shorturl;
-		var fullurl = tabs[0].url;
-		if(getStoreFromURL(fullurl) === "LDLC"){
-			shorturl = buildGraphFromStoreAndID("LDLC", ()=>{
-				return fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length)
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "amazoncom"){
-			shorturl = buildGraphFromStoreAndID("amazoncom", ()=>{
-				var n = fullurl.indexOf('#');
-				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
+	
+	chrome.tabs.getSelected(null, function(tab) {
+		chrome.tabs.sendMessage(tab.id, {action: "getItemData"}, function(response) {
+			if (response === undefined) {
+				$("header span").text("Error loading item name");
+				//We don't want undefined favorites
+				$("#fav_button")
+				.off("click")
+				.css("opacity", "0")
+				.css("cursor", "auto")
+				.find("img")
+				.css("cursor", "auto");
+			}
+			else{
+				$("header span").text(response.itemName);
 
-				n = fullurl.indexOf('?');
-				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
-				
-				if (fullurl.includes("www.amazon.com/dp/"))
-					fullurl = getUrlPart(fullurl, 2);
-				else if (fullurl.includes("www.amazon.com/d/"))
-					fullurl = getUrlPart(fullurl, 4);
-				else
-					fullurl = getUrlPart(fullurl, 3);
+				getPriceCurve(response.itemID, response.storeName);
 
-				return fullurl;
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "amazoncouk"){
-			shorturl = buildGraphFromStoreAndID("amazoncouk", ()=>{
-				var n = fullurl.indexOf('#');
-				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
+				//Now let's take care of the page elements
+				$("#sett_button").click(showOptionsDropMenu);
+				$("#fav_button").click(function(){favoritesClicked(response.fullurl, response.itemID, response.storeName);});
+				$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
+				$("#seeMyFavorites").click(showFavorites);
+				//BUG: clicking show favorites when the page is still loading does nothing
 
-				n = fullurl.indexOf('?');
-				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
-				
-				if (fullurl.includes("www.amazon.com/dp/"))
-					fullurl = getUrlPart(fullurl, 2);
-				else if (fullurl.includes("www.amazon.com/d/"))
-					fullurl = getUrlPart(fullurl, 4);
-				else
-					fullurl = getUrlPart(fullurl, 3);
-
-				return fullurl;
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "amazonfr"){
-			shorturl = buildGraphFromStoreAndID("amazonfr", ()=>{
-				var n = fullurl.indexOf('#');
-				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
-
-				n = fullurl.indexOf('?');
-				fullurl = fullurl.substring(0, n != -1 ? n : fullurl.length);
-				
-				if (fullurl.includes("www.amazon.com/dp/"))
-					fullurl = getUrlPart(fullurl, 2);
-				else if (fullurl.includes("www.amazon.com/d/"))
-					fullurl = getUrlPart(fullurl, 4);
-				else
-					fullurl = getUrlPart(fullurl, 3);
-
-				return fullurl;
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "hardwarefr"){
-			shorturl = buildGraphFromStoreAndID("hardwarefr", ()=>{
-				return fullurl.slice(fullurl.indexOf("/fiche/"), fullurl.length)
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "cdiscount"){
-			shorturl = buildGraphFromStoreAndID("cdiscount", ()=>{
-				return getLastUrlPart(fullurl);
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "conradfr"){
-			shorturl = buildGraphFromStoreAndID("conradfr", ()=>{
-				return getLastUrlPart(fullurl);
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "nike"){
-			shorturl = buildGraphFromStoreAndID("nike", ()=>{
-				return getUrlPart(fullurl, 5);
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "grosbill"){
-			shorturl = buildGraphFromStoreAndID("cdiscount", ()=>{
-				return getLastUrlPart(fullurl);
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "undiz"){
-			shorturl = buildGraphFromStoreAndID("undiz", ()=>{
-				return getLastUrlPart(fullurl);
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "romwe"){
-			shorturl = buildGraphFromStoreAndID("romwe", ()=>{
-				return getLastUrlPart(fullurl);
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "casekingde"){
-			shorturl = buildGraphFromStoreAndID("casekingde", ()=>{
-				return getLastUrlPart(fullurl);
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "zalandofr"){
-			shorturl = buildGraphFromStoreAndID("zalandofr", ()=>{
-				return getLastUrlPart(fullurl);
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "neweggcom"){
-			shorturl = buildGraphFromStoreAndID("neweggcom", ()=>{
-				var shorturl = fullurl.match(/N([A-Z]|[0-9]){14}/g);
-				if(shorturl.length === 0){
-					$("#chart").append("An error occurred getting the ID of this item, please let the devs know about it!");
-					return;
-				}
-				return shorturl[0];
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "gearbestcom"){
-			shorturl = buildGraphFromStoreAndID("gearbestcom", ()=>{
-				return getLastUrlPart(fullurl);
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "topachatcom"){
-			shorturl = buildGraphFromStoreAndID("topachatcom", ()=>{
-				return getLastUrlPart(fullurl);
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "rueducommercefr"){
-			shorturl = buildGraphFromStoreAndID("rueducommercefr", ()=>{
-				return getLastUrlPart(fullurl);
-			});
-		}
-		else if(getStoreFromURL(fullurl) === "materielnet"){
-			shorturl = buildGraphFromStoreAndID("materielnet", ()=>{
-				return getLastUrlPart(fullurl);
-			});
-		}
-		else{
-			console.log("Warning: Unknown store for page " + tfullurl);
-			shorturl = "Error, unknown store";
-		}
-
-		//Now let's take care of the page elements
-		$("#sett_button").click(showOptionsDropMenu);
-		$("#fav_button").click(function(){favoritesClicked(fullurl, shorturl);});
-		$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
-		$("#seeMyFavorites").click(showFavorites);
-		//BUG: clicking show favorites when the page is still loading does nothing
-		
-		//Making sure the favorite star has correct icon
-		chrome.storage.sync.get(null, (data) => {
-			//By default, the star-outline is used
-			if (isInFavorites(data.favlist, tabs[0].url))
-				$("#fav_button img").attr("src", "img/star.png");
+				//Making sure the favorite star has correct icon
+				chrome.storage.sync.get(null, (data) => {
+					//By default, the star-outline is used
+					if (isInFavorites(data.favlist, response.fullurl))
+						$("#fav_button img").attr("src", "img/star.png");
+				});
+			}
 		});
-
 	});
-
-}); //End of document.ready callback
-
-//getStoreFromURL
-//Feed it a url, and returns the store name
-function getStoreFromURL(fullurl){
-	if (fullurl.includes("ldlc.com/fiche/")) {
-		return "LDLC";
-	}
-	else if (fullurl.includes("://www.amazon.com/")) {
-		return "amazoncom";
-	}
-	else if (fullurl.includes("://www.amazon.co.uk/")) {
-		return "amazoncouk";
-	}
-	else if (fullurl.includes("shop.hardware.fr/fiche/")) {
-		return "hardwarefr";
-	}
-	else if (fullurl.includes("cdiscount.com/")) {
-		return "cdiscount";
-	}
-	else if (fullurl.includes("conrad.fr/ce/fr/product/")) {
-		return "conradfr";
-	}
-	else if (fullurl.includes("store.nike.com/")) {
-		return "nike";
-	}
-	else if (fullurl.includes("grosbill.com/")) {
-		return "grosbill";
-	}
-	else if (fullurl.includes("www.undiz.com/")) {
-		return "undiz";
-	}
-	else if (fullurl.includes("romwe.com/")) {
-		return "romwe";
-	}
-	else if (fullurl.includes("://www.amazon.fr/")) {
-		return "amazonfr";
-	}
-	else if (fullurl.includes("://www.caseking.de/")) {
-		return "casekingde";
-	}
-	else if (fullurl.includes("://www.zalando.fr/")) {
-		return "zalandofr";
-	}
-	else if (fullurl.includes("://www.gearbest.com/")) {
-		return "gearbestcom";
-	}
-	else if (fullurl.includes("://www.newegg.com/")) {
-		return "neweggcom";
-	}
-	else if (fullurl.includes("://www.topachat.com/")) {
-		return "topachatcom";
-	}
-	else if (fullurl.includes("://www.rueducommerce.fr/")) {
-		return "rueducommercefr";
-	}
-	else if (fullurl.includes("://www.materiel.net/")) {
-		return "materielnet";
-	}
-	else{
-		return "Unknown store";
-	}
-}
+});
 
 
 /* ****************************************************** */
@@ -256,7 +66,7 @@ function hideOptionsDropMenu(){
 	.click(showOptionsDropMenu);
 }
 
-function favoritesClicked(fullurl, shorturl){
+function favoritesClicked(fullurl, shorturl, store){
 
 	//First of all, we have to figure if the page has been loaded
 	//This check is done in getPriceCurve if the title can't be found,
@@ -289,7 +99,10 @@ function favoritesClicked(fullurl, shorturl){
 			favorite["dateAdded"] = date;
 			favorite["fullurl"] = fullurl;
 			favorite["shorturl"] = shorturl;
-			favorite["store"] = getStoreFromURL(fullurl);
+			favorite["store"] = store;
+
+			console.log("Favorite added:");
+			console.log(favorite);
 
 			//First check if this is the first favorite
 			if (data.favlist === undefined) {
@@ -345,9 +158,9 @@ function showFavorites(){
 
 				$("div.favchart").last().click(()=>{
 					$("div.favchart[data-url='" + favorite["shorturl"] + "']").text("Loading");
-					//TODO
+
 					//function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = "#chart", mini)
-					getPriceCurve(favorite["store"], favorite["shorturl"], ".datadiv." + id, ".favchart." + id, true);
+					getPriceCurve(favorite["shorturl"], favorite["store"], ".datadiv." + id, ".favchart." + id, true);
 				});
 			});
 		}

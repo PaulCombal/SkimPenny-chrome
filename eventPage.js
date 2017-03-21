@@ -1,6 +1,5 @@
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
     if (request.action == "showPageAction") {
-    	console.log("HEHEH");
     	chrome.pageAction.show(sender.tab.id);
     }
     else if (request.action == "xhttp") {
@@ -10,7 +9,7 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
 				product : request.productPage,
 				price : request.price
 			},
-			logAddRecordResponse,
+			(response)=>{console.log(response);},
 			'text')
 		.fail(function(){
 			console.log("Error sending request :(");
@@ -19,7 +18,3 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
         return true; // prevents the callback from being called too early on return
     }
 });
-
-function logAddRecordResponse(response){
-	console.log(response);
-}

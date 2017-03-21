@@ -360,12 +360,17 @@ function sendItemData(){
 	}
 }
 
-//If the popup is opened, it will ask for the item name
-//Here we answer what th item name is
-//Simply have a look to what have been done, and do the same for your store
+//If the popup is opened, it will ask for the item info
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-	if (request.action == "getItemName"){
-	 	sendResponse({itemName: payload.itemName});
+	if (request.action == "getItemData"){
+	 	sendResponse(
+	 		{
+	 			itemName: payload.itemName,
+	 			itemID: payload.itemID,
+	 			storeName: payload.storeName,
+	 			fullurl: window.location.href
+	 		}
+	 	);
 	}
 	else
 		sendResponse({error: "Unexpected message on skimpenny.js"});

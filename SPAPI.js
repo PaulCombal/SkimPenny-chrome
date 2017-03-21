@@ -41,13 +41,6 @@ function storeDomainIs(argument) {
 
 /* FUNCTIONS FOR POPUP.JS */
 
-function buildGraphFromStoreAndID(shopName, itemID)
-{
-	var id = itemID();
-	getPriceCurve(shopName, id);
-	return id;
-}
-
 function isInFavorites(favArray, fullurl) {
 
 	if (favArray !== undefined) {
@@ -66,33 +59,15 @@ function isInFavorites(favArray, fullurl) {
 //Below are funcs to get data from the database//
 /////////////////////////////////////////////////
 
-function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = "#chart", mini = false){
+//TODO REMOVE CHROME LOADING 
 
-	//This chrome message gets the item name from the loaded page
-	//This message MUST be read in the script injected in the store page
-	chrome.tabs.getSelected(null, function(tab) {
-		chrome.tabs.sendMessage(tab.id, {action: "getItemName", store: storeName}, function(response) {
-			if (response === undefined) {
-				$("header span").text("Error loading item name");
-				//We don't want undefined favorites
-				$("#fav_button")
-				.off("click")
-				.css("opacity", "0")
-				.css("cursor", "auto")
-				.find("img")
-				.css("cursor", "auto");
-			}
-			else{
-				$("header span").text(response.itemName);
-			}
-		});
-	});
+//builds a graph from an itemID and the storeName
+function getPriceCurve(itemID, storeName, datadiv = "#maindiv", selector = "#chart", mini = false){
 
-	//This post request gets us the prices and dates for the item
 	$.post("http://waxence.fr/skimpenny/get.php", 
 		{
 			store : storeName,
-			product : productPage,
+			product : itemID,
 		},
 		(data) => {showResults(data, datadiv, selector, mini);},
 		'text')
@@ -105,6 +80,7 @@ function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = 
 		console.log(status);
 		console.log(error);
 	});
+		
 }
 
 /*text: the data retrieved from the server
