@@ -49,8 +49,8 @@ payload.executeOnLoad = true;
 //Payload MUST contain the following values:
 // storeName: The store name
 // itemID: the unique identifier of the item
-// itemPrice: the price of the item (format NNN.NN)
-// itemCurrency: the currency of the item ("EUR|USDOLL|TODODDODODO")
+// itemPrice: the price of the item (format NNNNN.NN)
+// itemCurrency: the currency of the item ("EUR|USD|GBP|AUD|CAD|CHF|HKD|NZD|JPY|RUB|BRL|CLP|NOK|DKK|SEK|KRW|ILS|COP|MXN|PEN|THB|IDR|UAH|PLN")
 // itemName: the name to display on the popup
 function sendItemData(){
 	
@@ -112,7 +112,7 @@ function sendItemData(){
 					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/\$/g, "");
 				
 				payload.itemName = $("span#productTitle").text().trim();
-				payload.itemCurrency = "USDOLL";
+				payload.itemCurrency = "USD";
 
 				addPriceRecord(
 					payload.storeName, 
@@ -191,7 +191,7 @@ function sendItemData(){
 					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/£/g, "");		
 				
 				payload.itemName = $("span#productTitle").text().trim();
-				payload.itemCurrency = "STERLING";
+				payload.itemCurrency = "GBP";
 
 				addPriceRecord(
 					payload.storeName, 
@@ -224,15 +224,27 @@ function sendItemData(){
 		payload.timeout = 200;
 
 		var processNike = ()=>{
+			var priceString = $('.exp-pdp-product-price span').last().text().trim();
+			switch(true)
+			{
+				case priceString.includes("€"):
+					payload.itemPrice = priceString.replace("€", "").replace(",", ".").trim();
+					payload.itemCurrency = "EUR";
+					break;
+
+				case priceString.includes("$"):
+					payload.itemPrice = priceString.replace(/\$/g, "").replace(",", ".").trim();
+					payload.itemCurrency = "USD";
+					break;
+			}
+
 			payload.itemID = getUrlPart(window.location.pathname, 5);
-			payload.itemPrice = $('.exp-pdp-product-price span').last().text().trim().replace("€", "").replace(",", ".").trim();
-			payload.itemCurrency = "EUR";
 			payload.itemName = $('h1.exp-product-title.nsg-font-family--platform').text().trim();
 
 			addPriceRecord(payload.storeName, 
 			payload.itemID,
 			payload.itemPrice,
-			payload.currency);
+			payload.itemCurrency);
 		};
 
 		processNike();
@@ -345,13 +357,20 @@ function sendItemData(){
 		payload.itemCurrency = "EUR";
 		payload.itemName = $('h1').text().trim();
 	}
+	else if (storeDomainIs("fr.aliexpress.com")) {
+		payload.storeName = "aliexpressfr";
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		//TODO
+		//Look closely at #skuAttr
+	}
 	else{
 		console.log("Couldnt find appropriate store :(");
 		return;
 	}
 
 	if(payload.executeOnLoad){
-		setTimeout(()=>{addPriceRecord(
+		setTimeout(()=>{
+			addPriceRecord(
 			payload.storeName,
 			payload.itemID,
 			payload.itemPrice,

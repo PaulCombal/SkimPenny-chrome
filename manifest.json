@@ -28,7 +28,8 @@
           "*://www.rueducommerce.fr/m/ps/mpid:MP-*",
           "*://www.rueducommerce.fr/*/*/*/*/*.htm*",
           "*://www.topachat.com/pages/detail2_cat_*.html*",
-          "*://www.materiel.net/*/*.html*" ]
+          "*://www.materiel.net/*/*.html*" ],
+        "all_frames": true
       }],
    
    "icons": {

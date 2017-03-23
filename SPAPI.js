@@ -22,9 +22,9 @@ function getLastUrlPart(fullurl) {
 //Parameters:
 //string storeName: The store's name. Not the URL or anything, just its name
 // eg: amazon.com => "amazoncom", topachat.com => "topachatcom"
-//function itemName: a function that will return the item's ID
-//function price: a function that will return the item's price
-//function currency: a function that will return the item's currency for the price given
+//function itemName: a string that is the item's ID
+//function price: a string that's the item's price
+//function currency: a string that's the item's currency for the price given
 function addPriceRecord(storeName, itemName, price, currency) {
 	chrome.runtime.sendMessage({
 		action: 'xhttp',
