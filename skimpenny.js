@@ -232,9 +232,24 @@ function sendItemData(){
 					payload.itemCurrency = "EUR";
 					break;
 
-				case priceString.includes("$"):
+				case priceString.includes("$") && (window.location.href.includes("/us/") || window.location.href.includes("/pr/")):
 					payload.itemPrice = priceString.replace(/\$/g, "").replace(",", ".").trim();
 					payload.itemCurrency = "USD";
+					break;
+
+				case priceString.includes("CAD "):
+					payload.itemPrice = priceString.replace(/CAD\s/g, "").replace(",", ".").trim();
+					payload.itemCurrency = "CAD";
+					break;
+
+				case priceString.includes("$") && window.location.href.includes("/mx/"):
+					payload.itemPrice = priceString.replace(/\$/g, "").replace(",", "").trim();
+					payload.itemCurrency = "MXN";
+					break;
+
+				case $("span#ctl00_Conteudo_ctl21_precoPorValue").text().includes("R$  "):
+					payload.itemPrice = $("span#ctl00_Conteudo_ctl21_precoPorValue").text().replace(/R\$\s/g, "").replace(",", ".").trim();
+					payload.itemCurrency = "BRL";
 					break;
 			}
 
