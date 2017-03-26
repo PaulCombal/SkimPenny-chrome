@@ -320,22 +320,19 @@ function sendItemData(){
 		payload.executeOnLoad = false;
 		payload.timeout = 2000;
 		payload.storeName = "gearbestcom";
+		payload.itemName = $('h1').first().text().trim();
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemCurrency = "";
 
-		setTimeout(()=>{
-
-			payload.itemID = getLastUrlPart(window.location.pathname);
-			payload.itemPrice = $("#unit_price").text().trim();
-			
-			if (payload.itemPrice.includes("€")) {
-				payload.itemPrice = payload.itemPrice.replace(/€/g, "");
-				payload.itemCurrency = "EUR";
-			}
-			else{
-				console.log("For now, this extension only supports pricing in euros. Contact us if you desire support for another currency!");
+		//Updates price and currency, then sends data
+		var processGearbest = ()=>{
+			payload.itemPrice = $("#unit_price").text().trim().match(/[0-9]{0,5}(\.[0-9]{1,2})?$/g);
+			if (payload.itemPrice === null) {
+				console.log("No price found!");
 				return;
 			}
-			
-			payload.itemName = $('h1').first().text().trim();
+			payload.itemPrice = payload.itemPrice[0];
+			payload.itemCurrency = $("span.currency").text().trim();
 
 			addPriceRecord(
 				payload.storeName, 
@@ -343,8 +340,16 @@ function sendItemData(){
 				payload.itemPrice,
 				payload.itemCurrency
 			);
+		};
+
+		setInterval(()=>{
+			//If currency set, or changed
+			if (payload.itemCurrency != $("span.currency").text().trim()) {
+				processGearbest();
+			}
 		}, 
 		payload.timeout);
+
 	}
 	else if (storeDomainIs("topachat.com")) {
 		payload.storeName = "topachatcom";
