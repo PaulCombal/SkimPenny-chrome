@@ -19,6 +19,7 @@ $(document).ready(function() {
 				/.*\/\/www\.gearbest\.com\/.*\/pp_[0-9]{6}\.html.*/g,
 				/.*\/\/www\.newegg\.com\/Product\/Product\.aspx\?(i|I)tem=.*/g,
 				/.*\/\/www\.materiel\.net\/.*\/.*[0-9]{6}\.html.*/g,
+				/.*\/\/www\.aliexpress\.com\/item\/.*\/[0-9]{9,12}\.html.*/g,
 				/.*\/\/www\.caseking\.de\/.*\.html.*/g];
 
 	for (let i in matches) {
@@ -49,8 +50,8 @@ payload.executeOnLoad = true;
 //Payload MUST contain the following values:
 // storeName: The store name
 // itemID: the unique identifier of the item
-// itemPrice: the price of the item (format NNN.NN)
-// itemCurrency: the currency of the item ("EUR|USDOLL|TODODDODODO")
+// itemPrice: the price of the item (format NNNNN.NN)
+// itemCurrency: the currency of the item ("EUR|USD|GBP|AUD|CAD|CHF|HKD|NZD|JPY|RUB|BRL|CLP|NOK|DKK|SEK|KRW|ILS|COP|MXN|PEN|THB|IDR|UAH|PLN")
 // itemName: the name to display on the popup
 function sendItemData(){
 	
@@ -112,7 +113,7 @@ function sendItemData(){
 					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/\$/g, "");
 				
 				payload.itemName = $("span#productTitle").text().trim();
-				payload.itemCurrency = "USDOLL";
+				payload.itemCurrency = "USD";
 
 				addPriceRecord(
 					payload.storeName, 
@@ -191,7 +192,7 @@ function sendItemData(){
 					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/£/g, "");		
 				
 				payload.itemName = $("span#productTitle").text().trim();
-				payload.itemCurrency = "STERLING";
+				payload.itemCurrency = "GBP";
 
 				addPriceRecord(
 					payload.storeName, 
@@ -224,15 +225,43 @@ function sendItemData(){
 		payload.timeout = 200;
 
 		var processNike = ()=>{
+			var priceString = $('.exp-pdp-product-price span').last().text().trim();
+			//Add your own currency if you want, too lazy to make them all
+			switch(true)
+			{
+				case priceString.includes("€"):
+					payload.itemPrice = priceString.replace("€", "").replace(",", ".").trim();
+					payload.itemCurrency = "EUR";
+					break;
+
+				case priceString.includes("$") && (window.location.href.includes("/us/") || window.location.href.includes("/pr/")):
+					payload.itemPrice = priceString.replace(/\$/g, "").replace(",", ".").trim();
+					payload.itemCurrency = "USD";
+					break;
+
+				case priceString.includes("CAD "):
+					payload.itemPrice = priceString.replace(/CAD\s/g, "").replace(",", ".").trim();
+					payload.itemCurrency = "CAD";
+					break;
+
+				case priceString.includes("$") && window.location.href.includes("/mx/"):
+					payload.itemPrice = priceString.replace(/\$/g, "").replace(",", "").trim();
+					payload.itemCurrency = "MXN";
+					break;
+
+				case $("span#ctl00_Conteudo_ctl21_precoPorValue").text().includes("R$  "):
+					payload.itemPrice = $("span#ctl00_Conteudo_ctl21_precoPorValue").text().replace(/R\$\s/g, "").replace(",", ".").trim();
+					payload.itemCurrency = "BRL";
+					break;
+			}
+
 			payload.itemID = getUrlPart(window.location.pathname, 5);
-			payload.itemPrice = $('.exp-pdp-product-price span').last().text().trim().replace("€", "").replace(",", ".").trim();
-			payload.itemCurrency = "EUR";
 			payload.itemName = $('h1.exp-product-title.nsg-font-family--platform').text().trim();
 
-			addPriceRecord(payload.storeName, 
+			addPriceRecord(payload.storeName,
 			payload.itemID,
 			payload.itemPrice,
-			payload.currency);
+			payload.itemCurrency);
 		};
 
 		processNike();
@@ -291,22 +320,19 @@ function sendItemData(){
 		payload.executeOnLoad = false;
 		payload.timeout = 2000;
 		payload.storeName = "gearbestcom";
+		payload.itemName = $('h1').first().text().trim();
+		payload.itemID = getLastUrlPart(window.location.pathname);
+		payload.itemCurrency = "";
 
-		setTimeout(()=>{
-
-			payload.itemID = getLastUrlPart(window.location.pathname);
-			payload.itemPrice = $("#unit_price").text().trim();
-			
-			if (payload.itemPrice.includes("€")) {
-				payload.itemPrice = payload.itemPrice.replace(/€/g, "");
-				payload.itemCurrency = "EUR";
-			}
-			else{
-				console.log("For now, this extension only supports pricing in euros. Contact us if you desire support for another currency!");
+		//Updates price and currency, then sends data
+		var processGearbest = ()=>{
+			payload.itemPrice = $("#unit_price").text().trim().match(/[0-9]{0,5}(\.[0-9]{1,2})?$/g);
+			if (payload.itemPrice === null) {
+				console.log("No price found!");
 				return;
 			}
-			
-			payload.itemName = $('h1').first().text().trim();
+			payload.itemPrice = payload.itemPrice[0];
+			payload.itemCurrency = $("span.currency").text().trim();
 
 			addPriceRecord(
 				payload.storeName, 
@@ -314,8 +340,16 @@ function sendItemData(){
 				payload.itemPrice,
 				payload.itemCurrency
 			);
+		};
+
+		setInterval(()=>{
+			//If currency set, or changed
+			if (payload.itemCurrency != $("span.currency").text().trim()) {
+				processGearbest();
+			}
 		}, 
 		payload.timeout);
+
 	}
 	else if (storeDomainIs("topachat.com")) {
 		payload.storeName = "topachatcom";
@@ -345,13 +379,66 @@ function sendItemData(){
 		payload.itemCurrency = "EUR";
 		payload.itemName = $('h1').text().trim();
 	}
+	else if (storeDomainIs("aliexpress.com")) {
+		payload.executeOnLoad = false;
+		payload.timeout = 2000;
+		payload.storeName = "aliexpresscom";
+		payload.itemID = "";
+		payload.itemCurrency = $("span.currency").text();
+		payload.itemName = $("h1.product-name").text().trim();
+		payload.dynamic = true; //Only used for aliexpress
+
+		//Do NOT use dynamic things if there is no price range indicated by " - "
+		if(!$(".p-price").last().text().includes(" - ")){
+			console.log("There is no selector on page. Not Doing dynamic loading.");
+			payload.dynamic = false;
+
+			payload.itemID = getLastUrlPart(window.location.pathname);
+			payload.itemPrice = $(".p-price").last().text();
+
+			addPriceRecord(
+			payload.storeName,
+			payload.itemID,
+			payload.itemPrice,
+			payload.itemCurrency);
+		}
+
+
+		//processAliexpress checks for a new item, and sends new data when item changed
+		var processAliexpress = () => {
+			if (payload.itemID !== getLastUrlPart(window.location.pathname)+$("#skuAttr").attr("value")) {
+				payload.itemID = getLastUrlPart(window.location.pathname)+$("#skuAttr").attr("value");
+				payload.itemPrice = $(".p-price").last().text();
+				payload.itemName = $("h1.product-name").text().trim();
+				
+				if (payload.itemPrice.includes(" - "))
+					return;
+
+				addPriceRecord(
+				payload.storeName,
+				payload.itemID,
+				payload.itemPrice,
+				payload.itemCurrency);
+			}
+		};
+
+		if (payload.dynamic)
+		{
+			setInterval(() => {
+				processAliexpress();
+			},
+			payload.timeout);
+		}
+		
+	}
 	else{
 		console.log("Couldnt find appropriate store :(");
 		return;
 	}
 
 	if(payload.executeOnLoad){
-		setTimeout(()=>{addPriceRecord(
+		setTimeout(()=>{
+			addPriceRecord(
 			payload.storeName,
 			payload.itemID,
 			payload.itemPrice,

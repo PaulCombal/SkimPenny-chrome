@@ -22,9 +22,9 @@ function getLastUrlPart(fullurl) {
 //Parameters:
 //string storeName: The store's name. Not the URL or anything, just its name
 // eg: amazon.com => "amazoncom", topachat.com => "topachatcom"
-//function itemName: a function that will return the item's ID
-//function price: a function that will return the item's price
-//function currency: a function that will return the item's currency for the price given
+//function itemName: a string that is the item's ID
+//function price: a string that's the item's price
+//function currency: a string that's the item's currency for the price given
 function addPriceRecord(storeName, itemName, price, currency) {
 	chrome.runtime.sendMessage({
 		action: 'xhttp',
@@ -104,7 +104,13 @@ function buildSelectGraph(datadiv = "#maindiv", selector = "#chart", mini = fals
 		buildGraph(pricearray, datearray, selector, mini);
 	}
 	else{
-		$(selector).empty().append("<div>Something went wrong :( <br> If this message appears again on this product, send us an email!</div>");
+		$(selector)
+		.empty()
+		.append("Something went wrong :( <br> Are you sure you selected a color and/or size for your item? <br> If yes, then don't hesitate to contact us! <br> <br> Server said: " + $(datadiv + " #errorDiv").text())
+		.css("display", "block")
+		.css("font-size", "x-large")
+		.css("text-align", "center")
+		.css("width", "100%");
 	}
 }
 

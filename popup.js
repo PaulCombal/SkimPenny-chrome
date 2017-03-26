@@ -93,10 +93,11 @@ function favoritesClicked(fullurl, shorturl, store){
 		else{
 			//We have to add the current page to favorites
 			var date = new Date();
-			date = date.toLocaleDateString();
 			var favorite = {};
+
 			favorite["itemName"] = $("header span").text();
-			favorite["dateAdded"] = date;
+			favorite["dateAdded"] = date.toLocaleDateString();
+			favorite["lastTimeUpdated"] = date;
 			favorite["fullurl"] = fullurl;
 			favorite["shorturl"] = shorturl;
 			favorite["store"] = store;

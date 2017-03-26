@@ -28,7 +28,9 @@
           "*://www.rueducommerce.fr/m/ps/mpid:MP-*",
           "*://www.rueducommerce.fr/*/*/*/*/*.htm*",
           "*://www.topachat.com/pages/detail2_cat_*.html*",
-          "*://www.materiel.net/*/*.html*" ]
+          "*://www.aliexpress.com/item/*/*.html*",
+          "*://www.materiel.net/*/*.html*" ],
+        "all_frames": true
       }],
    
    "icons": {
@@ -46,7 +48,7 @@
 
    "permissions": [ "storage", "tabs", "*://waxence.fr/*"],
 
-   "version": "0.5.2.0",
+   "version": "0.5.2.2",
 
    "page_action": {
       "default_title": "Worth buying?",
