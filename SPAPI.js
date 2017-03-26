@@ -104,7 +104,13 @@ function buildSelectGraph(datadiv = "#maindiv", selector = "#chart", mini = fals
 		buildGraph(pricearray, datearray, selector, mini);
 	}
 	else{
-		$(selector).empty().append("<div>Something went wrong :( <br> If this message appears again on this product, send us an email!</div>");
+		$(selector)
+		.empty()
+		.append("Something went wrong :( <br> Are you sure you selected a color and/or size for your item? <br> If yes, then don't hesitate to contact us! <br> <br> Server said: " + $(datadiv + " #errorDiv").text())
+		.css("display", "block")
+		.css("font-size", "x-large")
+		.css("text-align", "center")
+		.css("width", "100%");
 	}
 }
 
