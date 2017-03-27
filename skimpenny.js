@@ -19,7 +19,7 @@ $(document).ready(function() {
 				/.*\/\/www\.gearbest\.com\/.*\/pp_[0-9]{6}\.html.*/g,
 				/.*\/\/www\.newegg\.com\/Product\/Product\.aspx\?(i|I)tem=.*/g,
 				/.*\/\/www\.materiel\.net\/.*\/.*[0-9]{6}\.html.*/g,
-				/.*\/\/www\.aliexpress\.com\/item\/.*\/[0-9]{9,12}\.html.*/g,
+				/.*\/\/.*\.aliexpress\.com\/item\/.*\/[0-9]{9,12}\.html.*/g,
 				/.*\/\/www\.caseking\.de\/.*\.html.*/g];
 
 	for (let i in matches) {
@@ -394,7 +394,7 @@ function sendItemData(){
 			payload.dynamic = false;
 
 			payload.itemID = getLastUrlPart(window.location.pathname);
-			payload.itemPrice = $(".p-price").last().text();
+			payload.itemPrice = $(".p-price").last().text().replace(/,/g, ".");
 
 			addPriceRecord(
 			payload.storeName,
@@ -408,7 +408,7 @@ function sendItemData(){
 		var processAliexpress = () => {
 			if (payload.itemID !== getLastUrlPart(window.location.pathname)+$("#skuAttr").attr("value")) {
 				payload.itemID = getLastUrlPart(window.location.pathname)+$("#skuAttr").attr("value");
-				payload.itemPrice = $(".p-price").last().text();
+				payload.itemPrice = $(".p-price").last().text().replace(/,/g, ".");
 				payload.itemName = $("h1.product-name").text().trim();
 				
 				if (payload.itemPrice.includes(" - "))
