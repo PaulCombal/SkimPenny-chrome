@@ -20,7 +20,7 @@ For now, supported sites are:
 * amazon.co.uk
 * zalando.fr
 * caseking.de
-* gearbest.com (only euro currency)
+* gearbest.com
 * newegg.com
 * topachat.com
 * rueducommerce.fr
