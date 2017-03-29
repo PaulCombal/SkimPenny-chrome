@@ -2,11 +2,11 @@ $(document).ready(function() {
 
 	//First, we have to make sure this script is injected in a product page.
 	//It should always be, but with the chrome manifest regex, it's not always possible
-	let matches = [	/.*:\/\/.*ldlc.com\/fiche\/.*(\.html)$/g, 
-				/.*:\/\/.*shop\.hardware\.fr\/fiche\/.*(\.html)$/g, 
-				/.*:\/\/www\.amazon\.fr\/((.*\/)?dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g, 
-				/.*:\/\/www\.amazon\.com\/((.*\/)?dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g, 
-				/.*:\/\/www\.amazon\.co\.uk\/((.*\/)?dp\/|gp\/product\/|d\/.*\/.*\/)([0-9]|[A-Z]){10}(\/.*)?/g, 
+	let matches = [	/.*:\/\/.*ldlc.com\/fiche\/.*(\.html)$/g,
+				/.*:\/\/.*shop\.hardware\.fr\/fiche\/.*(\.html)$/g,
+				/.*:\/\/www\.amazon\.fr\/((.*\/)?dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g,
+				/.*:\/\/www\.amazon\.com\/((.*\/)?dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g,
+				/.*:\/\/www\.amazon\.co\.uk\/((.*\/)?dp\/|gp\/product\/|d\/.*\/.*\/)([0-9]|[A-Z]){10}(\/.*)?/g,
 				/.*:\/\/.*cdiscount\.com\/.*(\/f-[0-9]+-.*\.html((#|\?).*)?)$/g,
 				/.*:\/\/www\.topachat\.com\/pages\/detail2_cat_.*\.html(((#|\?).*)?)$/g,
 				/.*:\/\/.*conrad\.fr\/ce\/fr\/product\/[0-9]+\/.+/g,
@@ -20,7 +20,8 @@ $(document).ready(function() {
 				/.*\/\/www\.newegg\.com\/Product\/Product\.aspx\?(i|I)tem=.*/g,
 				/.*\/\/www\.materiel\.net\/.*\/.*[0-9]{6}\.html.*/g,
 				/.*\/\/.*\.aliexpress\.com\/item\/.*\/[0-9]{9,12}\.html.*/g,
-				/.*\/\/www\.caseking\.de\/.*\.html.*/g];
+				/.*\/\/www\.caseking\.de\/.*\.html.*/g,
+				/.*\/\/(livre|www|musique|jeux-video|video).*fnac\.com\/.*(a|mp)[0-9]{5,10}.*/g];
 
 	for (let i in matches) {
 		if (window.location.href.match(matches[i])){
@@ -54,7 +55,7 @@ payload.executeOnLoad = true;
 // itemCurrency: the currency of the item ("EUR|USD|GBP|AUD|CAD|CHF|HKD|NZD|JPY|RUB|BRL|CLP|NOK|DKK|SEK|KRW|ILS|COP|MXN|PEN|THB|IDR|UAH|PLN")
 // itemName: the name to display on the popup
 function sendItemData(){
-	
+
 	if(storeDomainIs("ldlc.com")){
 		payload.storeName = "LDLC";
 		payload.itemID = window.location.pathname;
@@ -71,7 +72,7 @@ function sendItemData(){
 			payload.itemID = window.location.pathname;
 			payload.itemCurrency = "EUR";
 			payload.itemName = $("#description h1").first().text().trim();
-			
+
 			payload.itemPrice = $("#stockPriceBlock .prix .new-price").text().replace(/€/g, '.').trim();
 			if (payload.itemPrice.length === 0) {
 				payload.itemPrice = $("#stockPriceBlock .prix").text().replace(/€/g, '.').trim();
@@ -96,7 +97,7 @@ function sendItemData(){
 		setInterval(()=>{
 			if (pathname !== window.location.pathname) {
 				pathname = window.location.pathname;
-				
+
 				//Item is updated, got to update the payload data
 
 				if (window.location.pathname.startsWith("/dp/"))
@@ -111,12 +112,12 @@ function sendItemData(){
 					payload.itemPrice = $('span#priceblock_dealprice').text().trim().replace(/\$/g, "");
 				if (payload.itemPrice.length === 0)
 					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/\$/g, "");
-				
+
 				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "USD";
 
 				addPriceRecord(
-					payload.storeName, 
+					payload.storeName,
 					payload.itemID,
 					payload.itemPrice,
 					payload.itemCurrency
@@ -135,7 +136,7 @@ function sendItemData(){
 		setInterval(()=>{
 			if (pathname !== window.location.pathname) {
 				pathname = window.location.pathname;
-				
+
 				//Item is updated, got to update the payload data
 
 				if (window.location.pathname.startsWith("/dp/"))
@@ -150,12 +151,12 @@ function sendItemData(){
 					payload.itemPrice = $('span#priceblock_saleprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
 				if (payload.itemPrice.length === 0)
 					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
-		
+
 				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "EUR";
 
 				addPriceRecord(
-					payload.storeName, 
+					payload.storeName,
 					payload.itemID,
 					payload.itemPrice,
 					payload.itemCurrency
@@ -175,7 +176,7 @@ function sendItemData(){
 		setInterval(()=>{
 			if (pathname !== window.location.pathname) {
 				pathname = window.location.pathname;
-				
+
 				//Item is updated, got to update the payload data
 
 				if (window.location.pathname.startsWith("/dp/"))
@@ -189,13 +190,13 @@ function sendItemData(){
 				if (payload.itemPrice.length === 0)
 					payload.itemPrice = $('span#priceblock_dealprice').text().trim().replace(/£/g, "");
 				if (payload.itemPrice.length === 0)
-					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/£/g, "");		
-				
+					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/£/g, "");
+
 				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "GBP";
 
 				addPriceRecord(
-					payload.storeName, 
+					payload.storeName,
 					payload.itemID,
 					payload.itemPrice,
 					payload.itemCurrency
@@ -335,7 +336,7 @@ function sendItemData(){
 			payload.itemCurrency = $("span.currency").text().trim();
 
 			addPriceRecord(
-				payload.storeName, 
+				payload.storeName,
 				payload.itemID,
 				payload.itemPrice,
 				payload.itemCurrency
@@ -347,7 +348,7 @@ function sendItemData(){
 			if (payload.itemCurrency != $("span.currency").text().trim()) {
 				processGearbest();
 			}
-		}, 
+		},
 		payload.timeout);
 
 	}
@@ -379,6 +380,25 @@ function sendItemData(){
 		payload.itemCurrency = "EUR";
 		payload.itemName = $('h1').text().trim();
 	}
+	//***********FNAC STORE****************
+	else if (storeDomainIs("fnac.com")) { // www. -> english site
+		payload.storeName = "fnaccom";
+		payload.itemID = window.location.pathname.match(/\/[a-z]{1,5}[0-9]{5,10}\//g);
+		if (payload.itemID === null) {
+			console.log("No price found!");
+			return;
+		}
+		payload.itemID = payload.itemID[0];
+		payload.itemPrice = $('strong.product-price').first().text().trim().replace(/€/g, '.');
+
+		if (payload.itemPrice.endsWith('.')) {
+			 payload.itemPrice = payload.itemPrice.replace(/\./g, '');
+		}
+
+		payload.itemCurrency = "EUR";
+		payload.itemName = $('span[itemprop=name]').first().text().trim();
+	}
+	//***********ALIEXPRESS STORE***************
 	else if (storeDomainIs("aliexpress.com")) {
 		payload.executeOnLoad = false;
 		payload.timeout = 2000;
@@ -410,7 +430,7 @@ function sendItemData(){
 				payload.itemID = getLastUrlPart(window.location.pathname)+$("#skuAttr").attr("value");
 				payload.itemPrice = $(".p-price").last().text().replace(/,/g, ".");
 				payload.itemName = $("h1.product-name").text().trim();
-				
+
 				if (payload.itemPrice.includes(" - "))
 					return;
 
@@ -429,7 +449,7 @@ function sendItemData(){
 			},
 			payload.timeout);
 		}
-		
+
 	}
 	else{
 		console.log("Couldnt find appropriate store :(");
@@ -442,7 +462,7 @@ function sendItemData(){
 			payload.storeName,
 			payload.itemID,
 			payload.itemPrice,
-			payload.itemCurrency);}, 
+			payload.itemCurrency);},
 		payload.timeout);
 	}
 }
