@@ -199,7 +199,7 @@ function buildGraph(pricearray, datearray, selector, mini = false){
 		},
 		interaction: {
 			enabled: !mini
-		}
+		},
 		line: {
 			connectNull: true
 		}
