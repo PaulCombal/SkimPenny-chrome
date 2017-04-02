@@ -307,7 +307,7 @@ function sendItemData(){
 		}
 		payload.itemID = payload.itemID[0];
 		payload.itemPrice = $("#landingpage-price li.price-current").last().text().trim().replace(/\$/g, "");
-		payload.itemCurrency = "USDOLL";
+		payload.itemCurrency = "USD";
 		payload.itemName = $('#grpDescrip_h').text().trim();
 	}
 	else if (storeDomainIs("zalando.fr")) {

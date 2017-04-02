@@ -26,6 +26,7 @@ For now, supported sites are:
 * rueducommerce.fr
 * materiel.net
 * aliexpress.com
+* fnac.com
 
 I am very open to any kind of feedback, and if you want to ask for a new store support, just go to the issues tab, and make your request!
 
