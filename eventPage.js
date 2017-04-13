@@ -20,21 +20,25 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
     }
 });
 
-/* TOO COMPLICATED, TODO!
+
 //Check the favorites price on every chrome startup
 //Do NOT forget to switch those lines for testing as Installed will 
 //trigger more esily than if it were a onStartup event, it's just for testing purposes
-//chrome.runtime.onStartup.addListener(()=>{
+//chrome.runtime.onStartup.addListener(()=>{	
 chrome.runtime.onInstalled.addListener(()=>{
-	//Step 1: for every favorite, only keep those which need to be updated
-	//Step 2: embed the page in an invisible iframe, content script will be embedded in the iframe i guess
+	//Original plan was to embed the pages in an iframe for them to be processed again,
+	//but X-frame headers prevented that, and chrome doesn't offer non-displayed tabs.
+	//So now we have to download the raw html and retrieve the price, to compare it
+	//with the user's last price record
 
 	console.log("SkimPenny will check for updated prices in background now.");
+
 	chrome.storage.sync.get(null, (data) => {
 		//TODO add check if want this feature enabled
 		$.each(data.favlist, (i, fav) => {
-			var currentDate = new Date("2018-01-01"); //THIS IS A FUTURE DATE FOR TEST!! REMOVE THE STRING FOR PROD!!
-			var timeDifference = new Date(currentDate - fav.lastTimeUpdated);
+			var currentDate = new Date("2020-01-01"); //THIS IS A FUTURE DATE FOR TEST!! REMOVE THE STRING FOR PROD!!
+			var lastDate = new Date(fav.lastTimeUpdated);
+			var timeDifference = new Date(currentDate.getTime() - lastDate.getTime());
 			//gets time difference in seconds, 86400 is the number of seconds in a day
 			//It's useless to modify this value, as the server will reject the request anyway
 			//if set to lower.
@@ -42,13 +46,26 @@ chrome.runtime.onInstalled.addListener(()=>{
 			//I'm open to this
 			if (timeDifference.getTime()/1000 > 86400) {
 				console.log("Favorite: " + fav.itemName + " should be updated.");
-				$.get(fav.fullurl, (data, status) => {
-					//console.log(data); //OK!
-					console.log(status);
+				//Now we have to load the favorite page in an iframe
 
-					//
-				});
+				switch(fav.store){
+					case "amazonfr":
+						//Fuck amazon AWS, better download everything, it's free
+						$.get(fav.fullurl, ( data ) => {
+						startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to b too high
+						endPos = data.indexOf("</", startPos);
+						/*price = ""; TODO
+
+						price = $(allpage).find('span#priceblock_dealprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
+						if (payload.itemPrice.length === 0)
+							payload.itemPrice = $('span#priceblock_saleprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
+						if (payload.itemPrice.length === 0)
+							payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/EUR /g, "").replace(/,/g, ".").replace(/\s+/g, "");
+
+						});*/
+						break;
+				}
 			}
 		});
 	});
-});*/
+});
