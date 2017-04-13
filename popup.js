@@ -97,7 +97,7 @@ function favoritesClicked(fullurl, shorturl, store){
 
 			favorite["itemName"] = $("header span").text();
 			favorite["dateAdded"] = date.toLocaleDateString();
-			favorite["lastTimeUpdated"] = date;
+			favorite["lastTimeUpdated"] = date.toJSON();
 			favorite["fullurl"] = fullurl;
 			favorite["shorturl"] = shorturl;
 			favorite["store"] = store;

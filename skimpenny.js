@@ -77,6 +77,13 @@ function sendItemData(){
 			if (payload.itemPrice.length === 0) {
 				payload.itemPrice = $("#stockPriceBlock .prix").text().replace(/€/g, '.').trim();
 			}
+
+			addPriceRecord(
+			payload.storeName,
+			payload.itemID,
+			payload.itemPrice,
+			payload.itemCurrency
+			);
 		},
 		payload.timeout);
 
