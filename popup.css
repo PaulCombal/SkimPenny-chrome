@@ -144,6 +144,10 @@ div.favchart {
     max-width: 400px;
 }
 
+.itemLastVisit, .itemCurrency{
+	font-size: small;
+}
+
 a{
     color: #006eff;
     text-decoration: none;

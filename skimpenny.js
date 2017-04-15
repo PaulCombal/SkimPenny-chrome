@@ -114,11 +114,11 @@ function sendItemData(){
 				else
 					payload.itemID =  getUrlPart(window.location.pathname, 3);
 
-				payload.itemPrice = $('span#priceblock_saleprice').text().trim().replace(/\$/g, "");
+				payload.itemPrice = $('span#priceblock_saleprice').text().trim().replace(/(\$|,)/g, "");
 				if (payload.itemPrice.length === 0)
-					payload.itemPrice = $('span#priceblock_dealprice').text().trim().replace(/\$/g, "");
+					payload.itemPrice = $('span#priceblock_dealprice').text().trim().replace(/(\$|,)/g, "");
 				if (payload.itemPrice.length === 0)
-					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/\$/g, "");
+					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/(\$|,)/g, "");
 
 				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "USD";
@@ -193,11 +193,11 @@ function sendItemData(){
 				else
 					payload.itemID =  getUrlPart(window.location.pathname, 3);
 
-				payload.itemPrice = $('span#priceblock_saleprice').text().trim().replace(/£/g, "");
+				payload.itemPrice = $('span#priceblock_saleprice').text().trim().replace(/(£|,)/g, "");
 				if (payload.itemPrice.length === 0)
-					payload.itemPrice = $('span#priceblock_dealprice').text().trim().replace(/£/g, "");
+					payload.itemPrice = $('span#priceblock_dealprice').text().trim().replace(/(£|,)/g, "");
 				if (payload.itemPrice.length === 0)
-					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/£/g, "");
+					payload.itemPrice = $('span#priceblock_ourprice').text().trim().replace(/(£|,)/g, "");
 
 				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "GBP";
@@ -479,9 +479,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.action == "getItemData"){
 	 	sendResponse(
 	 		{
-	 			itemName: payload.itemName,
-	 			itemID: payload.itemID,
-	 			storeName: payload.storeName,
+	 			itemPayload: payload,
 	 			fullurl: window.location.href
 	 		}
 	 	);

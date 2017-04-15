@@ -13,13 +13,13 @@ $(document).ready(function() {
 				.css("cursor", "auto");
 			}
 			else{
-				$("header span").text(response.itemName);
+				$("header span").text(response.itemPayload.itemName);
 
-				getPriceCurve(response.itemID, response.storeName);
+				getPriceCurve(response.itemPayload.itemID, response.itemPayload.storeName);
 
 				//Now let's take care of the page elements
 				$("#sett_button").click(showOptionsDropMenu);
-				$("#fav_button").click(function(){favoritesClicked(response.fullurl, response.itemID, response.storeName);});
+				$("#fav_button").click(function(){favoritesClicked(response.fullurl, response.itemPayload);});
 				$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
 				$("#seeMyFavorites").click(showFavorites);
 				//BUG: clicking show favorites when the page is still loading does nothing
@@ -66,7 +66,7 @@ function hideOptionsDropMenu(){
 	.click(showOptionsDropMenu);
 }
 
-function favoritesClicked(fullurl, shorturl, store){
+function favoritesClicked(fullurl, itemPayload){
 
 	//First of all, we have to figure if the page has been loaded
 	//This check is done in getPriceCurve if the title can't be found,
@@ -95,15 +95,14 @@ function favoritesClicked(fullurl, shorturl, store){
 			var date = new Date();
 			var favorite = {};
 
-			favorite["itemName"] = $("header span").text();
+			favorite["itemName"] = itemPayload.itemName;
 			favorite["dateAdded"] = date.toLocaleDateString();
-			favorite["lastTimeUpdated"] = date.toJSON();
 			favorite["fullurl"] = fullurl;
-			favorite["shorturl"] = shorturl;
-			favorite["store"] = store;
-
-			console.log("Favorite added:");
-			console.log(favorite);
+			favorite["shorturl"] = itemPayload.itemID;
+			favorite["store"] = itemPayload.storeName;
+			favorite["lastUserAcknowledgedDate"] = date.toJSON();
+			favorite["lastUserAcknowledgedPrice"] = itemPayload.itemPrice;
+			favorite["currency"] = itemPayload.itemCurrency;
 
 			//First check if this is the first favorite
 			if (data.favlist === undefined) {
@@ -141,20 +140,22 @@ function showFavorites(){
 		if (favorites.favlist !== undefined && favorites.favlist.length > 0) {
 			$.each(favorites.favlist, (index, favorite) => {
 				//Is there a way to improve the following?
-				var id = favorite["shorturl"].replace(/\//g, "-").replace(/\./g, "-");
+				var id = favorite["shorturl"].replace(/(\/|\.|#)/g, "-");
 				$("#chart").append(
-					'<div class="favorite">' +
-						'<div class="datadiv ' + id + '"></div>' +
-						'<div class="favinfo">' + 
-							'<a href="' + favorite["fullurl"] + '" target="_blank">' +
+					`<div class="favorite">
+						<div class="datadiv ` + id + `"></div>
+						<div class="favinfo"> 
+							<a href="` + favorite["fullurl"] + `" target="_blank">` +
 								favorite["itemName"] +
-							'</a> <br />' + 
-							'<span class="itemDate">Item added on ' + favorite["dateAdded"] + '</span>' +
-						'</div>' + 
-						'<div class="favchart ' + id + '">' +
-							'Click to see graph' +
-						'</div>' +
-					'</div>'
+							`</a> <br /> 
+							<span class="itemDate">Item added on ` + favorite["dateAdded"] + `</span><br />
+							<span class="itemCurrency">Currency: ` + favorite["currency"] + `</span><br />
+							<span class="itemLastVisit">Last time you've seen the price: ` + favorite["lastUserAcknowledgedDate"] + `</span><br />
+						</div> 
+						<div class="favchart ` + id + `">
+							Click to see graph
+						</div>
+					</div>`
 				);
 
 				$("div.favchart").last().click(()=>{
