@@ -47,7 +47,7 @@
 
    "description": "Shows you the price evolution of items",
 
-   "permissions": [ "storage", "tabs", "*://waxence.fr/*"],
+   "permissions": [ "storage", "tabs", "notifications", "*://waxence.fr/*"],
 
    "version": "0.5.3.2",
 

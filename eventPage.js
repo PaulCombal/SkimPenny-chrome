@@ -30,7 +30,33 @@ function notifyAndSend(payload, favorite) {
 	listenMessages(payload, null, null);
 
 	//Now let's notify
-	//TODO
+	//Broken in 2 ifs because I might add options that would get in between the two.
+	if (payload.currency === favorite.currency) {
+		// if (payload.price == favorite.lastUserAcknowledgedPrice) {
+		if (payload.price < favorite.lastUserAcknowledgedPrice) {
+			var notificationTitle = "A price dropped!";
+			var newprice = parseFloat(payload.price);
+			var oldprice = parseFloat(favorite.lastUserAcknowledgedPrice);
+			var notificationText = favorite.itemName.substr(0, 20) + " dropped from " + oldprice + " to " + newprice +"(" + favorite.currency + ") since your last visit!";
+			
+			var e = {
+				type: "basic",
+				title: notificationTitle,
+				message: notificationText,
+				requireInteraction: true,
+				isClickable: true,
+				iconUrl: "img/sp48.png"
+			};
+
+			chrome.notifications.create(favorite.fullurl, e, () => {
+			//chrome.storage.sync.get({PlayAudio: 'true'}, function (data) {
+			//if (data.PlayAudio == 'true'){
+			//	var e = new Audio("audio.mp3");
+			//	e.play()
+			//}
+			});
+		}
+	}
 }
 
 chrome.runtime.onMessage.addListener(listenMessages);
@@ -118,7 +144,7 @@ chrome.runtime.onInstalled.addListener(()=>{
 							endPos = data.indexOf("</", startPos);
 							price = data.substring(startPos + 20, endPos);
 							if (price.length > 0) {
-								price = price.replace(/(\$|,)/g, "");
+								price = price.replace(/(.*\$|,)/g, "");
 								
 								payload.price = price;
 								payload.currency = "USD";
@@ -149,7 +175,7 @@ chrome.runtime.onInstalled.addListener(()=>{
 							endPos = data.indexOf("</", startPos);
 							price = data.substring(startPos + 20, endPos);
 							if (price.length > 0) {
-								price = price.replace(/(£|,)/g, "");
+								price = price.replace(/(.*£|,|\s)/g, "");
 								
 								payload.price = price;
 								payload.currency = "GBP";

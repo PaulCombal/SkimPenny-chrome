@@ -27,6 +27,7 @@ $(document).ready(function() {
 		if (window.location.href.match(matches[i])){
 			//We're definitely in a product page. Let's ask for the page action to show
 			sendItemData();
+
 			chrome.runtime.sendMessage({
 				action: 'showPageAction'
 			});
