@@ -5,7 +5,6 @@
 * Be able to change graph style
 * Optimize buildSelectGraph
 * Add french translation
-* Update favorite last time seen on every product change
 
 # KNOWN ISSUES:
 * Clicking the "Show favorites" button does nothing when the graph is loading

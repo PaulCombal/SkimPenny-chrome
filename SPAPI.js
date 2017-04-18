@@ -29,14 +29,15 @@ function addPriceRecord(payload) {
 		currency: payload.itemCurrency
 	});
 
-	//TODO: UPDATE FAV TIME LAST SEEN
-	console.log("lol");
-
+	//Updates the favorite: last time/price seen by user
 	chrome.storage.sync.get(null, (data)=>{
-		if (isInFavorites(data.favlist)) {
-			console.log("lol");
-			console.log(data.favlist[favArray.map((a)=>{return a.fullurl}).indexOf(fullurl)]);
-			// chrome.settings.sync.set({});
+		if (isInFavorites(data.favlist, payload.itemID)) {
+			var favoriteIndex = data.favlist.map((a)=>{return a.shorturl}).indexOf(payload.itemID);
+			data.favlist[favoriteIndex].lastUserAcknowledgedDate = new Date().toJSON();
+			data.favlist[favoriteIndex].lastUserAcknowledgedPrice = payload.itemPrice;
+			data.favlist[favoriteIndex].currency = payload.itemCurrency;
+
+			chrome.storage.sync.set({favlist: data.favlist}, ()=>{console.log("Favorite updated.")});
 		}
 	});
 }

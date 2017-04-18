@@ -194,3 +194,21 @@ chrome.runtime.onInstalled.addListener(()=>{
 		});
 	});
 });
+
+/*Creating a new tab if notification is clicked*/
+chrome.notifications.onClicked.addListener((notifID) => {
+	chrome.notifications.clear(notifID);
+	chrome.windows.getCurrent(function(currentWindow) {
+		if (currentWindow != null) {
+			return chrome.tabs.create({
+				url: notifID
+			});
+		} else {
+			return chrome.windows.create({
+				url: notifID,
+				type: "normal",
+				focused: true
+			});
+		}
+	})
+});
