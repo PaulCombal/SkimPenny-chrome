@@ -18,20 +18,26 @@ function getLastUrlPart(fullurl) {
 
 /* FUNCTIONS FOR SKIMPENNY.JS */
 
-//Sends a price record to the database.
-//Parameters:
-//string storeName: The store's name. Not the URL or anything, just its name
-// eg: amazon.com => "amazoncom", topachat.com => "topachatcom"
-//function itemName: a string that is the item's ID
-//function price: a string that's the item's price
-//function currency: a string that's the item's currency for the price given
-function addPriceRecord(storeName, itemName, price, currency) {
+//Sends a price record to the database, and updates last time favorite seen
+//NOTE: This function must only be called when the user visits a page, no bakground calls!
+function addPriceRecord(payload) {
 	chrome.runtime.sendMessage({
 		action: 'xhttp',
-		storeName: storeName,
-		productPage: itemName,
-		price: price,
-		currency: currency
+		storeName: payload.storeName,
+		productPage: payload.itemID,
+		price: payload.itemPrice,
+		currency: payload.itemCurrency
+	});
+
+	//TODO: UPDATE FAV TIME LAST SEEN
+	console.log("lol");
+
+	chrome.storage.sync.get(null, (data)=>{
+		if (isInFavorites(data.favlist)) {
+			console.log("lol");
+			console.log(data.favlist[favArray.map((a)=>{return a.fullurl}).indexOf(fullurl)]);
+			// chrome.settings.sync.set({});
+		}
 	});
 }
 
@@ -41,18 +47,9 @@ function storeDomainIs(argument) {
 
 /* FUNCTIONS FOR POPUP.JS */
 
-function isInFavorites(favArray, fullurl) {
-
-	if (favArray !== undefined) {
-		var result = false;
-		$.each(favArray, (index, favorite) =>{
-			if (favorite["fullurl"] == fullurl) {
-				return result = true;
-			}
-		 });
-		return result;
-	}
-	return false;
+function isInFavorites(favArray, itemID) {
+	
+	return favArray.map((a)=>{return a.shorturl}).indexOf(itemID) != -1;
 }
 
 /////////////////////////////////////////////////

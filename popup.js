@@ -27,7 +27,7 @@ $(document).ready(function() {
 				//Making sure the favorite star has correct icon
 				chrome.storage.sync.get(null, (data) => {
 					//By default, the star-outline is used
-					if (isInFavorites(data.favlist, response.fullurl))
+					if (isInFavorites(data.favlist, response.itemPayload.itemID))
 						$("#fav_button img").attr("src", "img/star.png");
 				});
 			}
@@ -74,7 +74,7 @@ function favoritesClicked(fullurl, itemPayload){
 
 	//First we figure if it is not already in favorites
 	chrome.storage.sync.get(null, (data) => {
-		if(isInFavorites(data.favlist, fullurl)){
+		if(isInFavorites(data.favlist, itemPayload.itemID)){
 			//This page is already in favorites
 			//We have to delete the page from the favorites
 

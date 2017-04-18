@@ -79,12 +79,7 @@ function sendItemData(){
 				payload.itemPrice = $("#stockPriceBlock .prix").text().replace(/€/g, '.').trim();
 			}
 
-			addPriceRecord(
-			payload.storeName,
-			payload.itemID,
-			payload.itemPrice,
-			payload.itemCurrency
-			);
+			addPriceRecord(payload);
 		},
 		payload.timeout);
 
@@ -124,12 +119,7 @@ function sendItemData(){
 				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "USD";
 
-				addPriceRecord(
-					payload.storeName,
-					payload.itemID,
-					payload.itemPrice,
-					payload.itemCurrency
-				);
+				addPriceRecord(payload);
 			}
 		},
 		payload.timeout);
@@ -163,12 +153,7 @@ function sendItemData(){
 				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "EUR";
 
-				addPriceRecord(
-					payload.storeName,
-					payload.itemID,
-					payload.itemPrice,
-					payload.itemCurrency
-				);
+				addPriceRecord(payload);
 			}
 		},
 		payload.timeout);
@@ -203,12 +188,7 @@ function sendItemData(){
 				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "GBP";
 
-				addPriceRecord(
-					payload.storeName,
-					payload.itemID,
-					payload.itemPrice,
-					payload.itemCurrency
-				);
+				addPriceRecord(payload);
 			}
 		},
 		payload.timeout);
@@ -267,10 +247,7 @@ function sendItemData(){
 			payload.itemID = getUrlPart(window.location.pathname, 5);
 			payload.itemName = $('h1.exp-product-title.nsg-font-family--platform').text().trim();
 
-			addPriceRecord(payload.storeName,
-			payload.itemID,
-			payload.itemPrice,
-			payload.itemCurrency);
+			addPriceRecord(payload);
 		};
 
 		processNike();
@@ -343,12 +320,7 @@ function sendItemData(){
 			payload.itemPrice = payload.itemPrice[0];
 			payload.itemCurrency = $("span.currency").text().trim();
 
-			addPriceRecord(
-				payload.storeName,
-				payload.itemID,
-				payload.itemPrice,
-				payload.itemCurrency
-			);
+			addPriceRecord(payload);
 		};
 
 		setInterval(()=>{
@@ -424,11 +396,7 @@ function sendItemData(){
 			payload.itemID = getLastUrlPart(window.location.pathname);
 			payload.itemPrice = $(".p-price").last().text().replace(/,/g, ".");
 
-			addPriceRecord(
-			payload.storeName,
-			payload.itemID,
-			payload.itemPrice,
-			payload.itemCurrency);
+			addPriceRecord(payload);
 		}
 
 
@@ -442,11 +410,7 @@ function sendItemData(){
 				if (payload.itemPrice.includes(" - "))
 					return;
 
-				addPriceRecord(
-				payload.storeName,
-				payload.itemID,
-				payload.itemPrice,
-				payload.itemCurrency);
+				addPriceRecord(payload);
 			}
 		};
 
@@ -466,11 +430,7 @@ function sendItemData(){
 
 	if(payload.executeOnLoad){
 		setTimeout(()=>{
-			addPriceRecord(
-			payload.storeName,
-			payload.itemID,
-			payload.itemPrice,
-			payload.itemCurrency);},
+			addPriceRecord(payload);},
 		payload.timeout);
 	}
 }
