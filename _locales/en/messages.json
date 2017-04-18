@@ -31,5 +31,38 @@
 	},
 	"loading_prices": {
 		"message": "Hacking datasets..."
+	},
+	"notification_title": {
+		"message": "A price dropped!"
+	},
+	"dropped_from": {
+		"message": " dropped from ",
+		"description": "Don't forget the spaces at the beginning and end!"
+	},
+	"dropped_to": {
+		"message": " to ",
+		"description": "Same here. Sentence is : %itemname% dropped_from %oldprice% dropped_to %newprice%."
+	},
+	"local_storage": {
+		"message": "Local storage",
+		"description" : "Note to self: Données locales"
+	},
+	"delete_local_content": {
+		"message": "Delete local content (favorites will not be saved)"
+	},
+	"button_delete_local_content": {
+		"message": "Clear content"
+	},
+	"chart_look": {
+		"message": "Chart appearance"
+	},
+	"contact_us": {
+		"message": "Contact us"
+	},
+	"our_mail": {
+		"message": "Our mail is "
+	},
+	"suggest_feature": {
+		"message": "Click here to suggest a feature/new store"
 	}
 }

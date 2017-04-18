@@ -34,10 +34,10 @@ function notifyAndSend(payload, favorite) {
 	if (payload.currency === favorite.currency) {
 		// if (payload.price == favorite.lastUserAcknowledgedPrice) {
 		if (payload.price < favorite.lastUserAcknowledgedPrice) {
-			var notificationTitle = "A price dropped!";
+			var notificationTitle = chrome.i18n.getMessage("notification_title");
 			var newprice = parseFloat(payload.price);
 			var oldprice = parseFloat(favorite.lastUserAcknowledgedPrice);
-			var notificationText = favorite.itemName.substr(0, 20) + " dropped from " + oldprice + " to " + newprice +"(" + favorite.currency + ") since your last visit!";
+			var notificationText = favorite.itemName.substr(0, 20) + chrome.i18n.getMessage("dropped_from") + oldprice + chrome.i18n.getMessage("dropped_to") + newprice +"(" + favorite.currency + ")!";
 			
 			var e = {
 				type: "basic",
@@ -91,7 +91,7 @@ chrome.runtime.onInstalled.addListener(()=>{
 				var payload = {};
 				//The two values you have to set are:
 				// payload.price = YOU SET IT;
-				// payload.currency = YOU SET IT;
+				// payload.currency = YOU SET IT; Try to get the same than the saved favorite
 
 				switch(fav.store){
 					case "amazonfr":
