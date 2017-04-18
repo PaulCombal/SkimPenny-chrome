@@ -41,6 +41,8 @@
    },
    "manifest_version": 2,
 
+   "default_locale": "en",
+
    "name": "SkimPenny Price Tracker",
 
    "short_name": "SkimPenny",

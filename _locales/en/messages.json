@@ -1,0 +1,35 @@
+{
+	"error_loading_item": {
+		"message": "Error loading item data"
+	},
+	"item_added_on": {
+		"message": "Item added on"
+	},
+	"currency": {
+		"message" : "Currency"
+	},
+	"last_time_seen": {
+		"message" : "Last time you've seen the price"
+	},
+	"click_to_see_graph": {
+		"message" : "Click to see graph"
+	},
+	"no_favorites": {
+		"message": "You don't have any favorites yet :("
+	},
+	"error_getting_prices": {
+		"message": "Hacking didn't go so well..<br><span style=\"font-size: smaller\">Are you connected to the internet?</span>"
+	},
+	"error_empty_pricelist": {
+		"message": "Something went wrong :( <br> Are you sure you selected a color and/or size for your item? <br> If yes, then don't hesitate to contact us! <br> <br> Server said: "
+	},
+	"options": {
+		"message": "Options"
+	},
+	"my_favorites": {
+		"message": "My Favorites"
+	},
+	"loading_prices": {
+		"message": "Hacking datasets..."
+	}
+}

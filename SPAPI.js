@@ -70,7 +70,7 @@ function getPriceCurve(itemID, storeName, datadiv = "#maindiv", selector = "#cha
 		(data) => {showResults(data, datadiv, selector, mini);},
 		'text')
 	.fail(function(xhr, status, error){
-		$("#maindiv").html("Hacking didn't go so well..<br><span style=\"font-size: smaller\">Are you connected to the internet?</span>")
+		$("#maindiv").html(chrome.i18n.getMessage("error_getting_prices"))
 		.css("animation", "none")
 		.css("line-height", "100px");
 
@@ -153,7 +153,7 @@ function buildSelectGraph(datadiv = "#maindiv", selector = "#chart", mini = fals
 	else{
 		$(selector)
 		.empty()
-		.append("Something went wrong :( <br> Are you sure you selected a color and/or size for your item? <br> If yes, then don't hesitate to contact us! <br> <br> Server said: " + $(datadiv + " #errorDiv").text())
+		.append(chrome.i18n.getMessage("error_empty_pricelist") + $(datadiv + " #errorDiv").text())
 		.css("display", "block")
 		.css("font-size", "x-large")
 		.css("text-align", "center")

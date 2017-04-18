@@ -3,7 +3,7 @@ $(document).ready(function() {
 	chrome.tabs.getSelected(null, function(tab) {
 		chrome.tabs.sendMessage(tab.id, {action: "getItemData"}, function(response) {
 			if (response === undefined) {
-				$("header span").text("Error loading item name");
+				$("header span").text(chrome.i18n.getMessage("error_loading_item"));
 				//We don't want undefined favorites
 				$("#fav_button")
 				.off("click")
@@ -14,6 +14,9 @@ $(document).ready(function() {
 			}
 			else{
 				$("header span").text(response.itemPayload.itemName);
+				$("#openOptions").text(chrome.i18n.getMessage("options"));
+				$("#seeMyFavorites").text(chrome.i18n.getMessage("my_favorites"));
+				$("#maindiv").text(chrome.i18n.getMessage("loading_prices"));
 
 				getPriceCurve(response.itemPayload.itemID, response.itemPayload.storeName);
 
@@ -148,12 +151,12 @@ function showFavorites(){
 							<a href="` + favorite["fullurl"] + `" target="_blank">` +
 								favorite["itemName"] +
 							`</a> <br /> 
-							<span class="itemDate">Item added on ` + favorite["dateAdded"] + `</span><br />
-							<span class="itemCurrency">Currency: ` + favorite["currency"] + `</span><br />
-							<span class="itemLastVisit">Last time you've seen the price: ` + favorite["lastUserAcknowledgedDate"] + `</span><br />
+							<span class="itemDate">` + chrome.i18n.getMessage("item_added_on") + " " + favorite["dateAdded"] + `</span><br />
+							<span class="itemCurrency">` + chrome.i18n.getMessage("currency") + ": " + favorite["currency"] + `</span><br />
+							<span class="itemLastVisit">` + chrome.i18n.getMessage("last_time_seen") + ": " + favorite["lastUserAcknowledgedDate"] + `</span><br />
 						</div> 
 						<div class="favchart ` + id + `">
-							Click to see graph
+							` + chrome.i18n.getMessage("click_to_see_graph") +`
 						</div>
 					</div>`
 				);
@@ -169,7 +172,7 @@ function showFavorites(){
 		else{
 			console.log("favlist is ");
 			console.log(favorites.favlist);
-			$("#chart").append("<span id=\"nofavorites\">You don't have any favorites yet :(</span>");
+			$("#chart").append("<span id=\"nofavorites\">" + chrome.i18n.getMessage("no_favorites") + "</span>");
 		}
 
 		$("#sett_button")
