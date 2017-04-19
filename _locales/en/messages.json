@@ -67,5 +67,20 @@
 	},
 	"extDesc": {
 		"message": "Shows price history of items in many online stores"
+	},
+	"done": {
+		"message": "Done"
+	},
+	"save": {
+		"message": "Save"
+	},
+	"option_line":{
+		"message": "Line"
+	},
+	"option_spline": {
+		"message": "Spline"
+	},
+	"option_step": {
+		"message": "Step"
 	}
 }

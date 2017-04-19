@@ -9,12 +9,17 @@
 		<h3 id="local_storage">Local storage</h3>
 		<div>
 			<span id="delete_local_content">Delete local content (favorites)</span>
+			<br />
 			<button type="button" id="clearButton">Clear content</button>
 		</div>
 		<h3 id="chart_look">Chart appearance</h3>
 		<div>
-			This section will be available very soon!
-			<!--TODO: graph type: line, area, curved area... -->
+			<select id="chartDesignSelect">
+				<option value="line">Line</option>
+				<option value="spline">Spline</option>
+				<option value="step">Step</option>
+			</select>
+			<button type="button" id="saveAppearance">Save</button>
 		</div>
 		<h3 id="contact_us">Contact us</h3>
 		<div>
@@ -27,5 +32,6 @@
 				</li>
 			</ul>
 		</div>
+		<button type="button" id="debugStorage" style="display: none;">Send nudes</button>
 	</body>
 </html>

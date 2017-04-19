@@ -66,5 +66,20 @@
 	},
 	"extDesc": {
 		"message": "Montre l'historique des prix d'articles sur de nombreux sites de e-commerce"
+	},
+	"done": {
+		"message": "Fait!"
+	},
+	"save": {
+		"message": "Sauvegarder"
+	},
+	"option_line":{
+		"message": "Ligne"
+	},
+	"option_spline": {
+		"message": "Courbe"
+	},
+	"option_step": {
+		"message": "Palier"
 	}
 }
