@@ -1,0 +1,70 @@
+{
+	"error_loading_item": {
+		"message": "Erreur de chargement des données"
+	},
+	"item_added_on": {
+		"message": "Article ajouté le"
+	},
+	"currency": {
+		"message" : "Devise"
+	},
+	"last_time_seen": {
+		"message" : "Dernier affichage du prix le"
+	},
+	"click_to_see_graph": {
+		"message" : "Cliquez pour le graph"
+	},
+	"no_favorites": {
+		"message": "Il n'y a aucun favoris, pour l'instant :("
+	},
+	"error_getting_prices": {
+		"message": "Le hacking ne s'est pas bien terminé..<br><span style=\"font-size: smaller\">Êtes-vous connecté à internet?</span>"
+	},
+	"error_empty_pricelist": {
+		"message": "Quelque chose a déraillé :( <br> Avez-vous sélectionné une taille/couleur pour l'article. <br> Si cela arrive fréquemment, contactez-nous! <br> <br> Le serveur a répondu: "
+	},
+	"options": {
+		"message": "Options"
+	},
+	"my_favorites": {
+		"message": "Mes favoris"
+	},
+	"loading_prices": {
+		"message": "Hacking des données..."
+	},
+	"notification_title": {
+		"message": "Un prix a baissé!"
+	},
+	"dropped_from": {
+		"message": " est passé de ",
+		"description": "Don't forget the spaces at the beginning and end!"
+	},
+	"dropped_to": {
+		"message": " à ",
+		"description": "Same here. Sentence is : %itemname% dropped_from %oldprice% dropped_to %newprice%."
+	},
+	"local_storage": {
+		"message": "Données locales"
+	},
+	"delete_local_content": {
+		"message": "Supprimer les données locales (favoris inclus)"
+	},
+	"button_delete_local_content": {
+		"message": "Supprimer"
+	},
+	"chart_look": {
+		"message": "Apparence du graphique"
+	},
+	"contact_us": {
+		"message": "Nous contacter"
+	},
+	"our_mail": {
+		"message": "Notre mail: "
+	},
+	"suggest_feature": {
+		"message": "Cliquez ici pour suggérer un nouveau magasin/une nouvelle fonctionnalité"
+	},
+	"extDesc": {
+		"message": "Montre l'historique des prix d'articles sur de nombreux sites de e-commerce"
+	}
+}

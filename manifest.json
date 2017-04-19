@@ -47,7 +47,7 @@
 
    "short_name": "SkimPenny",
 
-   "description": "Shows you the price evolution of items",
+   "description": "__MSG_extDesc__",
 
    "permissions": [ "storage", "tabs", "notifications", "*://waxence.fr/*"],
 

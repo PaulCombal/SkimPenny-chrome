@@ -64,5 +64,8 @@
 	},
 	"suggest_feature": {
 		"message": "Click here to suggest a feature/new store"
+	},
+	"extDesc": {
+		"message": "Shows price history of items in many online stores"
 	}
 }
