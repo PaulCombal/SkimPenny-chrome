@@ -169,37 +169,40 @@ function buildGraph(pricearray, datearray, selector, mini = false){
 		columns.push(currencyColumn);
 	});
 
-	var chart = c3.generate({
-		bindto: selector,
-		data: {
-			x: 'x',
-			columns: columns
-		},
-		size: {
-			height: mini ? 197 : 500,
-			width: mini ? 310 : 770
-		},
-		padding: {
-			//We add this padding to prevent labels from getting cropped
-			right: 30
-		},
-		axis: {
-			x: {
-				type: 'timeseries',
-				show: !mini,
-				tick: {
-					format: '%d/%m/%Y'
+	chrome.storage.sync.get({chartStyle: "line"}, (data) =>{
+		var chart = c3.generate({
+			bindto: selector,
+			data: {
+				x: 'x',
+				columns: columns,
+				type: data.chartStyle
+			},
+			size: {
+				height: mini ? 197 : 500,
+				width: mini ? 310 : 770
+			},
+			padding: {
+				//We add this padding to prevent labels from getting cropped
+				right: 30
+			},
+			axis: {
+				x: {
+					type: 'timeseries',
+					show: !mini,
+					tick: {
+						format: '%d/%m/%Y'
+					}
+				},
+				y: {
+					show: !mini
 				}
 			},
-			y: {
-				show: !mini
+			interaction: {
+				enabled: !mini
+			},
+			line: {
+				connectNull: true
 			}
-		},
-		interaction: {
-			enabled: !mini
-		},
-		line: {
-			connectNull: true
-		}
+		});
 	});
 }
