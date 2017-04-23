@@ -164,6 +164,10 @@ function showFavorites(){
 				$("div.favchart").last().click(()=>{
 					$("div.favchart[data-url='" + favorite["shorturl"] + "']").text("Loading");
 
+					//Get the current price, and send it to the server
+					//We're doing it in the background, so we have to use the event page
+					addRecordBackground(favorite);
+
 					//function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = "#chart", mini)
 					getPriceCurve(favorite["shorturl"], favorite["store"], ".datadiv." + id, ".favchart." + id, true);
 				});

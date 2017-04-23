@@ -53,11 +53,15 @@ function isInFavorites(favArray, itemID) {
 	return favArray.map((a)=>{return a.shorturl}).indexOf(itemID) != -1;
 }
 
+//Gets the current price of a favorite, and sends it to the database in the background
+//Ususally called when user clicks the "Show graph" button when viewing the favorite list
+function addRecordBackground(favorite) {
+	chrome.runtime.sendMessage({action: "updatefav", fav: favorite});
+}
+
 /////////////////////////////////////////////////
 //Below are funcs to get data from the database//
 /////////////////////////////////////////////////
-
-//TODO REMOVE CHROME LOADING 
 
 //builds a graph from an itemID and the storeName
 function getPriceCurve(itemID, storeName, datadiv = "#maindiv", selector = "#chart", mini = false){

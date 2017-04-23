@@ -15,9 +15,12 @@ function listenMessages(request, sender, callback) {
 		.fail(function(){
 			console.log("Error sending request :(");
 		});
-
-		return true; // prevents the callback from being called too early on return
 	}
+	else if (request.action === "updatefav") {
+		addRecord(request.fav);
+	}
+	
+	return true; // prevents the callback from being called too early on return
 }
 
 //Will send a notification if price dropped, and send the new record to the server
@@ -59,6 +62,113 @@ function notifyAndSend(payload, favorite) {
 	}
 }
 
+//Gets the price of a favorite, and send it to the sever
+function addRecord(fav) {
+	//Now we have to load the favorite page in an iframe
+	var payload = {};
+	//The two values you have to set are:
+	// payload.price = YOU SET IT;
+	// payload.currency = YOU SET IT; Try to get the same than the saved favorite
+
+	switch(fav.store){
+		case "amazonfr":
+			//Fuck amazon AWS, better download everything, it's free
+			$.get(fav.fullurl, ( data ) => {
+				startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
+				if (startPos < 0) {
+					startPos = data.indexOf('"priceblock_saleprice"', 100000);
+				}
+				if (startPos < 0) {
+					startPos = data.indexOf('"priceblock_ourprice"', 100000);
+				}
+				if (startPos < 0) {
+					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
+					return;
+				}
+				endPos = data.indexOf("</", startPos);
+				price = data.substring(startPos + 20, endPos);
+				if (price.length > 0) {
+					price = price.replace(/.*EUR\s+/g, "");
+					price = price.replace(/\s+/g, "");
+					price = price.replace(/,/g, ".");
+					
+					payload.price = price;
+					payload.currency = "EUR";
+
+				}
+				else{
+					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
+					return;
+				}
+
+				notifyAndSend(payload, fav);
+			});
+		break;
+		case "amazoncom":
+			//Fuck amazon AWS, better download everything, it's free
+			$.get(fav.fullurl, ( data ) => {
+				startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
+				if (startPos < 0) {
+					startPos = data.indexOf('"priceblock_saleprice"', 100000);
+				}
+				if (startPos < 0) {
+					startPos = data.indexOf('"priceblock_ourprice"', 100000);
+				}
+				if (startPos < 0) {
+					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
+					return;
+				}
+				endPos = data.indexOf("</", startPos);
+				price = data.substring(startPos + 20, endPos);
+				if (price.length > 0) {
+					price = price.replace(/(.*\$|,)/g, "");
+					
+					payload.price = price;
+					payload.currency = "USD";
+
+				}
+				else{
+					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
+					return;
+				}
+
+				notifyAndSend(payload, fav);
+			});
+		break;
+		case "amazoncouk":
+			//Fuck amazon AWS, better download everything, it's free
+			$.get(fav.fullurl, ( data ) => {
+				startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
+				if (startPos < 0) {
+					startPos = data.indexOf('"priceblock_saleprice"', 100000);
+				}
+				if (startPos < 0) {
+					startPos = data.indexOf('"priceblock_ourprice"', 100000);
+				}
+				if (startPos < 0) {
+					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
+					return;
+				}
+				endPos = data.indexOf("</", startPos);
+				price = data.substring(startPos + 20, endPos);
+				if (price.length > 0) {
+					price = price.replace(/(.*£|,|\s)/g, "");
+					
+					payload.price = price;
+					payload.currency = "GBP";
+
+				}
+				else{
+					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
+					return;
+				}
+
+				notifyAndSend(payload, fav);
+			});
+		break;
+	}
+}
+
 chrome.runtime.onMessage.addListener(listenMessages);
 
 
@@ -77,7 +187,7 @@ chrome.runtime.onInstalled.addListener(()=>{
 	chrome.storage.sync.get(null, (data) => {
 		//TODO add check if want this feature enabled
 		$.each(data.favlist, (i, fav) => {
-			var currentDate = new Date("2020-01-01"); //THIS IS A FUTURE DATE FOR TEST!! REMOVE THE STRING FOR PROD!!
+			var currentDate = new Date();
 			var lastDate = new Date(fav.lastUserAcknowledgedDate);
 			var timeDifference = new Date(currentDate.getTime() - lastDate.getTime());
 			//gets time difference in seconds, 86400 is the number of seconds in a day
@@ -87,109 +197,7 @@ chrome.runtime.onInstalled.addListener(()=>{
 			//I'm open to this
 			if (timeDifference.getTime()/1000 > 86400) {
 				console.log("Favorite: " + fav.itemName + " should be updated.");
-				//Now we have to load the favorite page in an iframe
-				var payload = {};
-				//The two values you have to set are:
-				// payload.price = YOU SET IT;
-				// payload.currency = YOU SET IT; Try to get the same than the saved favorite
-
-				switch(fav.store){
-					case "amazonfr":
-						//Fuck amazon AWS, better download everything, it's free
-						$.get(fav.fullurl, ( data ) => {
-							startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
-							if (startPos < 0) {
-								startPos = data.indexOf('"priceblock_saleprice"', 100000);
-							}
-							if (startPos < 0) {
-								startPos = data.indexOf('"priceblock_ourprice"', 100000);
-							}
-							if (startPos < 0) {
-								console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-								return;
-							}
-							endPos = data.indexOf("</", startPos);
-							price = data.substring(startPos + 20, endPos);
-							if (price.length > 0) {
-								price = price.replace(/.*EUR\s+/g, "");
-								price = price.replace(/\s+/g, "");
-								price = price.replace(/,/g, ".");
-								
-								payload.price = price;
-								payload.currency = "EUR";
-
-							}
-							else{
-								console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-								return;
-							}
-
-							notifyAndSend(payload, fav);
-						});
-					break;
-					case "amazoncom":
-						//Fuck amazon AWS, better download everything, it's free
-						$.get(fav.fullurl, ( data ) => {
-							startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
-							if (startPos < 0) {
-								startPos = data.indexOf('"priceblock_saleprice"', 100000);
-							}
-							if (startPos < 0) {
-								startPos = data.indexOf('"priceblock_ourprice"', 100000);
-							}
-							if (startPos < 0) {
-								console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-								return;
-							}
-							endPos = data.indexOf("</", startPos);
-							price = data.substring(startPos + 20, endPos);
-							if (price.length > 0) {
-								price = price.replace(/(.*\$|,)/g, "");
-								
-								payload.price = price;
-								payload.currency = "USD";
-
-							}
-							else{
-								console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-								return;
-							}
-
-							notifyAndSend(payload, fav);
-						});
-					break;
-					case "amazoncouk":
-						//Fuck amazon AWS, better download everything, it's free
-						$.get(fav.fullurl, ( data ) => {
-							startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
-							if (startPos < 0) {
-								startPos = data.indexOf('"priceblock_saleprice"', 100000);
-							}
-							if (startPos < 0) {
-								startPos = data.indexOf('"priceblock_ourprice"', 100000);
-							}
-							if (startPos < 0) {
-								console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-								return;
-							}
-							endPos = data.indexOf("</", startPos);
-							price = data.substring(startPos + 20, endPos);
-							if (price.length > 0) {
-								price = price.replace(/(.*£|,|\s)/g, "");
-								
-								payload.price = price;
-								payload.currency = "GBP";
-
-							}
-							else{
-								console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-								return;
-							}
-
-							notifyAndSend(payload, fav);
-						});
-					break;
-				}
+				addRecord(fav);
 			}
 		});
 	});
