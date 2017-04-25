@@ -27,26 +27,33 @@ $(document).ready(function() {
 		if (window.location.href.match(matches[i])){
 			//We're definitely in a product page. Let's ask for the page action to show
 			sendItemData();
-
-			chrome.runtime.sendMessage({
-				action: 'showPageAction'
-			});
 			break;
 		}
 	}
 });
 
 //payload will contain the data to send
-//More details before the sendItemData declaration
 //Default values are:
 //timeout: milliseconds to wait before sendig the data (pretty useless i guess, unless you use it otherwise)
-//executeOnLoad: whether or not the data must be sent at the end of the function
-// If you need to manually send the data (to handle ajax events for exemple), you
-// can use the addPriceRecord function directly, and the automatic submission will
-// be skipped
+//executeOnLoad: if you need to wait for ajax events, or send multiple items in one page,
+// you can set this to false. This will allow you to use the sendPayload function directly.
 var payload = {};
 payload.timeout = 0;
 payload.executeOnLoad = true;
+
+//If you set payload.executeOnLoad = false, then you will have to call this function everytime you're done
+//collecting the new item data. In the case you didn't, this func will be called once at the end of sendItemData.
+function sendPayload(){
+	addPriceRecord(payload);
+
+	if (sendPayload.sentOnce === undefined) {
+		sendPayload.sentOnce = true;
+
+		chrome.runtime.sendMessage({
+			action: 'showPageAction'
+		});
+	}
+}
 
 //This function gathers all the data about the item, and stores in in payload.
 //Payload MUST contain the following values:
@@ -79,7 +86,7 @@ function sendItemData(){
 				payload.itemPrice = $("#stockPriceBlock .prix").text().replace(/€/g, '.').trim();
 			}
 
-			addPriceRecord(payload);
+			sendPayload();
 		},
 		payload.timeout);
 
@@ -119,7 +126,7 @@ function sendItemData(){
 				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "USD";
 
-				addPriceRecord(payload);
+				sendPayload();
 			}
 		},
 		payload.timeout);
@@ -153,7 +160,7 @@ function sendItemData(){
 				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "EUR";
 
-				addPriceRecord(payload);
+				sendPayload();
 			}
 		},
 		payload.timeout);
@@ -188,7 +195,7 @@ function sendItemData(){
 				payload.itemName = $("span#productTitle").text().trim();
 				payload.itemCurrency = "GBP";
 
-				addPriceRecord(payload);
+				sendPayload();
 			}
 		},
 		payload.timeout);
@@ -247,7 +254,7 @@ function sendItemData(){
 			payload.itemID = getUrlPart(window.location.pathname, 5);
 			payload.itemName = $('h1.exp-product-title.nsg-font-family--platform').text().trim();
 
-			addPriceRecord(payload);
+			sendPayload();
 		};
 
 		processNike();
@@ -320,7 +327,7 @@ function sendItemData(){
 			payload.itemPrice = payload.itemPrice[0];
 			payload.itemCurrency = $("span.currency").text().trim();
 
-			addPriceRecord(payload);
+			sendPayload();
 		};
 
 		setInterval(()=>{
@@ -396,7 +403,7 @@ function sendItemData(){
 			payload.itemID = getLastUrlPart(window.location.pathname);
 			payload.itemPrice = $(".p-price").last().text().replace(/,/g, ".");
 
-			addPriceRecord(payload);
+			sendPayload();
 		}
 
 
@@ -410,7 +417,7 @@ function sendItemData(){
 				if (payload.itemPrice.includes(" - "))
 					return;
 
-				addPriceRecord(payload);
+				sendPayload();
 			}
 		};
 
@@ -430,7 +437,7 @@ function sendItemData(){
 
 	if(payload.executeOnLoad){
 		setTimeout(()=>{
-			addPriceRecord(payload);},
+			sendPayload();},
 		payload.timeout);
 	}
 }

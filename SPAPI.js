@@ -49,8 +49,7 @@ function storeDomainIs(argument) {
 /* FUNCTIONS FOR POPUP.JS */
 
 function isInFavorites(favArray, itemID) {
-	
-	return favArray.map((a)=>{return a.shorturl}).indexOf(itemID) != -1;
+	return favArray === undefined ? false : favArray.map((a)=>{return a.shorturl}).indexOf(itemID) != -1;
 }
 
 //Gets the current price of a favorite, and sends it to the database in the background
@@ -151,7 +150,7 @@ function buildSelectGraph(datadiv = "#maindiv", selector = "#chart", mini = fals
 		});
 	});
 
-	if (typeof pricearray !== 'undefined' && pricearray.length > 0) {
+	if (pricearray !== undefined && pricearray.length > 0) {
 		buildGraph(pricearray, datearray, selector, mini);
 	}
 	else{

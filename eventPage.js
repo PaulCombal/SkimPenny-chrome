@@ -175,8 +175,8 @@ chrome.runtime.onMessage.addListener(listenMessages);
 //Check the favorites price on every chrome startup
 //Do NOT forget to switch those lines for testing as Installed will 
 //trigger more esily than if it were a onStartup event, it's just for testing purposes
-//chrome.runtime.onStartup.addListener(()=>{	
-chrome.runtime.onInstalled.addListener(()=>{
+chrome.runtime.onStartup.addListener(()=>{	
+// chrome.runtime.onInstalled.addListener(()=>{
 	//Original plan was to embed the pages in an iframe for them to be processed again,
 	//but X-frame headers prevented that, and chrome doesn't offer non-displayed tabs.
 	//So now we have to download the raw html and retrieve the price, to compare it

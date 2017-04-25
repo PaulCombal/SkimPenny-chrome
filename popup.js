@@ -2,7 +2,7 @@ $(document).ready(function() {
 	
 	chrome.tabs.getSelected(null, function(tab) {
 		chrome.tabs.sendMessage(tab.id, {action: "getItemData"}, function(response) {
-			if (response === undefined) {
+			if (response.itemPayload === undefined) {
 				$("header span").text(chrome.i18n.getMessage("error_loading_item"));
 				//We don't want undefined favorites
 				$("#fav_button")
@@ -13,14 +13,20 @@ $(document).ready(function() {
 				.css("cursor", "auto");
 			}
 			else{
+				//This should never happen anymore now, but hey why not leave that anyway
+				if (response.itemPayload.itemID === undefined) {
+					$("header span").text("TOO QUICK! Please try again!");
+					return;
+				}
 				$("header span").text(response.itemPayload.itemName);
 				$("#openOptions").text(chrome.i18n.getMessage("options"));
 				$("#seeMyFavorites").text(chrome.i18n.getMessage("my_favorites"));
 				$("#maindiv").text(chrome.i18n.getMessage("loading_prices"));
 
+
 				getPriceCurve(response.itemPayload.itemID, response.itemPayload.storeName);
 
-				//Now let's take care of the page elements
+				//Now let's take care of the page dynamic elements
 				$("#sett_button").click(showOptionsDropMenu);
 				$("#fav_button").click(function(){favoritesClicked(response.fullurl, response.itemPayload);});
 				$("#openOptions").click(function(){chrome.runtime.openOptionsPage();});
@@ -83,7 +89,7 @@ function favoritesClicked(fullurl, itemPayload){
 
 			//We know that favlist isn't empty as there is at least one favorite
 			$.each(data.favlist, (index, favorite) => {
-				if (favorite["fullurl"] == fullurl) {
+				if (favorite.fullurl == fullurl) {
 					data.favlist.splice(index, 1);
 				}
 
