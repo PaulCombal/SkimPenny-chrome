@@ -2,35 +2,75 @@ $(document).ready(function() {
 
 	//First, we have to make sure this script is injected in a product page.
 	//It should always be, but with the chrome manifest regex, it's not always possible
-	let matches = [	/.*:\/\/.*ldlc.com\/fiche\/.*(\.html)$/g,
-				/.*:\/\/.*shop\.hardware\.fr\/fiche\/.*(\.html)$/g,
-				/.*:\/\/www\.amazon\.fr\/((.*\/)?dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g,
-				/.*:\/\/www\.amazon\.com\/((.*\/)?dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g,
-				/.*:\/\/www\.amazon\.co\.uk\/((.*\/)?dp\/|gp\/product\/|d\/.*\/.*\/)([0-9]|[A-Z]){10}(\/.*)?/g,
-				/.*:\/\/.*cdiscount\.com\/.*(\/f-[0-9]+-.*\.html((#|\?).*)?)$/g,
-				/.*:\/\/www\.topachat\.com\/pages\/detail2_cat_.*\.html(((#|\?).*)?)$/g,
-				/.*:\/\/.*conrad\.fr\/ce\/fr\/product\/[0-9]+\/.+/g,
-				/.*\/\/store\.nike\.com\/.*\/pgid-[0-9]{8}/g,
-				/.*\/\/www\.grosbill\.com\/4-.*/g,
-				/.*\/\/www\.undiz\.com\/.*\/.*\/.*([0-9]\.html(.*)?)$/g,
-				/.*(fr|es|de)\.romwe\.com\/.*-p-[0-9]*-cat-[0-9]*\.html.*/g,
-				/.*\/\/www\.zalando\.fr\/.*\.html.*/g,
-				/.*\/\/www\.rueducommerce\.fr\/(m\/ps\/mpid:MP-.*|.*\/.*\/.*\/.*\/.*\.htm(#.*)?)/g,
-				/.*\/\/www\.gearbest\.com\/.*\/pp_[0-9]{6}\.html.*/g,
-				/.*\/\/www\.newegg\.com\/Product\/Product\.aspx\?(i|I)tem=.*/g,
-				/.*\/\/www\.materiel\.net\/.*\/.*[0-9]{6}\.html.*/g,
-				/.*\/\/.*\.aliexpress\.com\/item\/.*\/[0-9]{9,12}\.html.*/g,
-				/.*\/\/www\.caseking\.de\/.*\.html.*/g,
-				/.*\/\/(livre|www|musique|jeux-video|video).*fnac\.com\/.*(a|mp)[0-9]{5,10}.*/g];
+	let matches = [	
+					{storeID: "LDLC", regex: /.*:\/\/.*ldlc.com\/fiche\/.*(\.html)$/g},
+					{storeID: "hardwarefr", regex: /.*:\/\/.*shop\.hardware\.fr\/fiche\/.*(\.html)$/g},
+					{storeID: "amazonfr", regex: /.*:\/\/www\.amazon\.fr\/((.*\/)?dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g},
+					{storeID: "amazoncom", regex: /.*:\/\/www\.amazon\.com\/((.*\/)?dp\/|gp\/product\/)([0-9]|[A-Z]){10}\/?(.*)/g},
+					{storeID: "amazoncouk", regex: /.*:\/\/www\.amazon\.co\.uk\/((.*\/)?dp\/|gp\/product\/|d\/.*\/.*\/)([0-9]|[A-Z]){10}(\/.*)?/g},
+					{storeID: "cdiscount", regex: /.*:\/\/.*cdiscount\.com\/.*(\/f-[0-9]+-.*\.html((#|\?).*)?)$/g},
+					{storeID: "topachatcom", regex: /.*:\/\/www\.topachat\.com\/pages\/detail2_cat_.*\.html(((#|\?).*)?)$/g},
+					{storeID: "conradfr", regex: /.*:\/\/.*conrad\.fr\/ce\/fr\/product\/[0-9]+\/.+/g},
+					{storeID: "nike", regex: /.*\/\/store\.nike\.com\/.*\/pgid-[0-9]{8}/g},
+					{storeID: "grosbill", regex: /.*\/\/www\.grosbill\.com\/4-.*/g},
+					{storeID: "undiz", regex: /.*\/\/www\.undiz\.com\/.*\/.*\/.*([0-9]\.html(.*)?)$/g},
+					{storeID: "romwe", regex: /.*(fr|es|de)\.romwe\.com\/.*-p-[0-9]*-cat-[0-9]*\.html.*/g},
+					{storeID: "zalandofr", regex: /.*\/\/www\.zalando\.fr\/.*\.html.*/g},
+					{storeID: "rueducommercefr", regex: /.*\/\/www\.rueducommerce\.fr\/(m\/ps\/mpid:MP-.*|.*\/.*\/.*\/.*\/.*\.htm(#.*)?)/g},
+					{storeID: "gearbestcom", regex: /.*\/\/www\.gearbest\.com\/.*\/pp_[0-9]{6}\.html.*/g},
+					{storeID: "neweggcom", regex: /.*\/\/www\.newegg\.com\/Product\/Product\.aspx\?(i|I)tem=.*/g},
+					{storeID: "materielnet", regex: /.*\/\/www\.materiel\.net\/.*\/.*[0-9]{6}\.html.*/g},
+					{storeID: "aliexpresscom", regex: /.*\/\/.*\.aliexpress\.com\/item\/.*\/[0-9]{9,12}\.html.*/g},
+					{storeID: "casekingde", regex: /.*\/\/www\.caseking\.de\/.*\.html.*/g},
+					{storeID: "fnaccom", regex: /.*\/\/(livre|www|musique|jeux-video|video).*fnac\.com\/.*(a|mp)[0-9]{5,10}.*/g}
+				];
 
 	for (let i in matches) {
-		if (window.location.href.match(matches[i])){
-			//We're definitely in a product page. Let's ask for the page action to show
-			sendItemData();
+		if (window.location.href.match(matches[i].regex)){
+			
+			//We're definitely in a product page.
+			//sendItemData(); //TODO Remove that and switch to API like
+
+			var bSendPayloadAfterParse = true;
+
+			switch(matches[i].storeID)
+			{
+				case "LDLC":
+				case "hardwarefr":
+					SPAPI.currentPayload.storeName = matches[i].storeID;
+					SPAPI.preparePayload({DOM: document, pathname: window.location.pathname});
+					break;
+
+				case "amazoncom":
+				case "amazonfr":
+				case "amazoncouk":
+					//TODO
+					break;
+			}
+
+			if (SPAPI.currentPayload.storeName !== "none") {
+				
+				SPAPI.registerLastTimeUserSeen();
+				
+				if (bSendPayloadAfterParse) {
+					askPageAction();
+					SPAPI.sendPayload();
+				}
+			}
 			break;
 		}
 	}
 });
+
+function askPageAction(){
+	if (askPageAction.sentOnce === undefined) {
+		askPageAction.sentOnce = true;
+
+		chrome.runtime.sendMessage({
+			action: 'showPageAction'
+		});
+	}
+}
 
 //payload will contain the data to send
 //Default values are:
@@ -41,19 +81,6 @@ var payload = {};
 payload.timeout = 0;
 payload.executeOnLoad = true;
 
-//If you set payload.executeOnLoad = false, then you will have to call this function everytime you're done
-//collecting the new item data. In the case you didn't, this func will be called once at the end of sendItemData.
-function sendPayload(){
-	addPriceRecord(payload);
-
-	if (sendPayload.sentOnce === undefined) {
-		sendPayload.sentOnce = true;
-
-		chrome.runtime.sendMessage({
-			action: 'showPageAction'
-		});
-	}
-}
 
 //This function gathers all the data about the item, and stores in in payload.
 //Payload MUST contain the following values:
@@ -65,31 +92,18 @@ function sendPayload(){
 function sendItemData(){
 
 	if(storeDomainIs("ldlc.com")){
-		payload.storeName = "LDLC";
-		payload.itemID = window.location.pathname;
-		payload.itemPrice = $("#productshipping meta[itemprop=price]").attr("content").replace(/,/g, '.');
-		payload.itemCurrency = "EUR";
-		payload.itemName = $("span.fn.designation_courte").first().text().trim();
+		// payload.storeName = "LDLC";
+		// payload.itemID = window.location.pathname;
+		// payload.itemPrice = $("#productshipping meta[itemprop=price]").attr("content").replace(/,/g, '.');
+		// payload.itemCurrency = "EUR";
+		// payload.itemName = $("span.fn.designation_courte").first().text().trim();
 	}
 	else if (storeDomainIs("shop.hardware.fr")) {
-		payload.executeOnLoad = false; //Price and more info loaded by Ajax and not on page load
-		payload.timeout = 2000;
-
-		setTimeout(()=>{
-			payload.storeName = "hardwarefr";
-			payload.itemID = window.location.pathname;
-			payload.itemCurrency = "EUR";
-			payload.itemName = $("#description h1").first().text().trim();
-
-			payload.itemPrice = $("#stockPriceBlock .prix .new-price").text().replace(/€/g, '.').trim();
-			if (payload.itemPrice.length === 0) {
-				payload.itemPrice = $("#stockPriceBlock .prix").text().replace(/€/g, '.').trim();
-			}
-
-			sendPayload();
-		},
-		payload.timeout);
-
+		// payload.storeName = "hardwarefr";
+		// payload.itemID = window.location.pathname;
+		// payload.itemCurrency = "EUR";
+		// payload.itemName = $("#description h1").first().text().trim();
+		// payload.itemPrice = $("meta[itemprop=price]").attr("content");
 	}
 	else if (storeDomainIs("amazon.com")) {
 		//The idea here is to check every 2 seconds if the URL changed
@@ -447,11 +461,11 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.action == "getItemData"){
 	 	sendResponse(
 	 		{
-	 			itemPayload: payload,
+	 			itemPayload: SPAPI.currentPayload,
 	 			fullurl: window.location.href
 	 		}
 	 	);
 	}
 	else
-		sendResponse({error: "Unexpected message on skimpenny.js"});
+		console.log("Unexpected message on skimpenny.js");
 });

@@ -191,8 +191,7 @@ chrome.runtime.onStartup.addListener(()=>{
 			var lastDate = new Date(fav.lastUserAcknowledgedDate);
 			var timeDifference = new Date(currentDate.getTime() - lastDate.getTime());
 			//gets time difference in seconds, 86400 is the number of seconds in a day
-			//It's useless to modify this value, as the server will reject the request anyway
-			//if set to lower.
+			//You can lower this value if you want, but the server will only add records every 24h
 			//Yet, if anyone wants to add a feature to check prices only every 2 days or more,
 			//I'm open to this
 			if (timeDifference.getTime()/1000 > 86400) {

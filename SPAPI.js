@@ -1,3 +1,71 @@
+function SPAPI(){
+
+}
+
+SPAPI.storeFuncs = [];
+SPAPI.currentPayload = {};
+
+SPAPI.currentPayload.storeName = "none";
+
+SPAPI.addStoreFunc = (storeID, func) => {
+	SPAPI.storeFuncs.push({store: storeID, specificFunc: func});
+};
+
+SPAPI.preparePayload = (necessaryElements) => {
+	if (SPAPI.currentPayload.storeName === "none") {
+		console.log("Store name not set");
+		return;
+	}
+
+	//Getting the index
+	var funcToCall = SPAPI.storeFuncs.map((a)=>{return a.store}).indexOf(SPAPI.currentPayload.storeName);
+	
+	if (funcToCall == -1) {
+		console.log("Error, couldn't find appropriate function!! SPAPI.js");
+		return;
+	}
+
+	funcToCall = SPAPI.storeFuncs[funcToCall].specificFunc;
+
+	funcToCall(necessaryElements);
+
+	// console.log(SPAPI.currentPayload);
+	// At this point, the payload should be filled, we're good but still a check never hurts
+
+	if (SPAPI.currentPayload.itemName.length < 0) {
+		console.log("/!\\ Payload doesn't seem to be initialized correctly!");
+		return;
+	}
+};
+
+SPAPI.sendPayload = () => {
+	chrome.runtime.sendMessage({
+		action: 'xhttp',
+		storeName: SPAPI.currentPayload.storeName,
+		productPage: SPAPI.currentPayload.itemID,
+		price: SPAPI.currentPayload.itemPrice,
+		currency: SPAPI.currentPayload.itemCurrency
+	});
+};
+
+//Updates the favorite: last time/price seen by user
+SPAPI.registerLastTimeUserSeen = () => {
+	chrome.storage.sync.get(null, (data)=>{
+		if (isInFavorites(data.favlist, SPAPI.currentPayload.itemID)) {
+			
+			var favoriteIndex = data.favlist.map((a)=>{return a.shorturl}).indexOf(SPAPI.currentPayload.itemID);
+			
+			data.favlist[favoriteIndex].lastUserAcknowledgedDate = new Date().toJSON();
+			data.favlist[favoriteIndex].lastUserAcknowledgedPrice = SPAPI.currentPayload.itemPrice;
+			data.favlist[favoriteIndex].currency = SPAPI.currentPayload.itemCurrency;
+
+			chrome.storage.sync.set({favlist: data.favlist}, ()=>{console.log("Favorite updated.")});
+		}
+	});
+};
+
+SPAPI.sendRecord = "TODO";
+
 /* FUNCTIONS FOR BOTH JS SCRIPTS */
 
 function getUrlPart(url, index) {

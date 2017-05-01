@@ -1,8 +1,9 @@
 {
   "content_scripts": [
     {
-        "js": [ "jquery.min.js", "SPAPI.js", "skimpenny.js" ],
-        "matches": [ "*://www.ldlc.com/fiche/*",
+        "js": [ "jquery.min.js", "SPAPI.js", "storeSpecific.js", "skimpenny.js" ],
+        "matches": [ 
+          "*://www.ldlc.com/fiche/*",
           "*://ldlc.com/fiche/*",
           "*://shop.hardware.fr/fiche/*",
           "*://www.cdiscount.com/*/*/*/f-*",
