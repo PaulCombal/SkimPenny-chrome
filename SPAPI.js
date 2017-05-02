@@ -12,13 +12,20 @@ SPAPI.addStoreFunc = (storeID, func) => {
 };
 
 SPAPI.preparePayload = (necessaryElements) => {
-	if (SPAPI.currentPayload.storeName === "none") {
-		console.log("Store name not set");
+	if (SPAPI.currentPayload.storeName === "none" || SPAPI.currentPayload.storeName === undefined) {
+		console.log("Fatal error: Store name not set");
 		return;
 	}
 
 	//Getting the index
 	var funcToCall = SPAPI.storeFuncs.map((a)=>{return a.store}).indexOf(SPAPI.currentPayload.storeName);
+
+	console.log("In prepare payload");
+	console.log(SPAPI.currentPayload);
+	console.log(SPAPI.storeFuncs);
+	console.log(funcToCall);
+	console.log(SPAPI.currentPayload.storeName);
+	console.log("End of prepare logs");
 	
 	if (funcToCall == -1) {
 		console.log("Error, couldn't find appropriate function!! SPAPI.js");
@@ -39,13 +46,40 @@ SPAPI.preparePayload = (necessaryElements) => {
 };
 
 SPAPI.sendPayload = () => {
-	chrome.runtime.sendMessage({
-		action: 'xhttp',
-		storeName: SPAPI.currentPayload.storeName,
-		productPage: SPAPI.currentPayload.itemID,
-		price: SPAPI.currentPayload.itemPrice,
-		currency: SPAPI.currentPayload.itemCurrency
-	});
+	//For some reason, I can't seem to be able to send a message from background script
+	//to background script, so I'm using this stupid workaround to ensure the request 
+	//is sent from the background page to avoid chrome security troubles and make the
+	//server happy too.
+	switch(window.location.protocol)
+	{
+		case "http:":
+		case "https:":
+			chrome.runtime.sendMessage({
+				action: 'xhttp',
+				storeName: SPAPI.currentPayload.storeName,
+				productPage: SPAPI.currentPayload.itemID,
+				price: SPAPI.currentPayload.itemPrice,
+				currency: SPAPI.currentPayload.itemCurrency
+			});
+			break;
+
+		case "chrome-extension:":
+			$.post("http://waxence.fr/skimpenny/add.php", 
+			{
+				store : SPAPI.currentPayload.storeName,
+				product : SPAPI.currentPayload.itemID,
+				price : SPAPI.currentPayload.itemPrice,
+				currency: SPAPI.currentPayload.itemCurrency
+			},
+			(response)=>{console.log(response);},
+			'text')
+			.fail(function(){
+				console.log("Error sending request :(");
+			});
+			break;
+	}
+
+	SPAPI.currentPayload = {};
 };
 
 //Updates the favorite: last time/price seen by user

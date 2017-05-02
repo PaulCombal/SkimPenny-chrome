@@ -64,13 +64,44 @@ function notifyAndSend(payload, favorite) {
 
 //Gets the price of a favorite, and send it to the sever
 function addRecord(fav) {
-	//Now we have to load the favorite page in an iframe
-	var payload = {};
-	//The two values you have to set are:
-	// payload.price = YOU SET IT;
-	// payload.currency = YOU SET IT; Try to get the same than the saved favorite
+	if (this.bCanContinue === undefined) {
+		this.bCanContinue = true;
+	}
 
-	switch(fav.store){
+	SPAPI.currentPayload.storeName = fav.store;
+
+	console.log("entering addRecord");
+	console.log(fav);
+	console.log(SPAPI.currentPayload);
+	console.log(SPAPI.currentPayload.storeName);
+	console.log("Going to enter preparePayload");
+
+	switch(fav.store)
+	{
+		case "LDLC":
+		case "amazoncom":
+		case "amazoncouk":
+		case "amazonfr":
+			
+			if(!this.bCanContinue){
+				//we wait here until bcancontinue has been set to true in the $.get callback
+				//We can wait with chrome alarms or something
+				//TODO
+			}
+
+			//OK, the async func has ended, now it's time for this synchronous thread to continue
+			//and tell the others behind us to stay behind
+			this.bCanContinue = false;
+			
+			$.get(fav.fullurl, (data) => {
+				SPAPI.preparePayload({DOM: data, pathname: new URL(fav.fullurl).pathname});
+				SPAPI.sendPayload();
+				addRecord.bCanContinue = true;
+			});
+			break;
+	}
+
+	/*switch(fav.store){
 		case "amazonfr":
 			//Fuck amazon AWS, better download everything, it's free
 			$.get(fav.fullurl, ( data ) => {
@@ -166,7 +197,7 @@ function addRecord(fav) {
 				notifyAndSend(payload, fav);
 			});
 		break;
-	}
+	}*/
 }
 
 chrome.runtime.onMessage.addListener(listenMessages);
@@ -175,8 +206,8 @@ chrome.runtime.onMessage.addListener(listenMessages);
 //Check the favorites price on every chrome startup
 //Do NOT forget to switch those lines for testing as Installed will 
 //trigger more esily than if it were a onStartup event, it's just for testing purposes
-chrome.runtime.onStartup.addListener(()=>{	
-// chrome.runtime.onInstalled.addListener(()=>{
+// chrome.runtime.onStartup.addListener(()=>{	
+chrome.runtime.onInstalled.addListener(()=>{
 	//Original plan was to embed the pages in an iframe for them to be processed again,
 	//but X-frame headers prevented that, and chrome doesn't offer non-displayed tabs.
 	//So now we have to download the raw html and retrieve the price, to compare it
@@ -186,16 +217,16 @@ chrome.runtime.onStartup.addListener(()=>{
 
 	chrome.storage.sync.get(null, (data) => {
 		//TODO add check if want this feature enabled
+		var currentDate = new Date("2020-01-01");
 		$.each(data.favlist, (i, fav) => {
-			var currentDate = new Date();
 			var lastDate = new Date(fav.lastUserAcknowledgedDate);
 			var timeDifference = new Date(currentDate.getTime() - lastDate.getTime());
 			//gets time difference in seconds, 86400 is the number of seconds in a day
 			//You can lower this value if you want, but the server will only add records every 24h
 			//Yet, if anyone wants to add a feature to check prices only every 2 days or more,
-			//I'm open to this
+			//please go on
 			if (timeDifference.getTime()/1000 > 86400) {
-				console.log("Favorite: " + fav.itemName + " should be updated.");
+				console.log("Favorite: " + fav.itemName + " will be updated.");
 				addRecord(fav);
 			}
 		});

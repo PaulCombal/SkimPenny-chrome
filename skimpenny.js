@@ -44,7 +44,13 @@ $(document).ready(function() {
 				case "amazoncom":
 				case "amazonfr":
 				case "amazoncouk":
-					//TODO
+					SPAPI.currentPayload.storeName = matches[i].storeID;
+					SPAPI.preparePayload(
+					{
+						DOM: document,
+						fullurl: window.location.pathname
+					}
+					);
 					break;
 			}
 

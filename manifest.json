@@ -60,7 +60,7 @@
     },
 
    "background":{
-    "scripts" : ["jquery.min.js", "eventPage.js"],
+    "scripts" : ["jquery.min.js", "SPAPI.js", "storeSpecific.js", "eventPage.js"],
     "persistent": false
    },
     "options_ui": {
