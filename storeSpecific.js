@@ -57,9 +57,7 @@ function parseAmazonPage(payload, elementsNeeded){
 	if (payload.itemPrice.length === 0)
 		payload.itemPrice = $(elementsNeeded.DOM).find('span#priceblock_ourprice').text().trim();
 
-	payload.itemName = $("span#productTitle").text().trim();
-	console.log("PRODTITLE");
-	console.log($("span#productTitle"));
+	payload.itemName = $(elementsNeeded.DOM).find("span#productTitle").text().trim();
 
 	//This value of the payload should already be set at this point
 	switch(payload.storeName)

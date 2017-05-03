@@ -36,8 +36,8 @@ SPAPI.preparePayload = (payload, necessaryElements) => {
 
 	funcToCall(payload, necessaryElements);
 
-	console.log("prepared Payload");
-	console.log(payload);
+	// console.log("prepared Payload");
+	// console.log(payload);
 	// At this point, the payload should be filled, we're good but still a check never hurts
 
 	if (payload.itemName === undefined || payload.itemName.length === 0) {
@@ -51,9 +51,10 @@ SPAPI.sendPayload = (payload) => {
 	//to background script, so I'm using this stupid workaround to ensure the request 
 	//is sent from the background page to avoid chrome security troubles and make the
 	//server happy too.
-	console.log("Payload that should have been sent");
-	console.log(payload);
-	return;
+	
+	// console.log("Payload that should have been sent");
+	// console.log(payload);
+	// return;
 
 	switch(window.location.protocol)
 	{
@@ -100,6 +101,12 @@ SPAPI.registerLastTimeUserSeen = (payload) => {
 			chrome.storage.sync.set({favlist: data.favlist}, ()=>{console.log("Favorite updated.")});
 		}
 	});
+};
+
+SPAPI.sendSimpleRecord = (nameOfStore, necessaryElements) => {
+	var payload = SPAPI.createPayload(nameOfStore);
+	SPAPI.preparePayload(payload, necessaryElements);
+	SPAPI.sendPayload(payload);
 };
 
 /* FUNCTIONS FOR BOTH JS SCRIPTS */

@@ -29,40 +29,24 @@ $(document).ready(function() {
 		if (window.location.href.match(matches[i].regex)){
 			
 			//We're definitely in a product page.
-			//sendItemData(); //TODO Remove that and switch to API like
-
-			var bSendPayloadAfterParse = true;
 
 			switch(matches[i].storeID)
 			{
 				case "LDLC":
 				case "hardwarefr":
-					SPAPI.currentPayload.storeName = matches[i].storeID;
-					SPAPI.preparePayload({DOM: document, pathname: window.location.pathname});
+					//TODO
 					break;
 
 				case "amazoncom":
 				case "amazonfr":
 				case "amazoncouk":
-					SPAPI.currentPayload.storeName = matches[i].storeID;
-					SPAPI.preparePayload(
-					{
-						DOM: document,
-						fullurl: window.location.pathname
-					}
-					);
+					//TODO
 					break;
 			}
 
-			if (SPAPI.currentPayload.storeName !== "none") {
-				
-				SPAPI.registerLastTimeUserSeen();
-				
-				if (bSendPayloadAfterParse) {
-					askPageAction();
-					SPAPI.sendPayload();
-				}
-			}
+			SPAPI.registerLastTimeUserSeen();
+			
+			askPageAction();
 			break;
 		}
 	}

@@ -75,9 +75,10 @@ function addRecord(fav) {
 				url: fav.fullurl
 			})
 			.done((data) => {
-				var payload = SPAPI.createPayload(fav.store);
-				SPAPI.preparePayload(payload, {DOM: data, pathname: new URL(fav.fullurl).pathname});
-				SPAPI.sendPayload(payload);
+				SPAPI.sendSimpleRecord(fav.store, {DOM: data, pathname: new URL(fav.fullurl).pathname});
+			})
+			.fail(()=>{
+				console.warn("Could not download page " + fav.fullurl + " in the background.");
 			});
 			break;
 	}
