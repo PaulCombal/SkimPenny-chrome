@@ -1,75 +1,80 @@
+//I'm not making a regular of that object because I only want one instance of this
+//Not sure if it's the correct way this should have been done
+
 function SPAPI(){
 
 }
 
 SPAPI.storeFuncs = [];
-SPAPI.currentPayload = {};
-
-SPAPI.currentPayload.storeName = "none";
+SPAPI.pendingPayloads = [];
 
 SPAPI.addStoreFunc = (storeID, func) => {
 	SPAPI.storeFuncs.push({store: storeID, specificFunc: func});
 };
 
-SPAPI.preparePayload = (necessaryElements) => {
-	if (SPAPI.currentPayload.storeName === "none" || SPAPI.currentPayload.storeName === undefined) {
-		console.log("Fatal error: Store name not set");
+SPAPI.createPayload = (nameOfStore)=>{
+	var payload = {};
+	payload.storeName = nameOfStore;
+	return payload;
+};
+
+SPAPI.preparePayload = (payload, necessaryElements) => {
+	if (payload.storeName === undefined) {
+		console.log("Fatal error: payload has no store name in preparePayload!");
 		return;
 	}
 
 	//Getting the index
-	var funcToCall = SPAPI.storeFuncs.map((a)=>{return a.store}).indexOf(SPAPI.currentPayload.storeName);
+	var funcToCall = SPAPI.storeFuncs.map((a)=>{return a.store}).indexOf(payload.storeName);
 
-	console.log("In prepare payload");
-	console.log(SPAPI.currentPayload);
-	console.log(SPAPI.storeFuncs);
-	console.log(funcToCall);
-	console.log(SPAPI.currentPayload.storeName);
-	console.log("End of prepare logs");
-	
 	if (funcToCall == -1) {
-		console.log("Error, couldn't find appropriate function!! SPAPI.js");
+		console.log("Error, couldn't find appropriate function in preparePayload");
 		return;
 	}
 
 	funcToCall = SPAPI.storeFuncs[funcToCall].specificFunc;
 
-	funcToCall(necessaryElements);
+	funcToCall(payload, necessaryElements);
 
-	// console.log(SPAPI.currentPayload);
+	console.log("prepared Payload");
+	console.log(payload);
 	// At this point, the payload should be filled, we're good but still a check never hurts
 
-	if (SPAPI.currentPayload.itemName.length < 0) {
-		console.log("/!\\ Payload doesn't seem to be initialized correctly!");
+	if (payload.itemName === undefined || payload.itemName.length === 0) {
+		console.warn("/!\\ Payload doesn't seem to be initialized correctly!");
 		return;
 	}
 };
 
-SPAPI.sendPayload = () => {
+SPAPI.sendPayload = (payload) => {
 	//For some reason, I can't seem to be able to send a message from background script
 	//to background script, so I'm using this stupid workaround to ensure the request 
 	//is sent from the background page to avoid chrome security troubles and make the
 	//server happy too.
+	console.log("Payload that should have been sent");
+	console.log(payload);
+	return;
+
 	switch(window.location.protocol)
 	{
 		case "http:":
 		case "https:":
 			chrome.runtime.sendMessage({
 				action: 'xhttp',
-				storeName: SPAPI.currentPayload.storeName,
-				productPage: SPAPI.currentPayload.itemID,
-				price: SPAPI.currentPayload.itemPrice,
-				currency: SPAPI.currentPayload.itemCurrency
+				storeName: payload.storeName,
+				productPage: payload.itemID,
+				price: payload.itemPrice,
+				currency: payload.itemCurrency
 			});
 			break;
 
 		case "chrome-extension:":
 			$.post("http://waxence.fr/skimpenny/add.php", 
 			{
-				store : SPAPI.currentPayload.storeName,
-				product : SPAPI.currentPayload.itemID,
-				price : SPAPI.currentPayload.itemPrice,
-				currency: SPAPI.currentPayload.itemCurrency
+				store : payload.storeName,
+				product : payload.itemID,
+				price : payload.itemPrice,
+				currency: payload.itemCurrency
 			},
 			(response)=>{console.log(response);},
 			'text')
@@ -78,12 +83,11 @@ SPAPI.sendPayload = () => {
 			});
 			break;
 	}
-
-	SPAPI.currentPayload = {};
 };
 
 //Updates the favorite: last time/price seen by user
-SPAPI.registerLastTimeUserSeen = () => {
+//TODO use payload
+SPAPI.registerLastTimeUserSeen = (payload) => {
 	chrome.storage.sync.get(null, (data)=>{
 		if (isInFavorites(data.favlist, SPAPI.currentPayload.itemID)) {
 			
@@ -97,8 +101,6 @@ SPAPI.registerLastTimeUserSeen = () => {
 		}
 	});
 };
-
-SPAPI.sendRecord = "TODO";
 
 /* FUNCTIONS FOR BOTH JS SCRIPTS */
 

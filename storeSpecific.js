@@ -1,35 +1,36 @@
 // LDLC
 
-SPAPI.addStoreFunc("LDLC", (elementsNeeded)=>{
-	if (elementsNeeded.DOM) {
-		SPAPI.currentPayload.storeName = "LDLC";
-		SPAPI.currentPayload.itemID = elementsNeeded.pathname;
-		SPAPI.currentPayload.itemPrice = $(elementsNeeded.DOM).find("#productshipping meta[itemprop=price]").attr("content").replace(/,/g, '.');
-		SPAPI.currentPayload.itemCurrency = "EUR";
-		SPAPI.currentPayload.itemName = $(elementsNeeded.DOM).find("span.fn.designation_courte").first().text().trim();
+SPAPI.addStoreFunc("LDLC", (payload, elementsNeeded)=>{
+	
+	if (!elementsNeeded.DOM) {
+		console.log("No DOM specified!");
+		return;
 	}
-	else{
-		console.log("No dom specified");
-	}
+
+	payload.storeName = "LDLC";
+	payload.itemID = elementsNeeded.pathname;
+	payload.itemPrice = $(elementsNeeded.DOM).find("#productshipping meta[itemprop=price]").attr("content").replace(/,/g, '.');
+	payload.itemCurrency = "EUR";
+	payload.itemName = $(elementsNeeded.DOM).find("span.fn.designation_courte").first().text().trim();
 });
 
 
 // Hardware.fr
 
 
-SPAPI.addStoreFunc("hardwarefr", (elementsNeeded) => {
-	SPAPI.currentPayload.storeName = "hardwarefr";
-	SPAPI.currentPayload.itemID = elementsNeeded.pathname;
-	SPAPI.currentPayload.itemCurrency = "EUR";
-	SPAPI.currentPayload.itemName = $(elementsNeeded.DOM).find("#description h1").first().text().trim();
-	SPAPI.currentPayload.itemPrice = $(elementsNeeded.DOM).find("meta[itemprop=price]").attr("content");
+SPAPI.addStoreFunc("hardwarefr", (payload, elementsNeeded) => {
+	payload.storeName = "hardwarefr";
+	payload.itemID = elementsNeeded.pathname;
+	payload.itemCurrency = "EUR";
+	payload.itemName = $(elementsNeeded.DOM).find("#description h1").first().text().trim();
+	payload.itemPrice = $(elementsNeeded.DOM).find("meta[itemprop=price]").attr("content");
 });
 
 
 // Amazon, for all countries
 
 
-function parseAmazonPage(elementsNeeded){
+function parseAmazonPage(payload, elementsNeeded){
 
 	// if (elementsNeeded.pathname.startsWith("/dp/"))
 	// 	payload.itemID = getUrlPart(window.location.pathname, 2);
@@ -47,7 +48,7 @@ function parseAmazonPage(elementsNeeded){
 	else{
 		regex = regex[1];
 		console.log("Item ID is " + regex);
-		return;
+		payload.itemID = regex;
 	}
 
 	payload.itemPrice = $(elementsNeeded.DOM).find('span#priceblock_saleprice').text().trim();
@@ -57,24 +58,25 @@ function parseAmazonPage(elementsNeeded){
 		payload.itemPrice = $(elementsNeeded.DOM).find('span#priceblock_ourprice').text().trim();
 
 	payload.itemName = $("span#productTitle").text().trim();
+	console.log("PRODTITLE");
+	console.log($("span#productTitle"));
 
 	//This value of the payload should already be set at this point
-	switch(SPAPI.currentPayload.storeName)
+	switch(payload.storeName)
 	{
 		case "amazoncom":
-			SPAPI.currentPayload.itemCurrency = "USD";
-			SPAPI.currentPayload.itemPrice = SPAPI.currentPayload.itemPrice.replace(/(\$|,|\s+)/g, "");
+			payload.itemCurrency = "USD";
+			payload.itemPrice = payload.itemPrice.replace(/(\$|,|\s+)/g, "");
 			break;
 		case "amazoncouk":
-			SPAPI.currentPayload.itemCurrency = "GBP";
-			SPAPI.currentPayload.itemPrice = SPAPI.currentPayload.itemPrice.replace(/(£|,|\s+)/g, "");
+			payload.itemCurrency = "GBP";
+			payload.itemPrice = payload.itemPrice.replace(/(£|,|\s+)/g, "");
 			break;
 		case "amazonfr":
-			SPAPI.currentPayload.itemCurrency = "EUR";
-			SPAPI.currentPayload.itemPrice = SPAPI.currentPayload.itemPrice.replace(/(EUR|\s+|,)/g, "");
+			payload.itemCurrency = "EUR";
+			payload.itemPrice = payload.itemPrice.replace(/(EUR|\s+)/g, "").replace(/,/g, ".");
 			break;
 	}
-
 }
 
 SPAPI.addStoreFunc("amazonfr", parseAmazonPage);

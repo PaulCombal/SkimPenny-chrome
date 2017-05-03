@@ -64,140 +64,23 @@ function notifyAndSend(payload, favorite) {
 
 //Gets the price of a favorite, and send it to the sever
 function addRecord(fav) {
-	if (this.bCanContinue === undefined) {
-		this.bCanContinue = true;
-	}
-
-	SPAPI.currentPayload.storeName = fav.store;
-
-	console.log("entering addRecord");
-	console.log(fav);
-	console.log(SPAPI.currentPayload);
-	console.log(SPAPI.currentPayload.storeName);
-	console.log("Going to enter preparePayload");
-
 	switch(fav.store)
 	{
 		case "LDLC":
 		case "amazoncom":
 		case "amazoncouk":
 		case "amazonfr":
-			
-			if(!this.bCanContinue){
-				//we wait here until bcancontinue has been set to true in the $.get callback
-				//We can wait with chrome alarms or something
-				//TODO
-			}
-
-			//OK, the async func has ended, now it's time for this synchronous thread to continue
-			//and tell the others behind us to stay behind
-			this.bCanContinue = false;
-			
-			$.get(fav.fullurl, (data) => {
-				SPAPI.preparePayload({DOM: data, pathname: new URL(fav.fullurl).pathname});
-				SPAPI.sendPayload();
-				addRecord.bCanContinue = true;
+			$.ajax(
+			{
+				url: fav.fullurl
+			})
+			.done((data) => {
+				var payload = SPAPI.createPayload(fav.store);
+				SPAPI.preparePayload(payload, {DOM: data, pathname: new URL(fav.fullurl).pathname});
+				SPAPI.sendPayload(payload);
 			});
 			break;
 	}
-
-	/*switch(fav.store){
-		case "amazonfr":
-			//Fuck amazon AWS, better download everything, it's free
-			$.get(fav.fullurl, ( data ) => {
-				startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_saleprice"', 100000);
-				}
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_ourprice"', 100000);
-				}
-				if (startPos < 0) {
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-				endPos = data.indexOf("</", startPos);
-				price = data.substring(startPos + 20, endPos);
-				if (price.length > 0) {
-					price = price.replace(/.*EUR\s+/g, "");
-					price = price.replace(/\s+/g, "");
-					price = price.replace(/,/g, ".");
-					
-					payload.price = price;
-					payload.currency = "EUR";
-
-				}
-				else{
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-
-				notifyAndSend(payload, fav);
-			});
-		break;
-		case "amazoncom":
-			//Fuck amazon AWS, better download everything, it's free
-			$.get(fav.fullurl, ( data ) => {
-				startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_saleprice"', 100000);
-				}
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_ourprice"', 100000);
-				}
-				if (startPos < 0) {
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-				endPos = data.indexOf("</", startPos);
-				price = data.substring(startPos + 20, endPos);
-				if (price.length > 0) {
-					price = price.replace(/(.*\$|,)/g, "");
-					
-					payload.price = price;
-					payload.currency = "USD";
-
-				}
-				else{
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-
-				notifyAndSend(payload, fav);
-			});
-		break;
-		case "amazoncouk":
-			//Fuck amazon AWS, better download everything, it's free
-			$.get(fav.fullurl, ( data ) => {
-				startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_saleprice"', 100000);
-				}
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_ourprice"', 100000);
-				}
-				if (startPos < 0) {
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-				endPos = data.indexOf("</", startPos);
-				price = data.substring(startPos + 20, endPos);
-				if (price.length > 0) {
-					price = price.replace(/(.*£|,|\s)/g, "");
-					
-					payload.price = price;
-					payload.currency = "GBP";
-
-				}
-				else{
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-
-				notifyAndSend(payload, fav);
-			});
-		break;
-	}*/
 }
 
 chrome.runtime.onMessage.addListener(listenMessages);
