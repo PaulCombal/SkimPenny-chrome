@@ -29,12 +29,13 @@ $(document).ready(function() {
 		if (window.location.href.match(matches[i].regex)){
 			
 			//We're definitely in a product page.
+			var storeID = matches[i].storeID;
 
-			switch(matches[i].storeID)
+			switch(storeID)
 			{
 				case "LDLC":
 				case "hardwarefr":
-					//TODO
+					var payload = SPAPI.sendSimpleRecord(storeID, {DOM: document, pathname: window.location.pathname});
 					break;
 
 				case "amazoncom":
@@ -44,7 +45,7 @@ $(document).ready(function() {
 					break;
 			}
 
-			SPAPI.registerLastTimeUserSeen();
+			SPAPI.registerLastTimeUserSeen(payload);
 			
 			askPageAction();
 			break;

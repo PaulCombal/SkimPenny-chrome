@@ -90,13 +90,13 @@ SPAPI.sendPayload = (payload) => {
 //TODO use payload
 SPAPI.registerLastTimeUserSeen = (payload) => {
 	chrome.storage.sync.get(null, (data)=>{
-		if (isInFavorites(data.favlist, SPAPI.currentPayload.itemID)) {
+		if (isInFavorites(data.favlist, payload.itemID)) {
 			
-			var favoriteIndex = data.favlist.map((a)=>{return a.shorturl}).indexOf(SPAPI.currentPayload.itemID);
+			var favoriteIndex = data.favlist.map((a)=>{return a.shorturl}).indexOf(payload.itemID);
 			
 			data.favlist[favoriteIndex].lastUserAcknowledgedDate = new Date().toJSON();
-			data.favlist[favoriteIndex].lastUserAcknowledgedPrice = SPAPI.currentPayload.itemPrice;
-			data.favlist[favoriteIndex].currency = SPAPI.currentPayload.itemCurrency;
+			data.favlist[favoriteIndex].lastUserAcknowledgedPrice = payload.itemPrice;
+			data.favlist[favoriteIndex].currency = payload.itemCurrency;
 
 			chrome.storage.sync.set({favlist: data.favlist}, ()=>{console.log("Favorite updated.")});
 		}
@@ -107,6 +107,7 @@ SPAPI.sendSimpleRecord = (nameOfStore, necessaryElements) => {
 	var payload = SPAPI.createPayload(nameOfStore);
 	SPAPI.preparePayload(payload, necessaryElements);
 	SPAPI.sendPayload(payload);
+	return payload;
 };
 
 /* FUNCTIONS FOR BOTH JS SCRIPTS */
