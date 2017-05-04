@@ -47,7 +47,7 @@ function parseAmazonPage(payload, elementsNeeded){
 	}
 	else{
 		regex = regex[1];
-		console.log("Item ID is " + regex);
+		// console.log("Item ID is " + regex);
 		payload.itemID = regex;
 	}
 

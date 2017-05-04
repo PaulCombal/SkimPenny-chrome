@@ -5,7 +5,6 @@
 * Optimize buildSelectGraph
 
 # This branch only
-* fix the last time user seen
 * make it easier to send simple request in event page
 * make the skimpenny.js page fully functionnal
 * understand why I get image 404 inthe first place with background requests

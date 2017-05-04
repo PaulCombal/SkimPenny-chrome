@@ -30,38 +30,34 @@ $(document).ready(function() {
 			
 			//We're definitely in a product page.
 			var storeID = matches[i].storeID;
+			var generalParameters = {storeName: storeID, updateFavorite: true, feedPopup: true};
 
 			switch(storeID)
 			{
 				case "LDLC":
 				case "hardwarefr":
-					var payload = SPAPI.sendSimpleRecord(storeID, {DOM: document, pathname: window.location.pathname});
+					SPAPI.sendSimpleRecord(generalParameters, {DOM: document, pathname: window.location.pathname});
 					break;
 
 				case "amazoncom":
 				case "amazonfr":
 				case "amazoncouk":
-					//TODO
+					var pathname = "";
+					setInterval(()=>{
+						if (pathname !== window.location.pathname) {
+							pathname = window.location.pathname;
+					
+							SPAPI.sendSimpleRecord(generalParameters, {DOM: document, pathname: window.location.pathname});
+						}
+					},
+					2000);
 					break;
 			}
-
-			SPAPI.registerLastTimeUserSeen(payload);
-			
-			askPageAction();
 			break;
 		}
 	}
 });
 
-function askPageAction(){
-	if (askPageAction.sentOnce === undefined) {
-		askPageAction.sentOnce = true;
-
-		chrome.runtime.sendMessage({
-			action: 'showPageAction'
-		});
-	}
-}
 
 //payload will contain the data to send
 //Default values are:
@@ -447,16 +443,4 @@ function sendItemData(){
 	}
 }
 
-//If the popup is opened, it will ask for the item info
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-	if (request.action == "getItemData"){
-	 	sendResponse(
-	 		{
-	 			itemPayload: SPAPI.currentPayload,
-	 			fullurl: window.location.href
-	 		}
-	 	);
-	}
-	else
-		console.log("Unexpected message on skimpenny.js");
-});
+

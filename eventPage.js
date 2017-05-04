@@ -62,6 +62,17 @@ function notifyAndSend(payload, favorite) {
 	}
 }
 
+function downloadPage(url, callback){
+	$.ajax(
+	{
+		url: url
+	})
+	.done((data)=>{callback(data);})
+	.fail(()=>{
+		console.warn("Could not download page " + fav.fullurl + " in the background.");
+	});
+}
+
 //Gets the price of a favorite, and send it to the sever
 function addRecord(fav) {
 	switch(fav.store)
@@ -70,15 +81,8 @@ function addRecord(fav) {
 		case "amazoncom":
 		case "amazoncouk":
 		case "amazonfr":
-			$.ajax(
-			{
-				url: fav.fullurl
-			})
-			.done((data) => {
-				SPAPI.sendSimpleRecord(fav.store, {DOM: data, pathname: new URL(fav.fullurl).pathname});
-			})
-			.fail(()=>{
-				console.warn("Could not download page " + fav.fullurl + " in the background.");
+			downloadPage(fav.fullurl, (page)=>{
+				SPAPI.sendSimpleRecord({storeName: fav.store}, {DOM: page, pathname: new URL(fav.fullurl).pathname});
 			});
 			break;
 	}
@@ -90,8 +94,8 @@ chrome.runtime.onMessage.addListener(listenMessages);
 //Check the favorites price on every chrome startup
 //Do NOT forget to switch those lines for testing as Installed will 
 //trigger more esily than if it were a onStartup event, it's just for testing purposes
-// chrome.runtime.onStartup.addListener(()=>{	
-chrome.runtime.onInstalled.addListener(()=>{
+chrome.runtime.onStartup.addListener(()=>{	
+// chrome.runtime.onInstalled.addListener(()=>{
 	//Original plan was to embed the pages in an iframe for them to be processed again,
 	//but X-frame headers prevented that, and chrome doesn't offer non-displayed tabs.
 	//So now we have to download the raw html and retrieve the price, to compare it
