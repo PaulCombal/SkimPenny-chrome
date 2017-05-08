@@ -34,14 +34,32 @@ $(document).ready(function() {
 
 			switch(storeID)
 			{
+				//Typically stores that show one product per page and don't have an API
 				case "LDLC":
 				case "hardwarefr":
+				case "conradfr":
+				case "grosbill":
+				case "undiz":
+				case "casekingde":
+				case "zalandofr":
 					SPAPI.sendSimpleRecord(generalParameters, {DOM: document, pathname: window.location.pathname});
 					break;
 
+				case "neweggcom":
+					SPAPI.sendSimpleRecord(generalParameters, {DOM: document, search: window.location.search});
+					break;
+
+				//Typically stores that show one product per page but have an API
+				case "cdiscount":
+					SPAPI.sendSimpleRecord(generalParameters, {isOnDocument: true, pathname: window.location.pathname});
+					break;
+
+
+				//Typically stores that change URL when another color/size is selected
 				case "amazoncom":
 				case "amazonfr":
 				case "amazoncouk":
+				case "nike":
 					var pathname = "";
 					setInterval(()=>{
 						if (pathname !== window.location.pathname) {
@@ -53,7 +71,7 @@ $(document).ready(function() {
 					2000);
 					break;
 			}
-			break;
+
 		}
 	}
 });

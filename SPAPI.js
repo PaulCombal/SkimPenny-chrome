@@ -87,7 +87,6 @@ SPAPI.sendPayload = (payload) => {
 };
 
 //Updates the favorite: last time/price seen by user
-//TODO use payload
 SPAPI.registerLastTimeUserSeen = (payload) => {
 	chrome.storage.sync.get(null, (data)=>{
 		if (isInFavorites(data.favlist, payload.itemID)) {
@@ -148,22 +147,4 @@ SPAPI.feedPopup = (payload) => {
 
 function isInFavorites(favArray, itemID) {
 	return favArray === undefined ? false : favArray.map((a)=>{return a.shorturl}).indexOf(itemID) != -1;
-}
-
-/* FUNCTIONS FOR BOTH JS SCRIPTS */
-
-function getUrlPart(url, index) {
-   return url.replace(/^https?:\/\//, '').split('/')[index];
-}
-
-function getLastUrlPart(fullurl) {
-	var shorturl = fullurl.substr(fullurl.lastIndexOf('/') + 1);
-
-	var n = shorturl.indexOf('#');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-
-	n = shorturl.indexOf('?');
-	shorturl = shorturl.substring(0, n != -1 ? n : shorturl.length);
-
-	return shorturl;
 }
