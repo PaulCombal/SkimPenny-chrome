@@ -213,9 +213,81 @@ SPAPI.addStoreFunc("neweggcom", (payload, elementsNeeded) =>{
 // Zalando.fr (might want to do like amazon for other domains)
 
 SPAPI.addStoreFunc("zalandofr", (payload, elementsNeeded) => {
-		payload.storeName = "zalandofr";
-		payload.itemID = getLastUrlPart(elementsNeeded.pathname);
-		payload.itemPrice = $(elementsNeeded.DOM).find("meta[name='twitter:data1']").attr("content").replace(/\s+€/g, "").replace(/,/g, ".");
-		payload.itemCurrency = "EUR";
-		payload.itemName = $(elementsNeeded.DOM).find("title").first().text()
+	payload.storeName = "zalandofr";
+	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
+	payload.itemPrice = $(elementsNeeded.DOM).find("meta[name='twitter:data1']").attr("content").replace(/\s+€/g, "").replace(/,/g, ".");
+	payload.itemCurrency = "EUR";
+	payload.itemName = $(elementsNeeded.DOM).find("title").first().text()
+});
+
+SPAPI.addStoreFunc("gearbestcom", (payload, elementsNeeded) => {
+	payload.storeName = "gearbestcom";
+	payload.itemName = $(elementsNeeded.DOM).find('h1').first().text().trim();
+	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
+	payload.itemCurrency = $("span.currency").text().trim();
+
+	payload.itemPrice = $("#unit_price").text().trim().match(/[0-9]{0,5}(\.[0-9]{1,2})?$/g);
+	
+	if (payload.itemPrice === null) {
+		console.log("No price found!");
+		return;
+	}
+	
+	payload.itemPrice = payload.itemPrice[0];
+});
+
+SPAPI.addStoreFunc("topachatcom", (payload, elementsNeeded) => {
+	payload.storeName = "topachatcom";
+	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
+	payload.itemPrice = $(elementsNeeded.DOM).find("span.priceFinal[itemprop=price]").attr("content");
+	payload.itemCurrency = "EUR";
+	payload.itemName = $(elementsNeeded.DOM).find("h1[itemprop=name").text().trim();
+});
+
+SPAPI.addStoreFunc("rueducommercefr", (payload, elementsNeeded) => {
+	payload.storeName = "rueducommercefr";
+	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
+	payload.itemPrice = $(elementsNeeded.DOM).find("meta[itemprop=price]").attr("content").replace(/,/g, ".");
+	payload.itemCurrency = "EUR";
+	payload.itemName = $(elementsNeeded.DOM).find("h1 span[itemprop=name]").text().trim();
+});
+
+SPAPI.addStoreFunc("materielnet", (payload, elementsNeeded) => {
+	payload.storeName = "materielnet";
+	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
+	payload.itemPrice = $("#ProdInfoPrice span").text().trim().replace(/€ TTC/g, "").replace(/,/g, ".").replace(/\s+/g, "");
+	payload.itemCurrency = "EUR";
+	payload.itemName = $("#breadcrumb li").last().text().trim();
+});
+
+SPAPI.addStoreFunc("romwe", (payload, elementsNeeded) => {
+	//OK fuck this shit continuing later. How bad could this site be possibly coded?
+	//payload.itemCurrency = $(elementsNeeded.DOM).find(".three.outer").attr("atr1");
+	
+	var price = $(elementsNeeded.DOM).find("span#spanSubTotal_").last().text().trim().match(/[0-9]{1,5}\.[0-9]{2}/g);
+	
+	if (price === null) {
+
+		console.log(payload.itemCurrency);
+		
+		//Might be roubles, too lazy to find right regex gonna handle it manually
+		if (payload.itemCurrency === "RUB") {
+		
+			price = $(elementsNeeded.DOM).find("span#spanSubTotal_").last().text().trim().match(/[0-9]+/g);
+			
+			if (price === null) {
+				console.log("Couldn't find a price.");
+				return;
+			}
+		}
+		else{
+			console.log("Couldn't find a price");
+			return;
+		}
+	}
+
+	payload.itemPrice = price[0];
+	payload.storeName = "romwe";
+	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
+	payload.itemName = $('h1').text().trim();
 });

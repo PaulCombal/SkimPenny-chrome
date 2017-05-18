@@ -54,7 +54,7 @@ SPAPI.sendPayload = (payload) => {
 	
 	console.log("Payload that should have been sent");
 	console.log(payload);
-	// return;
+	return;
 
 	switch(window.location.protocol)
 	{

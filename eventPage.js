@@ -69,7 +69,7 @@ function downloadPage(url, callback){
 	})
 	.done((data)=>{callback(data);})
 	.fail(()=>{
-		console.warn("Could not download page " + fav.fullurl + " in the background.");
+		console.warn("Could not download page " + url + " in the background.");
 	});
 }
 
