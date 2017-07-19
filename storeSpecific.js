@@ -261,33 +261,65 @@ SPAPI.addStoreFunc("materielnet", (payload, elementsNeeded) => {
 });
 
 SPAPI.addStoreFunc("romwe", (payload, elementsNeeded) => {
-	//OK fuck this shit continuing later. How bad could this site be possibly coded?
-	//payload.itemCurrency = $(elementsNeeded.DOM).find(".three.outer").attr("atr1");
+	var price = $(elementsNeeded.DOM).find("span.price-discount").last().text().trim().match(/([0-9]{1,5}(\.[0-9]{2})?)/g);
 	
-	var price = $(elementsNeeded.DOM).find("span#spanSubTotal_").last().text().trim().match(/[0-9]{1,5}\.[0-9]{2}/g);
-	
-	if (price === null) {
-
-		console.log(payload.itemCurrency);
-		
-		//Might be roubles, too lazy to find right regex gonna handle it manually
-		if (payload.itemCurrency === "RUB") {
-		
-			price = $(elementsNeeded.DOM).find("span#spanSubTotal_").last().text().trim().match(/[0-9]+/g);
-			
-			if (price === null) {
-				console.log("Couldn't find a price.");
-				return;
-			}
-		}
-		else{
-			console.log("Couldn't find a price");
-			return;
-		}
+	if(price !== null && price.length > 0){
+		price = price[0];
+	}
+	else{
+		console.log("No price found");
 	}
 
-	payload.itemPrice = price[0];
+	console.log(price);
+
+	var currency = $(".j-currency-title").text().trim();
+
+	switch(currency)
+	{
+		case "Pound Sterling":
+			currency = "GBP";
+			break;
+
+		case "US Dollar":
+			currency = "USD";
+			break;
+
+		case "Euro":
+			currency = "EUR";
+			break;
+
+		case "Norwegian Krone":
+			currency = "NOK";
+			break;
+
+		case "Australian Dollar":
+			currency = "AUD";
+			break;
+
+		case "Canadian Dollar":
+			currency = "CAD";
+			break;
+
+		case "Brazil Reais":
+			currency = "BRL";
+			break;
+
+		case "Russian Ruble":
+			currency = "RUB";
+			break;
+
+		case "Mexican Peso":
+			currency = "MXN";
+			break;
+	}
+
+	console.log(currency);
+
+	var id = $("div.sku").text().trim();
+
+	payload.itemPrice = price;
 	payload.storeName = "romwe";
-	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
-	payload.itemName = $('h1').text().trim();
+	payload.itemID = id;
+	payload.itemName = $('title').text().trim();
+	payload.itemCurrency = currency;
 });
