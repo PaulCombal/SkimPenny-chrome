@@ -31,8 +31,8 @@ $(document).ready(function() {
 			//We're definitely in a product page.
 			var storeID = matches[i].storeID;
 			var generalParameters = {storeName: storeID, updateFavorite: true, feedPopup: true};
-			var generalElementsNeededPathname = {DOM: document, pathname: window.location.pathname, fullurl: window.location.href};
-			var generalElementsNeededSearch   = {DOM: document, search: window.location.search, fullurl: window.location.href};
+			var generalElementsNeededPathname = {DOM: document, pathname: window.location.pathname, fullurl: window.location.href, onPage: true};
+			var generalElementsNeededSearch   = {DOM: document, search: window.location.search, fullurl: window.location.href, onPage: true};
 
 			switch(storeID)
 			{

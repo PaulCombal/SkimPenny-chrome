@@ -32,7 +32,10 @@ SPAPI.addStoreFunc("LDLC", (payload, elementsNeeded)=>{
 		payload.itemPrice.replace(/,/g, '.');
 	}
 	else{
-		SPAPI.createUnavailableItemNotification(elementsNeeded.fullurl);
+		if(!elementsNeeded.onPage){
+			SPAPI.createUnavailableItemNotification(elementsNeeded.fav.fullurl, elementsNeeded.fav.itemName);
+		}
+
 		SPAPI.cancelPayload(payload);
 		return;
 	}

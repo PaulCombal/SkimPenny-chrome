@@ -1,15 +1,17 @@
+// The function to be called everytime a message is received
 function listenMessages(request, sender, callback) {
-	if (request.action === "showPageAction") {
-		chrome.pageAction.show(sender.tab.id);
-	}
-	else if (request.action === "xhttp") {
-		
-		if (request.cancelled){
-			console.log("Payload was cancelled and will not be sent");
-			return;
-		}
+	switch(request.action){
+		case "showPageAction":
+			chrome.pageAction.show(sender.tab.id);
+		break;
 
-		$.post("http://waxence.fr/skimpenny/add.php", 
+		case "xhttp":
+			if (request.cancelled){
+				console.log("Payload was cancelled and will not be sent");
+				return;
+			}
+
+			$.post("http://waxence.fr/skimpenny/add.php", 
 			{
 				store : request.storeName,
 				product : request.productPage,
@@ -18,22 +20,28 @@ function listenMessages(request, sender, callback) {
 			},
 			(response)=>{console.log(response);},
 			'text')
-		.fail(function(){
-			console.log("Error sending request :(");
-		});
-	}
-	else if (request.action === "updatefav") {
-		addRecord(request.fav);
-	}
-	else if(request.action === "createNotif") {
-		createNotif(request.id, request.options, request.callback);
+			.fail(() => {console.log("Error sending request :(");});
+		break;
+
+		case "updatefav":
+			addRecord(request.fav);
+		break;
+
+		case "createNotif":
+			console.log("here lol");
+			console.log(request.id);
+			console.log(request.options);
+			console.log(request.callback);
+	
+			createNotif(request.id, request.options, request.callback);
+		break;
 	}
 	
 	return true; // prevents the callback from being called too early on return
 }
 
 function createNotif(id, options, callback) {
-	chrome.notification.create(id, options, callback);
+	chrome.notifications.create(id, options, callback);
 }
 
 //Will send a notification if price dropped, and send the new record to the server
@@ -96,7 +104,10 @@ function addRecord(fav) {
 		case "amazoncouk":
 		case "amazonfr":
 			downloadPage(fav.fullurl, (page)=>{
-				SPAPI.sendSimpleRecord({storeName: fav.store}, {DOM: page, pathname: new URL(fav.fullurl).pathname, fullurl: fav.fullurl});
+				SPAPI.sendSimpleRecord	(
+											{storeName: fav.store}, 
+											{DOM: page, pathname: new URL(fav.fullurl).pathname, fav: fav}
+										);
 			});
 			break;
 	}
@@ -108,8 +119,8 @@ chrome.runtime.onMessage.addListener(listenMessages);
 //Check the favorites price on every chrome startup
 //Do NOT forget to switch those lines for testing as Installed will 
 //trigger more esily than if it were a onStartup event, it's just for testing purposes
-chrome.runtime.onStartup.addListener(()=>{	
-// chrome.runtime.onInstalled.addListener(()=>{
+//chrome.runtime.onStartup.addListener(()=>{	
+chrome.runtime.onInstalled.addListener(()=>{
 	//Original plan was to embed the pages in an iframe for them to be processed again,
 	//but X-frame headers prevented that, and chrome doesn't offer non-displayed tabs.
 	//So now we have to download the raw html and retrieve the price, to compare it

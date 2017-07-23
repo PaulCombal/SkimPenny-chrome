@@ -85,5 +85,8 @@
 	},
 	"no_more_available": {
 		"message": "Item no more available"
+	},
+	"no_more_available_long": {
+		"message": "This item used to be sold, but isn't anymore. Click me to see the item page, and remove the associated favorite to stop seeing this."
 	}
 }

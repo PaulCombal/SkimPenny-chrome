@@ -35,15 +35,6 @@ SPAPI.preparePayload = (payload, necessaryElements) => {
 	funcToCall = SPAPI.storeFuncs[funcToCall].specificFunc;
 
 	funcToCall(payload, necessaryElements);
-
-	// console.log("prepared Payload");
-	// console.log(payload);
-	// At this point, the payload should be filled, we're good but still a check never hurts
-
-	if (payload.itemName === undefined || payload.itemName.length === 0) {
-		console.warn("/!\\ Payload doesn't seem to be initialized correctly!");
-		return;
-	}
 };
 
 SPAPI.sendPayload = (payload) => {
@@ -52,9 +43,9 @@ SPAPI.sendPayload = (payload) => {
 	//is sent from the background page to avoid chrome security troubles and make the
 	//server happy too.
 	
-	console.log("Payload that should have been sent");
-	console.log(payload);
-	return;
+	// console.log("Payload that should have been sent");
+	// console.log(payload);
+	// return;
 
 	if (payload.cancelled){
 		console.log("Payload was cancelled and will not be sent");
@@ -110,6 +101,10 @@ SPAPI.registerLastTimeUserSeen = (payload) => {
 SPAPI.sendSimpleRecord = (parameters, necessaryElements) => {
 	var payload = SPAPI.createPayload(parameters.storeName);
 	SPAPI.preparePayload(payload, necessaryElements);
+
+	if(payload.cancelled)
+		return;
+
 	SPAPI.sendPayload(payload);
 	
 	if (parameters.updateFavorite) {
@@ -150,21 +145,17 @@ SPAPI.feedPopup = (payload) => {
 	}
 }
 
-SPAPI.createUnavailableItemNotification = (sUrl) => {
+SPAPI.createUnavailableItemNotification = (sUrl, sItemName) => {
 	var e = {
 		type: "basic",
-		title: chrome.i18n.getMessage("no_more_available"),
-		message: "teeteteteterer",
+		title: sItemName,
+		message: chrome.i18n.getMessage("no_more_available_long"),
 		isClickable: true,
 		iconUrl: "img/sp48.png"
 	};
 
-	chrome.runtime.sendMessage({
-		action: "sendNotif",
-		id: sUrl,
-		options: e,
-		callback: null
-	});
+	//Function declared in event page
+	createNotif(sUrl, e, null);
 };
 
 SPAPI.cancelPayload = (payload) => {
