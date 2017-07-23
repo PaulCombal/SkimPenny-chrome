@@ -82,5 +82,8 @@
 	},
 	"option_step": {
 		"message": "Step"
+	},
+	"no_more_available": {
+		"message": "Item no more available"
 	}
 }

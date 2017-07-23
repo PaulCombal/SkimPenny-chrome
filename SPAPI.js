@@ -56,6 +56,11 @@ SPAPI.sendPayload = (payload) => {
 	console.log(payload);
 	return;
 
+	if (payload.cancelled){
+		console.log("Payload was cancelled and will not be sent");
+		return;
+	}
+
 	switch(window.location.protocol)
 	{
 		case "http:":
@@ -143,6 +148,27 @@ SPAPI.feedPopup = (payload) => {
 
 		SPAPI.bPopupFed = true;
 	}
+}
+
+SPAPI.createUnavailableItemNotification = (sUrl) => {
+	var e = {
+		type: "basic",
+		title: chrome.i18n.getMessage("no_more_available"),
+		message: "teeteteteterer",
+		isClickable: true,
+		iconUrl: "img/sp48.png"
+	};
+
+	chrome.runtime.sendMessage({
+		action: "sendNotif",
+		id: sUrl,
+		options: e,
+		callback: null
+	});
+};
+
+SPAPI.cancelPayload = (payload) => {
+	payload.cancelled = true;
 }
 
 function isInFavorites(favArray, itemID) {

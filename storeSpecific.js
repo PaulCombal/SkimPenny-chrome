@@ -27,7 +27,15 @@ SPAPI.addStoreFunc("LDLC", (payload, elementsNeeded)=>{
 
 	payload.storeName = "LDLC";
 	payload.itemID = elementsNeeded.pathname;
-	payload.itemPrice = $(elementsNeeded.DOM).find("#productshipping meta[itemprop=price]").attr("content").replace(/,/g, '.');
+	payload.itemPrice = $(elementsNeeded.DOM).find("#productshipping meta[itemprop=price]").attr("content");
+	if(payload.itemPrice !== undefined){
+		payload.itemPrice.replace(/,/g, '.');
+	}
+	else{
+		SPAPI.createUnavailableItemNotification(elementsNeeded.fullurl);
+		SPAPI.cancelPayload(payload);
+		return;
+	}
 	payload.itemCurrency = "EUR";
 	payload.itemName = $(elementsNeeded.DOM).find("span.fn.designation_courte").first().text().trim();
 });
@@ -100,19 +108,14 @@ SPAPI.addStoreFunc("amazoncom", parseAmazonPage);
 SPAPI.addStoreFunc("amazoncouk", parseAmazonPage);
 
 // Cdiscount.fr
+//Let's NOT use the API for the background and foreground, always down or "Too many invalid requests", never works.
 
 SPAPI.addStoreFunc("cdiscount", (payload, elementsNeeded) => {
-	if (elementsNeeded.isOnDocument) {
-		payload.storeName = "cdiscount";
-		payload.itemID = getLastUrlPart(elementsNeeded.pathname);
-		payload.itemPrice = $("span.price[itemprop=price]").attr("content");
-		payload.itemCurrency = "EUR";
-		payload.itemName = $("h1[itemprop=name").text().trim();
-	}
-	else{
-		//Background, let's use cdiscount API
-		//TODO
-	}
+	payload.storeName = "cdiscount";
+	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
+	payload.itemPrice = $(elementsNeeded.DOM).find("span.price[itemprop=price]").attr("content");
+	payload.itemCurrency = "EUR";
+	payload.itemName = $(elementsNeeded.DOM).find("h1[itemprop=name").text().trim();
 });
 
 //Conrad.fr
@@ -277,49 +280,128 @@ SPAPI.addStoreFunc("romwe", (payload, elementsNeeded) => {
 	switch(currency)
 	{
 		case "Pound Sterling":
+		case "£":
 			currency = "GBP";
 			break;
 
 		case "US Dollar":
+		case "US$":
 			currency = "USD";
 			break;
 
 		case "Euro":
+		case "€":
 			currency = "EUR";
 			break;
 
 		case "Norwegian Krone":
+		case "N.Kr":
 			currency = "NOK";
 			break;
 
 		case "Australian Dollar":
+		case "AU$":
 			currency = "AUD";
 			break;
 
 		case "Canadian Dollar":
+		case "CA$":
 			currency = "CAD";
 			break;
 
 		case "Brazil Reais":
+		case "R$":
 			currency = "BRL";
 			break;
 
 		case "Russian Ruble":
+		case "RUB":
 			currency = "RUB";
 			break;
 
 		case "Mexican Peso":
+		case "MXN$":
 			currency = "MXN";
+			break;
+
+		default:
+			console.log("Error getting currency: " + currency);
 			break;
 	}
 
 	console.log(currency);
 
-	var id = $("div.sku").text().trim();
+	var id = $(elementsNeeded.DOM).find("div.sku").text().trim();
 
 	payload.itemPrice = price;
 	payload.storeName = "romwe";
 	payload.itemID = id;
 	payload.itemName = $('title').text().trim();
 	payload.itemCurrency = currency;
+});
+
+SPAPI.addStoreFunc("fnaccom", (payload, elementsNeeded) => {
+	payload.storeName = "fnaccom";
+	
+	payload.itemID = elementsNeeded.pathname.match(/\/[a-z]{1,5}[0-9]{5,10}\//g);
+	if (payload.itemID === null) {
+		console.log("No price found!");
+		return;
+	}
+
+	payload.itemID = payload.itemID[0];
+	
+	payload.itemPrice = $(elementsNeeded.DOM).find('strong.product-price').first().text().trim().replace(/€/g, '.');
+	if (payload.itemPrice.endsWith('.')) {
+		 payload.itemPrice = payload.itemPrice.replace(/\./g, '');
+	}
+
+	payload.itemCurrency = "EUR";
+	payload.itemName = $(elementsNeeded.DOM).find('span[itemprop=name]').first().text().trim();
+});
+
+//TODO: replace with api
+SPAPI.addStoreFunc("aliexpresscom", (payload, elementsNeeded) => {
+	var timeout = 2000;
+	var dynamic = true;
+
+	payload.storeName = "aliexpresscom";
+	payload.itemID = "";
+	payload.itemCurrency = $("span.currency").text();
+	payload.itemName = $("h1.product-name").text().trim();
+
+	//Do NOT use dynamic things if there is no price range indicated by " - "
+	if(!$(elementsNeeded.DOM).find(".p-price").last().text().includes(" - ")){
+		console.log("There is no selector on page. Not Doing dynamic loading.");
+		dynamic = false;
+
+		payload.itemID = getLastUrlPart(elementsNeeded.pathname);
+		payload.itemPrice = $(elementsNeeded.DOM).find(".p-price").last().text().replace(/,/g, ".");
+
+		return;
+	}
+
+
+	//processAliexpress checks for a new item, and sends new data when item changed
+	var processAliexpress = () => {
+		if (payload.itemID !== getLastUrlPart(elementsNeeded.pathname)+$(elementsNeeded.DOM).find("#skuAttr").attr("value")) {
+			payload.itemID = getLastUrlPart(elementsNeeded.pathname)+$(elementsNeeded.DOM).find("#skuAttr").attr("value");
+			payload.itemPrice = $(elementsNeeded.DOM).find(".p-price").last().text().replace(/,/g, ".");
+			payload.itemName = $(elementsNeeded.DOM).find("h1.product-name").text().trim();
+
+			if (payload.itemPrice.includes(" - "))
+				return;
+
+			SPAPI.sendPayload(payload);
+		}
+	};
+
+	if (dynamic)
+	{
+		setInterval(() => {
+			processAliexpress();
+		},
+		timeout);
+	}
+
 });

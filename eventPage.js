@@ -3,6 +3,12 @@ function listenMessages(request, sender, callback) {
 		chrome.pageAction.show(sender.tab.id);
 	}
 	else if (request.action === "xhttp") {
+		
+		if (request.cancelled){
+			console.log("Payload was cancelled and will not be sent");
+			return;
+		}
+
 		$.post("http://waxence.fr/skimpenny/add.php", 
 			{
 				store : request.storeName,
@@ -19,8 +25,15 @@ function listenMessages(request, sender, callback) {
 	else if (request.action === "updatefav") {
 		addRecord(request.fav);
 	}
+	else if(request.action === "createNotif") {
+		createNotif(request.id, request.options, request.callback);
+	}
 	
 	return true; // prevents the callback from being called too early on return
+}
+
+function createNotif(id, options, callback) {
+	chrome.notification.create(id, options, callback);
 }
 
 //Will send a notification if price dropped, and send the new record to the server
@@ -37,7 +50,8 @@ function notifyAndSend(payload, favorite) {
 	if (payload.currency === favorite.currency) {
 		// if (payload.price == favorite.lastUserAcknowledgedPrice) {
 		if (payload.price < favorite.lastUserAcknowledgedPrice) {
-			var notificationTitle = chrome.i18n.getMessage("notification_title");
+			var notificationTitle = chrome.i18
+			n.getMessage("notification_title");
 			var newprice = parseFloat(payload.price);
 			var oldprice = parseFloat(favorite.lastUserAcknowledgedPrice);
 			var notificationText = favorite.itemName.substr(0, 20) + chrome.i18n.getMessage("dropped_from") + oldprice + chrome.i18n.getMessage("dropped_to") + newprice +"(" + favorite.currency + ")!";
@@ -51,7 +65,7 @@ function notifyAndSend(payload, favorite) {
 				iconUrl: "img/sp48.png"
 			};
 
-			chrome.notifications.create(favorite.fullurl, e, () => {
+			createNotif(favorite.fullurl, e, () => {
 			//chrome.storage.sync.get({PlayAudio: 'true'}, function (data) {
 			//if (data.PlayAudio == 'true'){
 			//	var e = new Audio("audio.mp3");
@@ -82,7 +96,7 @@ function addRecord(fav) {
 		case "amazoncouk":
 		case "amazonfr":
 			downloadPage(fav.fullurl, (page)=>{
-				SPAPI.sendSimpleRecord({storeName: fav.store}, {DOM: page, pathname: new URL(fav.fullurl).pathname});
+				SPAPI.sendSimpleRecord({storeName: fav.store}, {DOM: page, pathname: new URL(fav.fullurl).pathname, fullurl: fav.fullurl});
 			});
 			break;
 	}
