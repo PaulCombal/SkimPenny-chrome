@@ -61,13 +61,6 @@ SPAPI.addStoreFunc("hardwarefr", (payload, elementsNeeded) => {
 
 function parseAmazonPage(payload, elementsNeeded){
 
-	// if (elementsNeeded.pathname.startsWith("/dp/"))
-	// 	payload.itemID = getUrlPart(window.location.pathname, 2);
-	// else if (elementsNeeded.pathname.startsWith("/d/"))
-	// 	payload.itemID =  getUrlPart(window.location.pathname, 4);
-	// else
-	// 	payload.itemID =  getUrlPart(window.location.pathname, 3);
-
 	var regex = /\/(([A-Z]|[0-9]){10})(\/|\?|&|#)*/g;
 	regex = regex.exec(elementsNeeded.pathname);
 	if (regex === null) {

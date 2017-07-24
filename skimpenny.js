@@ -80,7 +80,8 @@ $(document).ready(function() {
 					setInterval(()=>{
 						if (pathname !== window.location.pathname) {
 							pathname = window.location.pathname;
-					
+							generalElementsNeededPathname.pathname = pathname;
+
 							SPAPI.sendSimpleRecord(generalParameters, generalElementsNeededPathname);
 						}
 					},
