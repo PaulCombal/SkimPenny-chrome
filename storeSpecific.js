@@ -185,6 +185,15 @@ SPAPI.addStoreFunc("undiz", (payload, elementsNeeded) => {
 // Caseking.de
 
 SPAPI.addStoreFunc("casekingde", (payload, elementsNeeded) => {
+	if($(elementsNeeded.DOM).find("meta[content=Discontinued]").length > 0){
+		if(!elementsNeeded.onPage){
+			SPAPI.createUnavailableItemNotification(elementsNeeded.fav.fullurl, elementsNeeded.fav.itemName);
+		}
+
+		SPAPI.cancelPayload(payload);
+		return;
+	}
+
 	payload.storeName = "casekingde";
 	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
 	payload.itemPrice = $(elementsNeeded.DOM).find('meta[itemprop=price]').first().attr("content").trim();
@@ -193,13 +202,23 @@ SPAPI.addStoreFunc("casekingde", (payload, elementsNeeded) => {
 });
 
 //Newegg.com (TODO: NCIX, and newegg.ca)
+//Newegg has an API, yet it's very obscure and I don't really feel it's gonna be easy
+//http://stackoverflow.com/questions/8265061/newegg-api-access-for-price-inventory-json-xml
 
 SPAPI.addStoreFunc("neweggcom", (payload, elementsNeeded) =>{
-	//Newegg has an API, yet it's very obscure and I don't really feel it's gonna be easy
-	//http://stackoverflow.com/questions/8265061/newegg-api-access-for-price-inventory-json-xml
+	if($(elementsNeeded.DOM).find("#landingpage-cart").length > 0 && !$(elementsNeeded.DOM).find("#landingpage-cart").text().includes("ADD TO CART")){
+		console.log("not available");
+		if(!elementsNeeded.onPage){
+			SPAPI.createUnavailableItemNotification(elementsNeeded.fav.fullurl, elementsNeeded.fav.itemName);
+		}
+
+		SPAPI.cancelPayload(payload);
+		return;
+	}
+
 	payload.storeName = "neweggcom";
-	payload.itemID = elementsNeeded.search.match(/N([A-Z]|[0-9]){14}/g);
-	if(payload.itemID.length === 0){
+	payload.itemID = elementsNeeded.search.match(/(N([A-Z]|[0-9]){14}|9([A-Z]|[0-9]){13})/g);
+	if(payload.itemID == null){
 		console.log("An error occurred getting the ID of this item, please let the devs know about it!");
 		return;
 	}

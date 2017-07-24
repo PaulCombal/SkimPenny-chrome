@@ -105,6 +105,9 @@ SPAPI.sendSimpleRecord = (parameters, necessaryElements) => {
 	if(payload.cancelled)
 		return;
 
+	if(!SPAPI.validatePayload(payload))
+		return;
+
 	SPAPI.sendPayload(payload);
 	
 	if (parameters.updateFavorite) {
@@ -160,6 +163,22 @@ SPAPI.createUnavailableItemNotification = (sUrl, sItemName) => {
 
 SPAPI.cancelPayload = (payload) => {
 	payload.cancelled = true;
+}
+
+SPAPI.validatePayload = (payload) => {
+	if(
+		payload.storeName 		!= undefined &&
+		payload.itemID 			!= undefined &&
+		payload.itemPrice 		!= undefined &&
+		payload.itemCurrency 	!= undefined &&
+		payload.itemName 		!= undefined
+	){
+		return true;
+	}
+	else{
+		console.log("Payload could not be validated.");
+		return false;
+	}
 }
 
 function isInFavorites(favArray, itemID) {

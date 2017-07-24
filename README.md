@@ -14,7 +14,7 @@ For now, supported sites are:
 * store.nike.com
 * grosbill.com
 * undiz.com
-* romwe.com (non-english only)
+* romwe.com
 * amazon.fr
 * amazon.com
 * amazon.co.uk
