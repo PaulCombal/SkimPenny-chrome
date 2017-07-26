@@ -1,8 +1,9 @@
 {
   "content_scripts": [
     {
-        "js": [ "jquery.min.js", "SPAPI.js", "skimpenny.js" ],
-        "matches": [ "*://www.ldlc.com/fiche/*",
+        "js": [ "jquery.min.js", "SPAPI.js", "storeSpecific.js", "skimpenny.js" ],
+        "matches": [ 
+          "*://www.ldlc.com/fiche/*",
           "*://ldlc.com/fiche/*",
           "*://shop.hardware.fr/fiche/*",
           "*://www.cdiscount.com/*/*/*/f-*",
@@ -51,7 +52,7 @@
 
    "permissions": [ "storage", "tabs", "notifications", "*://waxence.fr/*"],
 
-   "version": "0.5.4.3",
+   "version": "0.5.5.0",
 
    "page_action": {
       "default_title": "Worth buying?",
@@ -59,7 +60,7 @@
     },
 
    "background":{
-    "scripts" : ["jquery.min.js", "eventPage.js"],
+    "scripts" : ["jquery.min.js", "SPAPI.js", "storeSpecific.js", "eventPage.js"],
     "persistent": false
    },
     "options_ui": {

@@ -1,9 +1,17 @@
+// The function to be called everytime a message is received
 function listenMessages(request, sender, callback) {
-	if (request.action === "showPageAction") {
-		chrome.pageAction.show(sender.tab.id);
-	}
-	else if (request.action === "xhttp") {
-		$.post("http://waxence.fr/skimpenny/add.php", 
+	switch(request.action){
+		case "showPageAction":
+			chrome.pageAction.show(sender.tab.id);
+		break;
+
+		case "xhttp":
+			if (request.cancelled){
+				console.log("Payload was cancelled and will not be sent");
+				return;
+			}
+
+			$.post("http://waxence.fr/skimpenny/add.php", 
 			{
 				store : request.storeName,
 				product : request.productPage,
@@ -12,15 +20,28 @@ function listenMessages(request, sender, callback) {
 			},
 			(response)=>{console.log(response);},
 			'text')
-		.fail(function(){
-			console.log("Error sending request :(");
-		});
-	}
-	else if (request.action === "updatefav") {
-		addRecord(request.fav);
+			.fail(() => {console.log("Error sending request :(");});
+		break;
+
+		case "updatefav":
+			addRecord(request.fav);
+		break;
+
+		case "createNotif":
+			console.log("here lol");
+			console.log(request.id);
+			console.log(request.options);
+			console.log(request.callback);
+	
+			createNotif(request.id, request.options, request.callback);
+		break;
 	}
 	
 	return true; // prevents the callback from being called too early on return
+}
+
+function createNotif(id, options, callback) {
+	chrome.notifications.create(id, options, callback);
 }
 
 //Will send a notification if price dropped, and send the new record to the server
@@ -37,7 +58,8 @@ function notifyAndSend(payload, favorite) {
 	if (payload.currency === favorite.currency) {
 		// if (payload.price == favorite.lastUserAcknowledgedPrice) {
 		if (payload.price < favorite.lastUserAcknowledgedPrice) {
-			var notificationTitle = chrome.i18n.getMessage("notification_title");
+			var notificationTitle = chrome.i18
+			n.getMessage("notification_title");
 			var newprice = parseFloat(payload.price);
 			var oldprice = parseFloat(favorite.lastUserAcknowledgedPrice);
 			var notificationText = favorite.itemName.substr(0, 20) + chrome.i18n.getMessage("dropped_from") + oldprice + chrome.i18n.getMessage("dropped_to") + newprice +"(" + favorite.currency + ")!";
@@ -51,7 +73,7 @@ function notifyAndSend(payload, favorite) {
 				iconUrl: "img/sp48.png"
 			};
 
-			chrome.notifications.create(favorite.fullurl, e, () => {
+			createNotif(favorite.fullurl, e, () => {
 			//chrome.storage.sync.get({PlayAudio: 'true'}, function (data) {
 			//if (data.PlayAudio == 'true'){
 			//	var e = new Audio("audio.mp3");
@@ -62,121 +84,44 @@ function notifyAndSend(payload, favorite) {
 	}
 }
 
-//Gets the price of a favorite, and send it to the sever
+function downloadPage(url, callback){
+	$.ajax(
+	{
+		url: url
+	})
+	.done((data)=>{callback(data);})
+	.fail(()=>{
+		console.warn("Could not download page " + url + " in the background.");
+	});
+}
+
+//Gets the price of a favorite, and send it to the server
 function addRecord(fav) {
-	//Now we have to load the favorite page in an iframe
-	var payload = {};
-	//The two values you have to set are:
-	// payload.price = YOU SET IT;
-	// payload.currency = YOU SET IT; Try to get the same than the saved favorite
-
-	switch(fav.store){
-		case "amazonfr":
-			//Fuck amazon AWS, better download everything, it's free
-			$.get(fav.fullurl, ( data ) => {
-				startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_saleprice"', 100000);
-				}
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_ourprice"', 100000);
-				}
-				if (startPos < 0) {
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-				endPos = data.indexOf("</", startPos);
-				price = data.substring(startPos + 20, endPos);
-				if (price.length > 0) {
-					price = price.replace(/.*EUR\s+/g, "");
-					price = price.replace(/\s+/g, "");
-					price = price.replace(/,/g, ".");
-					
-					payload.price = price;
-					payload.currency = "EUR";
-
-				}
-				else{
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-
-				notifyAndSend(payload, fav);
-			});
-		break;
+	switch(fav.store)
+	{
+		case "LDLC":
 		case "amazoncom":
-			//Fuck amazon AWS, better download everything, it's free
-			$.get(fav.fullurl, ( data ) => {
-				startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_saleprice"', 100000);
-				}
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_ourprice"', 100000);
-				}
-				if (startPos < 0) {
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-				endPos = data.indexOf("</", startPos);
-				price = data.substring(startPos + 20, endPos);
-				if (price.length > 0) {
-					price = price.replace(/(.*\$|,)/g, "");
-					
-					payload.price = price;
-					payload.currency = "USD";
-
-				}
-				else{
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-
-				notifyAndSend(payload, fav);
-			});
-		break;
 		case "amazoncouk":
-			//Fuck amazon AWS, better download everything, it's free
-			$.get(fav.fullurl, ( data ) => {
-				startPos = data.indexOf('"priceblock_dealprice"', 100000); //Value can be changed if proven to be too high
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_saleprice"', 100000);
-				}
-				if (startPos < 0) {
-					startPos = data.indexOf('"priceblock_ourprice"', 100000);
-				}
-				if (startPos < 0) {
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-				endPos = data.indexOf("</", startPos);
-				price = data.substring(startPos + 20, endPos);
-				if (price.length > 0) {
-					price = price.replace(/(.*£|,|\s)/g, "");
-					
-					payload.price = price;
-					payload.currency = "GBP";
-
-				}
-				else{
-					console.log("It doesn't seem that " + fav.itemName + "'s page can be accessed, or price is available.");
-					return;
-				}
-
-				notifyAndSend(payload, fav);
+		case "amazonfr":
+		case "romwe":
+			downloadPage(fav.fullurl, (page)=>{
+				SPAPI.sendSimpleRecord	(
+											{storeName: fav.store}, 
+											{DOM: page, pathname: new URL(fav.fullurl).pathname, fav: fav}
+										);
 			});
-		break;
+			break;
 	}
 }
 
 chrome.runtime.onMessage.addListener(listenMessages);
 
 
-//Check the favorites price on every chrome startup
+//Checks the favorites price on every chrome startup
 //Do NOT forget to switch those lines for testing as Installed will 
 //trigger more esily than if it were a onStartup event, it's just for testing purposes
 chrome.runtime.onStartup.addListener(()=>{	
-// chrome.runtime.onInstalled.addListener(()=>{
+//chrome.runtime.onInstalled.addListener(()=>{
 	//Original plan was to embed the pages in an iframe for them to be processed again,
 	//but X-frame headers prevented that, and chrome doesn't offer non-displayed tabs.
 	//So now we have to download the raw html and retrieve the price, to compare it
@@ -186,17 +131,16 @@ chrome.runtime.onStartup.addListener(()=>{
 
 	chrome.storage.sync.get(null, (data) => {
 		//TODO add check if want this feature enabled
+		var currentDate = new Date(/*"2020-01-01"*/);
 		$.each(data.favlist, (i, fav) => {
-			var currentDate = new Date();
 			var lastDate = new Date(fav.lastUserAcknowledgedDate);
 			var timeDifference = new Date(currentDate.getTime() - lastDate.getTime());
 			//gets time difference in seconds, 86400 is the number of seconds in a day
-			//It's useless to modify this value, as the server will reject the request anyway
-			//if set to lower.
+			//You can lower this value if you want, but the server will only add records every 24h
 			//Yet, if anyone wants to add a feature to check prices only every 2 days or more,
-			//I'm open to this
+			//please go on
 			if (timeDifference.getTime()/1000 > 86400) {
-				console.log("Favorite: " + fav.itemName + " should be updated.");
+				console.log("Favorite: " + fav.itemName + " will be updated.");
 				addRecord(fav);
 			}
 		});

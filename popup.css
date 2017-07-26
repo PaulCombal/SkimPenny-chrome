@@ -139,6 +139,7 @@ div.favchart {
 }
 
 .favinfo {
+	position: relative;
     display: inline-block;
     height: 100%;
     max-width: 400px;
@@ -146,6 +147,12 @@ div.favchart {
 
 .itemLastVisit, .itemCurrency{
 	font-size: small;
+}
+
+span.deleteFav{
+	position: absolute;
+	bottom: 0;
+	left: 0;
 }
 
 a{

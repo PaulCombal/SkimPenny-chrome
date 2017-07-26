@@ -81,5 +81,14 @@
 	},
 	"option_step": {
 		"message": "Palier"
+	},
+	"no_more_available": {
+		"message": "Ce produit n'est plus disponible"
+	},
+	"no_more_available_long": {
+		"message": "Le magasin ne vend plus cet article. Cliquez ici pour aller vers la page associée, et enlevez le favoris correspondant pour ne plus voir ce message."
+	},
+	"delete_favorite": {
+		"message": "Supprimer ce favori"
 	}
 }
