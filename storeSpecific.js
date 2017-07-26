@@ -279,18 +279,23 @@ SPAPI.addStoreFunc("materielnet", (payload, elementsNeeded) => {
 });
 
 SPAPI.addStoreFunc("romwe", (payload, elementsNeeded) => {
-	var price = $(elementsNeeded.DOM).find("span.price-discount").last().text().trim().match(/([0-9]{1,5}(\.[0-9]{2})?)/g);
-	
-	if(price !== null && price.length > 0){
-		price = price[0];
-	}
-	else{
-		console.log("No price found");
+	var price = '"salePrice":{"amount":"';
+	var begin = elementsNeeded.DOM.indexOf(price, 100000) + price.length;
+	var end   = elementsNeeded.DOM.indexOf('"', begin);
+	price     = elementsNeeded.DOM.substring(begin, end);
+
+	//console.log("price :" + price + ", begin: " + begin + ", end: " + end);
+
+	if (price.length == 0) {
+		if(!elementsNeeded.onPage){
+			SPAPI.createUnavailableItemNotification(elementsNeeded.fav.fullurl, elementsNeeded.fav.itemName);
+		}
+		SPAPI.cancelPayload(payload);
+		console.log("Can't find price");
+		return;
 	}
 
-	console.log(price);
-
-	var currency = $(".j-currency-title").text().trim();
+	var currency = $(elementsNeeded.DOM).find(".j-currency-title").text().trim();
 
 	switch(currency)
 	{
@@ -341,6 +346,8 @@ SPAPI.addStoreFunc("romwe", (payload, elementsNeeded) => {
 
 		default:
 			console.log("Error getting currency: " + currency);
+			SPAPI.cancelPayload(payload);
+			return;
 			break;
 	}
 

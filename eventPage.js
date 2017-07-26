@@ -103,6 +103,7 @@ function addRecord(fav) {
 		case "amazoncom":
 		case "amazoncouk":
 		case "amazonfr":
+		case "romwe":
 			downloadPage(fav.fullurl, (page)=>{
 				SPAPI.sendSimpleRecord	(
 											{storeName: fav.store}, 
