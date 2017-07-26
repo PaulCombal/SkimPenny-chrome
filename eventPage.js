@@ -95,7 +95,7 @@ function downloadPage(url, callback){
 	});
 }
 
-//Gets the price of a favorite, and send it to the sever
+//Gets the price of a favorite, and send it to the server
 function addRecord(fav) {
 	switch(fav.store)
 	{
@@ -117,11 +117,11 @@ function addRecord(fav) {
 chrome.runtime.onMessage.addListener(listenMessages);
 
 
-//Check the favorites price on every chrome startup
+//Checks the favorites price on every chrome startup
 //Do NOT forget to switch those lines for testing as Installed will 
 //trigger more esily than if it were a onStartup event, it's just for testing purposes
-//chrome.runtime.onStartup.addListener(()=>{	
-chrome.runtime.onInstalled.addListener(()=>{
+chrome.runtime.onStartup.addListener(()=>{	
+//chrome.runtime.onInstalled.addListener(()=>{
 	//Original plan was to embed the pages in an iframe for them to be processed again,
 	//but X-frame headers prevented that, and chrome doesn't offer non-displayed tabs.
 	//So now we have to download the raw html and retrieve the price, to compare it
@@ -131,7 +131,7 @@ chrome.runtime.onInstalled.addListener(()=>{
 
 	chrome.storage.sync.get(null, (data) => {
 		//TODO add check if want this feature enabled
-		var currentDate = new Date("2020-01-01");
+		var currentDate = new Date(/*"2020-01-01"*/);
 		$.each(data.favlist, (i, fav) => {
 			var lastDate = new Date(fav.lastUserAcknowledgedDate);
 			var timeDifference = new Date(currentDate.getTime() - lastDate.getTime());

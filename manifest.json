@@ -52,7 +52,7 @@
 
    "permissions": [ "storage", "tabs", "notifications", "*://waxence.fr/*"],
 
-   "version": "0.5.4.3",
+   "version": "0.5.5.0",
 
    "page_action": {
       "default_title": "Worth buying?",
