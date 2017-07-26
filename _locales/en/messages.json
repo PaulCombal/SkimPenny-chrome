@@ -88,5 +88,8 @@
 	},
 	"no_more_available_long": {
 		"message": "This item used to be sold, but isn't anymore. Click me to see the item page, and remove the associated favorite to stop seeing this."
+	},
+	"delete_favorite": {
+		"message": "Delete this favorite"
 	}
 }

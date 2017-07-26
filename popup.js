@@ -84,19 +84,8 @@ function favoritesClicked(fullurl, itemPayload){
 	//First we figure if it is not already in favorites
 	chrome.storage.sync.get(null, (data) => {
 		if(isInFavorites(data.favlist, itemPayload.itemID)){
-			//This page is already in favorites
-			//We have to delete the page from the favorites
 
-			//We know that favlist isn't empty as there is at least one favorite
-			$.each(data.favlist, (index, favorite) => {
-				if (favorite.fullurl == fullurl) {
-					data.favlist.splice(index, 1);
-				}
-
-			});
-
-			chrome.storage.sync.set({favlist: data.favlist})
-
+			deleteFavorite(data.favlist, itemPayload.itemID);
 			$("#fav_button img").attr("src", "img/star-outline.png");
 		}
 		else{
@@ -160,6 +149,7 @@ function showFavorites(){
 							<span class="itemDate">` + chrome.i18n.getMessage("item_added_on") + " " + favorite["dateAdded"] + `</span><br />
 							<span class="itemCurrency">` + chrome.i18n.getMessage("currency") + ": " + favorite["currency"] + `</span><br />
 							<span class="itemLastVisit">` + chrome.i18n.getMessage("last_time_seen") + ": " + favorite["lastUserAcknowledgedDate"] + `</span><br />
+							<span class="deleteFav"><a style="cursor: pointer">` + chrome.i18n.getMessage("delete_favorite") + `</a></span>
 						</div> 
 						<div class="favchart ` + id + `">
 							` + chrome.i18n.getMessage("click_to_see_graph") +`
@@ -176,6 +166,10 @@ function showFavorites(){
 
 					//function getPriceCurve(storeName, productPage, datadiv = "#maindiv", selector = "#chart", mini)
 					getPriceCurve(favorite["shorturl"], favorite["store"], ".datadiv." + id, ".favchart." + id, true);
+				});
+
+				$("span.deleteFav").last().click(()=>{
+					deleteFavorite(favorites.favlist, id);
 				});
 			});
 		}
@@ -214,6 +208,25 @@ function exitFavoriteMode(){
 
 function isInFavorites(favArray, itemID) {
 	return favArray === undefined ? false : favArray.map((a)=>{return a.shorturl}).indexOf(itemID) != -1;
+}
+
+function deleteFavorite(favArray, favoriteId) {
+	if(favArray === undefined)
+		return false;
+	else{
+		var favIndex = favArray.map((a)=>{return a.shorturl}).indexOf(favoriteId);
+		if(favIndex > -1)
+			favArray.splice(favIndex, 1);
+		else
+			return false;
+
+
+		chrome.storage.sync.set({favlist: favArray});
+
+		console.log($(".datadiv." + favoriteId));
+		console.log($(".datadiv." + favoriteId).parent());
+		$(".datadiv." + favoriteId).parent().css("display", "none").empty();
+	}
 }
 
 //Gets the current price of a favorite, and sends it to the database in the background
