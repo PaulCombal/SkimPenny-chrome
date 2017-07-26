@@ -28,11 +28,6 @@ function listenMessages(request, sender, callback) {
 		break;
 
 		case "createNotif":
-			console.log("here lol");
-			console.log(request.id);
-			console.log(request.options);
-			console.log(request.callback);
-	
 			createNotif(request.id, request.options, request.callback);
 		break;
 	}
@@ -45,21 +40,13 @@ function createNotif(id, options, callback) {
 }
 
 //Will send a notification if price dropped, and send the new record to the server
-function notifyAndSend(payload, favorite) {
-	payload.storeName = favorite.store;
-	payload.productPage = favorite.shorturl;
-	payload.action = "xhttp";
-	
-	//will send to server
-	listenMessages(payload, null, null);
-
-	//Now let's notify
-	//Broken in 2 ifs because I might add options that would get in between the two.
-	if (payload.currency === favorite.currency) {
-		// if (payload.price == favorite.lastUserAcknowledgedPrice) {
+function createPriceDropNotif(payload, favorite) {
+	//Broken in two ifs because I might add options that would get in between the two.
+	if (payload.itemCurrency === favorite.currency) {
+		// if (payload.itemPrice == favorite.lastUserAcknowledgedPrice) {
 		if (payload.price < favorite.lastUserAcknowledgedPrice) {
 			var notificationTitle = chrome.i18n.getMessage("notification_title");
-			var newprice = parseFloat(payload.price);
+			var newprice = parseFloat(payload.itemPrice);
 			var oldprice = parseFloat(favorite.lastUserAcknowledgedPrice);
 			var notificationText = favorite.itemName.substr(0, 20) + chrome.i18n.getMessage("dropped_from") + oldprice + chrome.i18n.getMessage("dropped_to") + newprice +"(" + favorite.currency + ")!";
 			
@@ -104,10 +91,16 @@ function addRecord(fav) {
 		case "amazonfr":
 		case "romwe":
 			downloadPage(fav.fullurl, (page)=>{
-				SPAPI.sendSimpleRecord	(
-											{storeName: fav.store}, 
-											{DOM: page, pathname: new URL(fav.fullurl).pathname, fav: fav}
-										);
+				var payload = SPAPI.sendSimpleRecord	
+				(
+					{storeName: fav.store}, 
+					{DOM: page, pathname: new URL(fav.fullurl).pathname, fav: fav}
+				);
+
+				// console.log("Payload sent:");
+				// console.log(payload);
+
+				createPriceDropNotif(payload, fav);
 			});
 			break;
 	}

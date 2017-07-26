@@ -98,6 +98,7 @@ SPAPI.registerLastTimeUserSeen = (payload) => {
 	});
 };
 
+//Returns the generated payload that has been sent
 SPAPI.sendSimpleRecord = (parameters, necessaryElements) => {
 	var payload = SPAPI.createPayload(parameters.storeName);
 	SPAPI.preparePayload(payload, necessaryElements);
@@ -116,6 +117,8 @@ SPAPI.sendSimpleRecord = (parameters, necessaryElements) => {
 	if (parameters.feedPopup) {
 		SPAPI.feedPopup(payload);
 	}
+
+	return payload;
 };
 
 //Should only be used on content scripts
