@@ -58,8 +58,7 @@ function notifyAndSend(payload, favorite) {
 	if (payload.currency === favorite.currency) {
 		// if (payload.price == favorite.lastUserAcknowledgedPrice) {
 		if (payload.price < favorite.lastUserAcknowledgedPrice) {
-			var notificationTitle = chrome.i18
-			n.getMessage("notification_title");
+			var notificationTitle = chrome.i18n.getMessage("notification_title");
 			var newprice = parseFloat(payload.price);
 			var oldprice = parseFloat(favorite.lastUserAcknowledgedPrice);
 			var notificationText = favorite.itemName.substr(0, 20) + chrome.i18n.getMessage("dropped_from") + oldprice + chrome.i18n.getMessage("dropped_to") + newprice +"(" + favorite.currency + ")!";
