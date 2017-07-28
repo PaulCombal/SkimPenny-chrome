@@ -16,6 +16,31 @@ function getLastUrlPart(fullurl) {
 	return shorturl;
 }
 
+function getSubstrTwoBound(elementsNeeded, beginStr, endStr, searchStart) {
+	var sub = beginStr;
+	var begin = 0;
+	var end   = -1;
+
+	if(elementsNeeded.onPage){
+		begin = elementsNeeded.DOM.documentElement.innerHTML.indexOf(sub, searchStart) + sub.length;
+		end   = elementsNeeded.DOM.documentElement.innerHTML.indexOf(endStr, begin);
+		sub   = elementsNeeded.DOM.documentElement.innerHTML.substring(begin, end);	
+	}
+	else{
+		begin = elementsNeeded.DOM.indexOf(sub, searchStart) + sub.length;
+		end   = elementsNeeded.DOM.indexOf(endStr, begin);
+		sub   = elementsNeeded.DOM.substring(begin, end);		
+	}
+
+	if (begin > end || sub.length === 0) {
+		console.warn("Couldn't find requested substring!");
+		return "";
+	}
+	else{
+		return sub;
+	}
+}
+
 // LDLC
 
 SPAPI.addStoreFunc("LDLC", (payload, elementsNeeded)=>{
@@ -208,8 +233,10 @@ SPAPI.addStoreFunc("casekingde", (payload, elementsNeeded) => {
 //Newegg has an API, yet it's very obscure and I don't really feel it's gonna be easy
 //http://stackoverflow.com/questions/8265061/newegg-api-access-for-price-inventory-json-xml
 
-SPAPI.addStoreFunc("neweggcom", (payload, elementsNeeded) =>{
-	if($(elementsNeeded.DOM).find("#landingpage-cart").length > 0 && !$(elementsNeeded.DOM).find("#landingpage-cart").text().includes("ADD TO CART")){
+SPAPI.addStoreFunc("neweggcom", (payload, elementsNeeded) => {
+
+	if(getSubstrTwoBound(elementsNeeded, "_instock:['", "'", 100000) == "0"
+	|| ($(elementsNeeded.DOM).find("p.note") != null && $(elementsNeeded.DOM).find("p.note").text() === "OUT OF STOCK")) {
 		console.log("not available");
 		if(!elementsNeeded.onPage){
 			SPAPI.createUnavailableItemNotification(elementsNeeded.fav.fullurl, elementsNeeded.fav.itemName);
@@ -220,15 +247,22 @@ SPAPI.addStoreFunc("neweggcom", (payload, elementsNeeded) =>{
 	}
 
 	payload.storeName = "neweggcom";
-	payload.itemID = elementsNeeded.search.match(/(N([A-Z]|[0-9]){14}|9([A-Z]|[0-9]){13})/g);
+	payload.itemID = elementsNeeded.search.match(/((N([A-Z]|[0-9]){14}|9([A-Z]|[0-9]){13})|Combo\.[0-9]{6,8})/g);
 	if(payload.itemID == null){
 		console.log("An error occurred getting the ID of this item, please let the devs know about it!");
 		return;
 	}
 	payload.itemID = payload.itemID[0];
-	payload.itemPrice = $(elementsNeeded.DOM).find("meta[itemprop=price]").attr("content");
+
+	if(payload.itemID.charAt(0) === 'C'){
+		payload.itemName = $(elementsNeeded.DOM).find("h2.promo").text().trim();
+	}
+	else{
+		payload.itemName = $(elementsNeeded.DOM).find('#grpDescrip_h').text().trim();
+	}
+
+	payload.itemPrice = $(elementsNeeded.DOM).find("[itemprop=price]").first().attr("content");
 	payload.itemCurrency = "USD";
-	payload.itemName = $('#grpDescrip_h').text().trim();
 });
 
 // Zalando.fr (might want to do like amazon for other domains)
@@ -282,23 +316,9 @@ SPAPI.addStoreFunc("materielnet", (payload, elementsNeeded) => {
 });
 
 SPAPI.addStoreFunc("romwe", (payload, elementsNeeded) => {
-	
-	var price = '"salePrice":{"amount":"';
-	var begin = 0;
-	var end   = -1;
 
-	if(elementsNeeded.onPage){
-		begin = elementsNeeded.DOM.documentElement.innerHTML.indexOf(price, 100000) + price.length;
-		end   = elementsNeeded.DOM.documentElement.innerHTML.indexOf('"', begin);
-		price = elementsNeeded.DOM.documentElement.innerHTML.substring(begin, end);	
-	}
-	else{
-		begin = elementsNeeded.DOM.indexOf(price, 100000) + price.length;
-		end   = elementsNeeded.DOM.indexOf('"', begin);
-		price = elementsNeeded.DOM.substring(begin, end);		
-	}
-
-	//console.log("price :" + price + ", begin: " + begin + ", end: " + end);
+	var price = getSubstrTwoBound(elementsNeeded, '"salePrice":{"amount":"', '"', 100000);
+	console.log("price :" + price);
 
 	if (price.length == 0) {
 		if(!elementsNeeded.onPage){

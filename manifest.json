@@ -25,6 +25,7 @@
           "*://www.zalando.fr/*.html*",
           "*://www.caseking.de/*.html*",
           "*://www.newegg.com/Product/Product.aspx?*",
+          "*://www.newegg.com/Product/ComboBundleDetails.aspx?*",
           "*://www.gearbest.com/*/pp_*.html*",
           "*://www.rueducommerce.fr/m/ps/mpid:MP-*",
           "*://www.rueducommerce.fr/*/*/*/*/*.htm*",

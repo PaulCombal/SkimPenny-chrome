@@ -18,7 +18,7 @@ $(document).ready(function() {
 					{storeID: "zalandofr", regex: /.*\/\/www\.zalando\.fr\/.*\.html.*/g},
 					{storeID: "rueducommercefr", regex: /.*\/\/www\.rueducommerce\.fr\/(m\/ps\/mpid:MP-.*|.*\/.*\/.*\/.*\/.*\.htm(#.*)?)/g},
 					{storeID: "gearbestcom", regex: /.*\/\/www\.gearbest\.com\/.*\/pp_[0-9]{6}\.html.*/g},
-					{storeID: "neweggcom", regex: /.*\/\/www\.newegg\.com\/Product\/Product\.aspx\?(i|I)tem=.*/g},
+					{storeID: "neweggcom", regex: /.*\/\/www\.newegg\.com\/Product\/(Product\.aspx\?(i|I)tem=.*|ComboBundleDetails\.aspx\?(i|I)temList=Combo\.[0-9]*.*)/g},
 					{storeID: "materielnet", regex: /.*\/\/www\.materiel\.net\/.*\/.*[0-9]{6}\.html.*/g},
 					{storeID: "aliexpresscom", regex: /.*\/\/.*\.aliexpress\.com\/item\/.*\/[0-9]{9,12}\.html.*/g},
 					{storeID: "casekingde", regex: /.*\/\/www\.caseking\.de\/.*\.html.*/g},
