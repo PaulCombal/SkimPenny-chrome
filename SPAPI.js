@@ -104,10 +104,10 @@ SPAPI.sendSimpleRecord = (parameters, necessaryElements) => {
 	SPAPI.preparePayload(payload, necessaryElements);
 
 	if(payload.cancelled)
-		return;
+		return payload;
 
 	if(!SPAPI.validatePayload(payload))
-		return;
+		return payload;
 
 	SPAPI.sendPayload(payload);
 	

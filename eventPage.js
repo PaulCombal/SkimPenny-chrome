@@ -41,6 +41,8 @@ function createNotif(id, options, callback) {
 
 //Will send a notification if price dropped, and send the new record to the server
 function createPriceDropNotif(payload, favorite) {
+	if (payload.cancelled) return;
+
 	//Broken in two ifs because I might add options that would get in between the two.
 	if (payload.itemCurrency === favorite.currency) {
 		// if (payload.itemPrice == favorite.lastUserAcknowledgedPrice) {
@@ -93,11 +95,15 @@ function addRecord(fav) {
 		case "conradfr":
 		case "hardwarefr":
 		case "cdiscount":
+		case "grosbill":
+		case "undiz":
+		case "casekingde":
+		case "neweggcom":
 			downloadPage(fav.fullurl, (page)=>{
 				var payload = SPAPI.sendSimpleRecord	
 				(
 					{storeName: fav.store}, 
-					{DOM: page, pathname: new URL(fav.fullurl).pathname, fav: fav}
+					{DOM: page, search: new URL(fav.fullurl).search, pathname: new URL(fav.fullurl).pathname, fav: fav}
 				);
 
 				// console.log("Payload sent:");
