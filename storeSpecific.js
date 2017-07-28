@@ -62,7 +62,6 @@ SPAPI.addStoreFunc("hardwarefr", (payload, elementsNeeded) => {
 
 // Amazon, for all countries
 
-
 function parseAmazonPage(payload, elementsNeeded){
 
 	var regex = /\/(([A-Z]|[0-9]){10})(\/|\?|&|#)*/g;
@@ -115,7 +114,7 @@ SPAPI.addStoreFunc("cdiscount", (payload, elementsNeeded) => {
 	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
 	payload.itemPrice = $(elementsNeeded.DOM).find("span.price[itemprop=price]").attr("content");
 	payload.itemCurrency = "EUR";
-	payload.itemName = $(elementsNeeded.DOM).find("h1[itemprop=name").text().trim();
+	payload.itemName = $(elementsNeeded.DOM).find("h1[itemprop=name]").text().trim();
 });
 
 //Conrad.fr
@@ -125,7 +124,7 @@ SPAPI.addStoreFunc("conradfr", (payload, elementsNeeded) => {
 	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
 	payload.itemPrice = $(elementsNeeded.DOM).find("span.price").text().trim();
 	payload.itemCurrency = "EUR";
-	payload.itemName = $(elementsNeeded.DOM).find("a.fn[name=head_detail").text().trim();
+	payload.itemName = $(elementsNeeded.DOM).find("a.fn[name=head_detail]").text().trim();
 });
 
 //NIKE international

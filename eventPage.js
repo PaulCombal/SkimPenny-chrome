@@ -90,6 +90,9 @@ function addRecord(fav) {
 		case "amazoncouk":
 		case "amazonfr":
 		case "romwe":
+		case "conradfr":
+		case "hardwarefr":
+		case "cdiscount":
 			downloadPage(fav.fullurl, (page)=>{
 				var payload = SPAPI.sendSimpleRecord	
 				(
