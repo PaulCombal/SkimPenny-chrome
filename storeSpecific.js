@@ -31,7 +31,7 @@ SPAPI.addStoreFunc("LDLC", (payload, elementsNeeded)=>{
 	payload.itemCurrency = "EUR";
 	payload.itemName = "";
 	
-	var metadata = JSON.parse($('script[type="application/ld+json"]').first()[0].innerHTML);
+	var metadata = JSON.parse($(elementsNeeded.DOM).find('script[type="application/ld+json"]').first()[0].innerHTML);
 	var available = metadata.offers.availability.endsWith("InStock");
 	payload.itemName = metadata.name;
 	payload.itemPrice = metadata.offers.price;

@@ -85,7 +85,7 @@ function downloadPage(url, callback){
 function addRecord(fav) {
 	switch(fav.store)
 	{
-		case "LDLC":
+		//case "LDLC": //  Not anymore, blocked background downloading of their page
 		case "amazoncom":
 		case "amazoncouk":
 		case "amazonfr":
