@@ -27,20 +27,24 @@ SPAPI.addStoreFunc("LDLC", (payload, elementsNeeded)=>{
 
 	payload.storeName = "LDLC";
 	payload.itemID = elementsNeeded.pathname;
-	payload.itemPrice = $(elementsNeeded.DOM).find("#productshipping meta[itemprop=price]").attr("content");
-	if(payload.itemPrice !== undefined){
-		payload.itemPrice.replace(/,/g, '.');
-	}
-	else{
+	payload.itemPrice = 0;
+	payload.itemCurrency = "EUR";
+	payload.itemName = "";
+	
+	var metadata = JSON.parse($('script[type="application/ld+json"]').first()[0].innerHTML);
+	var available = metadata.offers.availability.endsWith("InStock");
+	payload.itemName = metadata.name;
+	payload.itemPrice = metadata.offers.price;
+
+	if(!available){
 		if(!elementsNeeded.onPage){
 			SPAPI.createUnavailableItemNotification(elementsNeeded.fav.fullurl, elementsNeeded.fav.itemName);
 		}
 
+		console.log("payload cancelled");
 		SPAPI.cancelPayload(payload);
 		return;
 	}
-	payload.itemCurrency = "EUR";
-	payload.itemName = $(elementsNeeded.DOM).find("span.fn.designation_courte").first().text().trim();
 });
 
 
