@@ -283,10 +283,21 @@ SPAPI.addStoreFunc("materielnet", (payload, elementsNeeded) => {
 });
 
 SPAPI.addStoreFunc("romwe", (payload, elementsNeeded) => {
+	
 	var price = '"salePrice":{"amount":"';
-	var begin = elementsNeeded.DOM.indexOf(price, 100000) + price.length;
-	var end   = elementsNeeded.DOM.indexOf('"', begin);
-	price     = elementsNeeded.DOM.substring(begin, end);
+	var begin = 0;
+	var end   = -1;
+
+	if(elementsNeeded.onPage){
+		begin = elementsNeeded.DOM.documentElement.innerHTML.indexOf(price, 100000) + price.length;
+		end   = elementsNeeded.DOM.documentElement.innerHTML.indexOf('"', begin);
+		price = elementsNeeded.DOM.documentElement.innerHTML.substring(begin, end);	
+	}
+	else{
+		begin = elementsNeeded.DOM.indexOf(price, 100000) + price.length;
+		end   = elementsNeeded.DOM.indexOf('"', begin);
+		price = elementsNeeded.DOM.substring(begin, end);		
+	}
 
 	//console.log("price :" + price + ", begin: " + begin + ", end: " + end);
 
