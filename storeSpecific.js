@@ -86,7 +86,7 @@ SPAPI.addStoreFunc("hardwarefr", (payload, elementsNeeded) => {
 		SPAPI.cancelPayload(payload);
 		return;
 	}
-	
+
 	payload.storeName = "hardwarefr";
 	payload.itemID = elementsNeeded.pathname;
 	payload.itemCurrency = "EUR";
@@ -290,10 +290,17 @@ SPAPI.addStoreFunc("neweggcom", (payload, elementsNeeded) => {
 SPAPI.addStoreFunc("zalandofr", (payload, elementsNeeded) => {
 	payload.storeName = "zalandofr";
 	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
-	payload.itemPrice = $(elementsNeeded.DOM).find("meta[name='twitter:data1']").attr("content").replace(/\s+€/g, "").replace(/,/g, ".");
+	if (elementsNeeded.onPage) {
+		payload.itemPrice = $(elementsNeeded.DOM).find("meta[name='twitter:data1']").attr("content").replace(/\s+€/g, "").replace(/,/g, ".");
+	}
+	else{
+		payload.itemPrice = $(elementsNeeded.DOM).siblings("meta[name='twitter:data1']").attr("content").replace(/\s+€/g, "").replace(/,/g, ".");
+	}
 	payload.itemCurrency = "EUR";
 	payload.itemName = $(elementsNeeded.DOM).find("title").first().text()
 });
+
+// gearbest.com
 
 SPAPI.addStoreFunc("gearbestcom", (payload, elementsNeeded) => {
 	payload.storeName = "gearbestcom";
@@ -311,6 +318,8 @@ SPAPI.addStoreFunc("gearbestcom", (payload, elementsNeeded) => {
 	payload.itemPrice = payload.itemPrice[0];
 });
 
+// topachat.com
+
 SPAPI.addStoreFunc("topachatcom", (payload, elementsNeeded) => {
 	payload.storeName = "topachatcom";
 	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
@@ -318,6 +327,8 @@ SPAPI.addStoreFunc("topachatcom", (payload, elementsNeeded) => {
 	payload.itemCurrency = "EUR";
 	payload.itemName = $(elementsNeeded.DOM).find("h1[itemprop=name").text().trim();
 });
+
+// rueducommerce.fr
 
 SPAPI.addStoreFunc("rueducommercefr", (payload, elementsNeeded) => {
 	payload.storeName = "rueducommercefr";
@@ -327,6 +338,8 @@ SPAPI.addStoreFunc("rueducommercefr", (payload, elementsNeeded) => {
 	payload.itemName = $(elementsNeeded.DOM).find("h1 span[itemprop=name]").text().trim();
 });
 
+// materiel.net
+
 SPAPI.addStoreFunc("materielnet", (payload, elementsNeeded) => {
 	payload.storeName = "materielnet";
 	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
@@ -334,6 +347,8 @@ SPAPI.addStoreFunc("materielnet", (payload, elementsNeeded) => {
 	payload.itemCurrency = "EUR";
 	payload.itemName = $("#breadcrumb li").last().text().trim();
 });
+
+// romwe.com
 
 SPAPI.addStoreFunc("romwe", (payload, elementsNeeded) => {
 
@@ -416,6 +431,8 @@ SPAPI.addStoreFunc("romwe", (payload, elementsNeeded) => {
 	payload.itemCurrency = currency;
 });
 
+// fnac.com
+
 SPAPI.addStoreFunc("fnaccom", (payload, elementsNeeded) => {
 	payload.storeName = "fnaccom";
 	
@@ -436,6 +453,7 @@ SPAPI.addStoreFunc("fnaccom", (payload, elementsNeeded) => {
 	payload.itemName = $(elementsNeeded.DOM).find('span[itemprop=name]').first().text().trim();
 });
 
+// aliexpress.com
 //TODO: replace with api
 SPAPI.addStoreFunc("aliexpresscom", (payload, elementsNeeded) => {
 	var timeout = 2000;

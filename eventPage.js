@@ -99,6 +99,7 @@ function addRecord(fav) {
 		case "undiz":
 		case "casekingde":
 		case "neweggcom":
+		case "zalandofr":
 			downloadPage(fav.fullurl, (page)=>{
 				var payload = SPAPI.sendSimpleRecord	
 				(
