@@ -352,7 +352,6 @@ SPAPI.addStoreFunc("materielnet", (payload, elementsNeeded) => {
 		return;
 	}
 
-	console.log("still ruinnin");
 	payload.storeName = "materielnet";
 	payload.itemID = getSubstrTwoBound(elementsNeeded, 'product_sku":"', '"', 10000);
 	payload.itemPrice = $(elementsNeeded.DOM).find("#ProdInfoPrice span").text().trim().replace(/(\s+|€ TTC)/g, "").replace(/,/g, ".");
@@ -450,15 +449,17 @@ SPAPI.addStoreFunc("fnaccom", (payload, elementsNeeded) => {
 	
 	payload.itemID = elementsNeeded.pathname.match(/\/[a-z]{1,5}[0-9]{5,10}\//g);
 	if (payload.itemID === null) {
-		console.log("No price found!");
+		console.log("No id found!");
 		return;
 	}
 
 	payload.itemID = payload.itemID[0];
 	
-	payload.itemPrice = $(elementsNeeded.DOM).find('strong.product-price').first().text().trim().replace(/€/g, '.');
-	if (payload.itemPrice.endsWith('.')) {
-		 payload.itemPrice = payload.itemPrice.replace(/\./g, '');
+	if(elementsNeeded.onPage){
+		payload.itemPrice = JSON.parse($(elementsNeeded.DOM).find("script[type='application/ld+json']").text()).offers.find((e)=>{return e.seller.name === "FNAC.COM";}).price;
+	}
+	else{
+		payload.itemPrice = JSON.parse($(elementsNeeded.DOM).siblings("script[type='application/ld+json']").text()).offers.find((e)=>{return e.seller.name === "FNAC.COM";}).price;
 	}
 
 	payload.itemCurrency = "EUR";
