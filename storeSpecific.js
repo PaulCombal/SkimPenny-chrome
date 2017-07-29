@@ -306,11 +306,11 @@ SPAPI.addStoreFunc("gearbestcom", (payload, elementsNeeded) => {
 	payload.storeName = "gearbestcom";
 	payload.itemName = $(elementsNeeded.DOM).find('h1').first().text().trim();
 	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
-	payload.itemCurrency = $("span.currency").text().trim();
+	payload.itemCurrency = $(elementsNeeded.DOM).find("span.currency").text().trim();
 
-	payload.itemPrice = $("#unit_price").text().trim().match(/[0-9]{0,5}(\.[0-9]{1,2})?$/g);
+	payload.itemPrice = $(elementsNeeded.DOM).find("#unit_price").text().trim().match(/[0-9]{0,5}(\.[0-9]{1,2})?$/g);
 	
-	if (payload.itemPrice === null) {
+	if (payload.itemPrice == undefined) {
 		console.log("No price found!");
 		return;
 	}
