@@ -77,6 +77,16 @@ SPAPI.addStoreFunc("LDLC", (payload, elementsNeeded)=>{
 
 
 SPAPI.addStoreFunc("hardwarefr", (payload, elementsNeeded) => {
+	if($(elementsNeeded.DOM).find("[itemprop=availability]").attr("href").endsWith("OutOfStock")){
+		if(!elementsNeeded.onPage){
+			SPAPI.createUnavailableItemNotification(elementsNeeded.fav.fullurl, elementsNeeded.fav.itemName);
+		}
+
+		console.log("payload cancelled");
+		SPAPI.cancelPayload(payload);
+		return;
+	}
+	
 	payload.storeName = "hardwarefr";
 	payload.itemID = elementsNeeded.pathname;
 	payload.itemCurrency = "EUR";
