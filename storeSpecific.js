@@ -341,11 +341,23 @@ SPAPI.addStoreFunc("rueducommercefr", (payload, elementsNeeded) => {
 // materiel.net
 
 SPAPI.addStoreFunc("materielnet", (payload, elementsNeeded) => {
+	if($(elementsNeeded.DOM).find("div#pdtNonDispo").length !== 0)
+	{
+		console.log("not available");
+		if(!elementsNeeded.onPage){
+			SPAPI.createUnavailableItemNotification(elementsNeeded.fav.fullurl, elementsNeeded.fav.itemName);
+		}
+
+		SPAPI.cancelPayload(payload);
+		return;
+	}
+
+	console.log("still ruinnin");
 	payload.storeName = "materielnet";
-	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
-	payload.itemPrice = $("#ProdInfoPrice span").text().trim().replace(/€ TTC/g, "").replace(/,/g, ".").replace(/\s+/g, "");
+	payload.itemID = getSubstrTwoBound(elementsNeeded, 'product_sku":"', '"', 10000);
+	payload.itemPrice = $(elementsNeeded.DOM).find("#ProdInfoPrice span").text().trim().replace(/(\s+|€ TTC)/g, "").replace(/,/g, ".");
 	payload.itemCurrency = "EUR";
-	payload.itemName = $("#breadcrumb li").last().text().trim();
+	payload.itemName = $(elementsNeeded.DOM).find("#breadcrumb li").last().text().trim();
 });
 
 // romwe.com

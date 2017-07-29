@@ -103,6 +103,7 @@ function addRecord(fav) {
 		case "gearbestcom":
 		case "topachatcom":
 		case "rueducommercefr":
+		case "materielnet":
 			downloadPage(fav.fullurl, (page)=>{
 				var payload = SPAPI.sendSimpleRecord	
 				(
