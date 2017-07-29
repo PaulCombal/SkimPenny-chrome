@@ -325,17 +325,17 @@ SPAPI.addStoreFunc("topachatcom", (payload, elementsNeeded) => {
 	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
 	payload.itemPrice = $(elementsNeeded.DOM).find("span.priceFinal[itemprop=price]").attr("content");
 	payload.itemCurrency = "EUR";
-	payload.itemName = $(elementsNeeded.DOM).find("h1[itemprop=name").text().trim();
+	payload.itemName = $(elementsNeeded.DOM).find("h1[itemprop=name]").text().trim();
 });
 
 // rueducommerce.fr
 
 SPAPI.addStoreFunc("rueducommercefr", (payload, elementsNeeded) => {
 	payload.storeName = "rueducommercefr";
-	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
-	payload.itemPrice = $(elementsNeeded.DOM).find("meta[itemprop=price]").attr("content").replace(/,/g, ".");
+	payload.itemID = $(elementsNeeded.DOM).find("span[itemprop=mpn]").text().trim();
+	payload.itemPrice = $(elementsNeeded.DOM).find("meta[itemprop=price]").first().attr("content").replace(/,/g, ".");
 	payload.itemCurrency = "EUR";
-	payload.itemName = $(elementsNeeded.DOM).find("h1 span[itemprop=name]").text().trim();
+	payload.itemName = $(elementsNeeded.DOM).find("h1 span[itemprop=name]").last().text().trim();
 });
 
 // materiel.net

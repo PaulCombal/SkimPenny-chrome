@@ -16,7 +16,7 @@ $(document).ready(function() {
 					{storeID: "undiz", regex: /.*\/\/www\.undiz\.com\/.*\/.*\/.*([0-9]\.html(.*)?)$/g},
 					{storeID: "romwe", regex: /.*(fr|es|de)\.romwe\.com\/.*-p-[0-9]*-cat-[0-9]*\.html.*/g},
 					{storeID: "zalandofr", regex: /.*\/\/www\.zalando\.fr\/.*\.html.*/g},
-					{storeID: "rueducommercefr", regex: /.*\/\/www\.rueducommerce\.fr\/(m\/ps\/mpid:MP-.*|.*\/.*\/.*\/.*\/.*\.htm(#.*)?)/g},
+					{storeID: "rueducommercefr", regex: /.*\/\/www\.rueducommerce\.fr\/produit\/.*-[0-9]{5,10}/g},
 					{storeID: "gearbestcom", regex: /.*\/\/www\.gearbest\.com\/.*\/pp_[0-9]{6}\.html.*/g},
 					{storeID: "neweggcom", regex: /.*\/\/www\.newegg\.com\/Product\/(Product\.aspx\?(i|I)tem=.*|ComboBundleDetails\.aspx\?(i|I)temList=Combo\.[0-9]*.*)/g},
 					{storeID: "materielnet", regex: /.*\/\/www\.materiel\.net\/.*\/.*[0-9]{6}\.html.*/g},
