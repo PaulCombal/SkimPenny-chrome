@@ -203,6 +203,16 @@ SPAPI.addStoreFunc("grosbill", (payload, elementsNeeded) => {
 // Undiz
 
 SPAPI.addStoreFunc("undiz", (payload, elementsNeeded) => {
+	if(getSubstrTwoBound(elementsNeeded, '"product_instock":"', '"', 5000) == "0"){
+		if(!elementsNeeded.onPage){
+			SPAPI.createUnavailableItemNotification(elementsNeeded.fav.fullurl, elementsNeeded.fav.itemName);
+		}
+
+		console.log("payload cancelled");
+		SPAPI.cancelPayload(payload);
+		return;
+	}
+
 	payload.storeName = "undiz";
 	payload.itemID = getLastUrlPart(elementsNeeded.pathname);
 	payload.itemPrice = $(elementsNeeded.DOM).find('.hidden.js-price-sales').first().text().trim();
