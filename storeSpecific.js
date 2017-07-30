@@ -455,15 +455,49 @@ SPAPI.addStoreFunc("fnaccom", (payload, elementsNeeded) => {
 
 	payload.itemID = payload.itemID[0];
 	
+	var offers;
 	if(elementsNeeded.onPage){
-		payload.itemPrice = JSON.parse($(elementsNeeded.DOM).find("script[type='application/ld+json']").text()).offers.find((e)=>{return e.seller.name === "FNAC.COM";}).price;
+		offers = JSON.parse($(elementsNeeded.DOM).find("script[type='application/ld+json']").text()).offers;
 	}
 	else{
-		payload.itemPrice = JSON.parse($(elementsNeeded.DOM).siblings("script[type='application/ld+json']").text()).offers.find((e)=>{return e.seller.name === "FNAC.COM";}).price;
+		offers = JSON.parse($(elementsNeeded.DOM).siblings("script[type='application/ld+json']").text()).offers;
 	}
+
+	if (offers.length == 0) {
+		if(!elementsNeeded.onPage){
+			SPAPI.createUnavailableItemNotification(elementsNeeded.fav.fullurl, elementsNeeded.fav.itemName);
+		}
+		SPAPI.cancelPayload(payload);
+		console.log("No offers available");
+		return;
+	}
+
+	var tempPrice;
+	offers.every((e, i) => {
+		console.log("Seller name: " + e.seller.name);
+		if (e.seller.name.includes("FNAC")){
+			tempPrice = e.price;
+			return false; // To stop the loop
+		}
+		else if(i == 0){
+			tempPrice = e.price;
+			return true;
+		}
+		else{
+			if (e.price < tempPrice) {
+				tempPrice = e.price;
+			}
+			return true;
+		}
+	});
+
+	console.log("selected price is " + tempPrice);
+	//payload.itemPrice = tempPrice;
 
 	payload.itemCurrency = "EUR";
 	payload.itemName = $(elementsNeeded.DOM).find('span[itemprop=name]').first().text().trim();
+
+	console.log(payload);
 });
 
 // aliexpress.com
